@@ -1,0 +1,33 @@
+{
+  "name": "scheldon",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "SPSE Jecna",
+    "scheduler",
+    "scheldon"
+  ],
+  "author": "Daniel Adámek",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/koa": "^2.15.0",
+    "@types/koa-bodyparser": "^4.3.12",
+    "@types/koa-router": "^7.4.8",
+    "@types/node": "^20.14.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "koa": "^2.15.3",
+    "koa-bodyparser": "^4.4.1",
+    "koa-router": "^12.0.1",
+    "pg-hstore": "^2.3.4",
+    "ph": "^0.1.10",
+    "sequelize": "^6.37.3",
+    "sequelize-typescript": "^2.1.6"
+  }
+}
