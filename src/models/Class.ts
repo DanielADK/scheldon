@@ -6,6 +6,7 @@ import {Student} from "./Student";
 import {TimetableSet} from "./TimetableSet";
 import {Lesson} from "./Lesson";
 import {ClassSubject} from "./ClassSubject";
+import {TimetableEntry} from "./TimetableEntry";
 
 @Table
 export class Class extends Model<Class> {
@@ -68,8 +69,8 @@ export class Class extends Model<Class> {
     @BelongsToMany(() => Subject, () => ClassSubject)
     subjects!: Subject[]
 
-    @HasMany(() => TimetableSet)
-    timetables!: TimetableSet[]
+    @HasMany(() => TimetableEntry)
+    timetableEntries!: TimetableEntry[]
 
     @HasMany(() => Lesson)
     lessons!: Lesson[]

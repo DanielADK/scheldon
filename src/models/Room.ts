@@ -23,7 +23,7 @@ export class Room extends Model<Room> {
     name!: string
 
     @Column({
-        type: DataType.TINYINT,
+        type: DataType.INTEGER,
         allowNull: false,
     })
     floor!: number
