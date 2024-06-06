@@ -3,7 +3,6 @@ import {Room} from "./Room";
 import {Employee} from "./Employee";
 import {Subject} from "./Subject";
 import {Student} from "./Student";
-import {TimetableSet} from "./TimetableSet";
 import {Lesson} from "./Lesson";
 import {ClassSubject} from "./ClassSubject";
 import {TimetableEntry} from "./TimetableEntry";

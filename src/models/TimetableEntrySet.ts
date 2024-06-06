@@ -1,6 +1,6 @@
-import {Table, Column, Model, ForeignKey, PrimaryKey, DataType} from 'sequelize-typescript';
-import { TimetableEntry } from './TimetableEntry';
-import { TimetableSet } from './TimetableSet';
+import {Column, DataType, ForeignKey, Model, PrimaryKey, Table} from 'sequelize-typescript';
+import {TimetableEntry} from './TimetableEntry';
+import {TimetableSet} from './TimetableSet';
 
 @Table({
     schema: 'public', // Specify schema if needed
