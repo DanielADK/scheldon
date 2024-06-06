@@ -1,5 +1,6 @@
-import {Column, DataType, HasMany, Model, Table} from "sequelize-typescript";
+import {BelongsToMany, Column, DataType, HasMany, Model, Table} from "sequelize-typescript";
 import {TimetableEntry} from "./TimetableEntry";
+import {TimetableEntrySet} from "./TimetableEntrySet";
 
 @Table
 export class TimetableSet extends Model<TimetableSet> {
@@ -8,12 +9,6 @@ export class TimetableSet extends Model<TimetableSet> {
         primaryKey: true
     })
     timetableSetId!: number;
-
-    @Column({
-        type: DataType.INTEGER,
-        allowNull: false,
-    })
-    schoolYear!: number
 
     @Column({
         type: DataType.STRING,
@@ -40,6 +35,6 @@ export class TimetableSet extends Model<TimetableSet> {
     })
     validTo!: Date
 
-    @HasMany(() => TimetableEntry)
+    @BelongsToMany(() => TimetableEntry, () => TimetableEntrySet)
     timetableEntries!: TimetableEntry[]
 }
