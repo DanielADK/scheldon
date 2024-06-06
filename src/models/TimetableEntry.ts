@@ -1,10 +1,21 @@
-import {AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table} from 'sequelize-typescript';
+import {
+    AutoIncrement,
+    BelongsTo,
+    BelongsToMany,
+    Column,
+    DataType,
+    ForeignKey,
+    Model,
+    PrimaryKey,
+    Table
+} from 'sequelize-typescript';
 import {TimetableSet} from './TimetableSet';
 import {Class} from './Class';
 import {Subject} from './Subject';
 import {Employee} from './Employee';
 import {Room} from './Room';
 import {SubjectPart} from "./SubjectPart";
+import {TimetableEntrySet} from "./TimetableEntrySet";
 
 @Table
 export class TimetableEntry extends Model<TimetableEntry> {
@@ -15,14 +26,6 @@ export class TimetableEntry extends Model<TimetableEntry> {
         allowNull: false,
     })
     timetableEntryId!: number;
-
-    // Set of timetables = version of timetable
-    @ForeignKey(() => TimetableSet)
-    @Column({
-        type: DataType.INTEGER,
-        allowNull: false,
-    })
-    timetableSetId!: number;
 
     @Column({
         type: DataType.INTEGER,
@@ -67,12 +70,12 @@ export class TimetableEntry extends Model<TimetableEntry> {
     @ForeignKey(() => Room)
     @Column({
         type: DataType.INTEGER,
-        allowNull: false,
+        allowNull: true,
     })
     roomId!: number;
 
-    @BelongsTo(() => TimetableSet)
-    timetableSet!: TimetableSet;
+    @BelongsToMany(() => TimetableSet, () => TimetableEntrySet)
+    timetableSets!: TimetableSet[];
 
     @BelongsTo(() => Class)
     class!: Class;
