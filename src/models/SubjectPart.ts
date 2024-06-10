@@ -1,12 +1,15 @@
 import {BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table} from "sequelize-typescript";
 import {Subject} from "./Subject";
 
-@Table
+@Table({
+    timestamps: false,
+})
 export class SubjectPart extends Model<SubjectPart> {
     @PrimaryKey
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
+
     })
     subjectFieldId!: number;
 

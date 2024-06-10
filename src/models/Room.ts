@@ -2,7 +2,9 @@ import {BelongsTo, Column, DataType, ForeignKey, Model, Table} from "sequelize-t
 import {RoomType} from "./types/RoomType";
 import {Employee} from "./Employee";
 
-@Table
+@Table({
+    timestamps: false,
+})
 export class Room extends Model<Room> {
     @Column({
         type: DataType.INTEGER,
@@ -57,6 +59,7 @@ export class Room extends Model<Room> {
     })
     employeeId!: number;
 
+    // Mapping
     @BelongsTo(() => Employee)
     employee!: Employee
 }

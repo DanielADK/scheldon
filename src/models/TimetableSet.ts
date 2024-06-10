@@ -2,7 +2,9 @@ import {BelongsToMany, Column, DataType, Model, Table} from "sequelize-typescrip
 import {TimetableEntry} from "./TimetableEntry";
 import {TimetableEntrySet} from "./TimetableEntrySet";
 
-@Table
+@Table({
+    timestamps: false,
+})
 export class TimetableSet extends Model<TimetableSet> {
     @Column({
         type: DataType.INTEGER,
@@ -35,6 +37,7 @@ export class TimetableSet extends Model<TimetableSet> {
     })
     validTo!: Date
 
+    // Mapping
     @BelongsToMany(() => TimetableEntry, () => TimetableEntrySet)
     timetableEntries!: TimetableEntry[]
 }

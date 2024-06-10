@@ -1,8 +1,11 @@
 import {AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table} from 'sequelize-typescript';
 import {Lesson} from './Lesson';
 import {Student} from './Student';
+import {AttendanceType} from "./types/AttendanceType";
 
-@Table
+@Table({
+    timestamps: false,
+})
 export class Attendance extends Model<Attendance> {
     @PrimaryKey
     @AutoIncrement
@@ -27,10 +30,11 @@ export class Attendance extends Model<Attendance> {
     studentId!: number;
 
     @Column({
-        type: DataType.BOOLEAN,
+        type: DataType.ENUM(...Object.values(AttendanceType)),
         allowNull: false,
+        defaultValue: AttendanceType.PRESENT,
     })
-    present!: boolean;
+    attendance!: AttendanceType;
 
     @BelongsTo(() => Lesson)
     lesson!: Lesson;

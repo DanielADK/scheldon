@@ -3,7 +3,7 @@ import {TimetableEntry} from './TimetableEntry';
 import {TimetableSet} from './TimetableSet';
 
 @Table({
-    schema: 'public', // Specify schema if needed
+    timestamps: false,
 })
 export class TimetableEntrySet extends Model<TimetableEntrySet> {
     @PrimaryKey
