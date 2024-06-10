@@ -17,7 +17,9 @@ import {Room} from './Room';
 import {SubjectPart} from "./SubjectPart";
 import {TimetableEntrySet} from "./TimetableEntrySet";
 
-@Table
+@Table({
+    timestamps: false,
+})
 export class TimetableEntry extends Model<TimetableEntry> {
     @PrimaryKey
     @AutoIncrement
@@ -26,6 +28,13 @@ export class TimetableEntry extends Model<TimetableEntry> {
         allowNull: false,
     })
     timetableEntryId!: number;
+
+    @ForeignKey(() => Class)
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: false,
+    })
+    classId!: number;
 
     @Column({
         type: DataType.INTEGER,
@@ -39,13 +48,6 @@ export class TimetableEntry extends Model<TimetableEntry> {
     })
     lessonNumber!: number;
 
-    @ForeignKey(() => Class)
-    @Column({
-        type: DataType.INTEGER,
-        allowNull: false,
-    })
-    classId!: number;
-
     @ForeignKey(() => Subject)
     @Column({
         type: DataType.INTEGER,
@@ -56,7 +58,7 @@ export class TimetableEntry extends Model<TimetableEntry> {
     @ForeignKey(() => SubjectPart)
     @Column({
         type: DataType.INTEGER,
-        allowNull: false,
+        allowNull: true,
     })
     subjectPartId!: number;
 
@@ -74,6 +76,7 @@ export class TimetableEntry extends Model<TimetableEntry> {
     })
     roomId!: number;
 
+    // Mappings
     @BelongsToMany(() => TimetableSet, () => TimetableEntrySet)
     timetableSets!: TimetableSet[];
 

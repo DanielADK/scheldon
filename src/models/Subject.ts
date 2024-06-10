@@ -3,9 +3,10 @@ import {SubjectPart} from "./SubjectPart";
 import {Class} from "./Class";
 import {Lesson} from "./Lesson";
 import {TimetableEntry} from "./TimetableEntry";
-import {ClassSubject} from "./ClassSubject";
 
-@Table
+@Table({
+    timestamps: false,
+})
 export class Subject extends Model<Subject> {
     @Column({
         type: DataType.INTEGER,
@@ -29,9 +30,6 @@ export class Subject extends Model<Subject> {
     // Subject parts
     @HasMany(() => SubjectPart)
     subjectParts!: SubjectPart[];
-
-    @BelongsToMany(() => Class, () => ClassSubject)
-    classes!: Class[];
 
     // Timetables of subject
     @HasMany(() => TimetableEntry)

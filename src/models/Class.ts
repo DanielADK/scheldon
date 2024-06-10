@@ -4,10 +4,11 @@ import {Employee} from "./Employee";
 import {Subject} from "./Subject";
 import {Student} from "./Student";
 import {Lesson} from "./Lesson";
-import {ClassSubject} from "./ClassSubject";
 import {TimetableEntry} from "./TimetableEntry";
 
-@Table
+@Table({
+    timestamps: false,
+})
 export class Class extends Model<Class> {
     @Column({
         type: DataType.INTEGER,
@@ -16,14 +17,14 @@ export class Class extends Model<Class> {
     classId!: number;
 
     @Column({
-        type: DataType.STRING
+        type: DataType.STRING,
+        allowNull: true
     })
     letter!: string;
 
     @Column({
         type: DataType.STRING,
         allowNull: false,
-        unique: true
     })
     prefix!: string
 
@@ -44,6 +45,7 @@ export class Class extends Model<Class> {
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
+        unique: true
     })
     roomId!: number
 
@@ -55,6 +57,7 @@ export class Class extends Model<Class> {
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
+        unique: true
     })
     employeeId!: number
 
@@ -64,9 +67,6 @@ export class Class extends Model<Class> {
     // Students
     @HasMany(() => Student)
     students!: Student[]
-
-    @BelongsToMany(() => Subject, () => ClassSubject)
-    subjects!: Subject[]
 
     @HasMany(() => TimetableEntry)
     timetableEntries!: TimetableEntry[]

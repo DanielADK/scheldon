@@ -15,8 +15,12 @@ import {Employee} from './Employee';
 import {TimetableEntry} from './TimetableEntry';
 import {Attendance} from "./Attendance";
 import {SubjectPart} from "./SubjectPart";
+import {Room} from "./Room";
 
-@Table
+@Table({
+    createdAt: true,
+    updatedAt: false,
+})
 export class Lesson extends Model<Lesson> {
     @PrimaryKey
     @AutoIncrement
@@ -25,6 +29,19 @@ export class Lesson extends Model<Lesson> {
         allowNull: false,
     })
     lessonId!: number;
+
+    @ForeignKey(() => TimetableEntry)
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: true,
+    })
+    timetableEntryId!: number;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    aim!: string
 
     @Column({
         type: DataType.DATE,
@@ -38,11 +55,13 @@ export class Lesson extends Model<Lesson> {
     })
     recordDate!: Date;
 
+    /* Can be calculated from lessons
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
     })
     lessonNumber!: number;
+    */
 
     @ForeignKey(() => Class)
     @Column({
@@ -61,24 +80,25 @@ export class Lesson extends Model<Lesson> {
     @ForeignKey(() => SubjectPart)
     @Column({
         type: DataType.INTEGER,
-        allowNull: false,
+        allowNull: true,
     })
     subjectPartId!: number;
 
     @ForeignKey(() => Employee)
     @Column({
         type: DataType.INTEGER,
-        allowNull: false,
+        allowNull: true,
     })
     teacherId!: number;
 
-    @ForeignKey(() => TimetableEntry)
+    @ForeignKey(() => Room)
     @Column({
         type: DataType.INTEGER,
         allowNull: true,
     })
-    timetableEntryId!: number;
+    roomId!: number;
 
+    // Mapping
     @BelongsTo(() => Class)
     class!: Class;
 
@@ -96,4 +116,7 @@ export class Lesson extends Model<Lesson> {
 
     @HasMany(() => Attendance)
     attendances!: Attendance[];
+
+    @BelongsTo(() => Room)
+    room!: Room;
 }
