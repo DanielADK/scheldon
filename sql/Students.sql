@@ -1,0 +1,22 @@
+-- Vložení ukázkových dat do tabulky Students
+INSERT INTO public."Students" ("studentId", username, name, surname, "classId") VALUES
+    (1, 'student1', 'John', 'Doe', 1),
+    (2, 'student2', 'Jane', 'Smith', 2),
+    (3, 'student3', 'Michael', 'Johnson', 3),
+    (4, 'student4', 'Emily', 'Davis', 4),
+    (5, 'student5', 'Daniel', 'Martinez', 5),
+    (6, 'student6', 'Emma', 'Garcia', 6),
+    (7, 'student7', 'Olivia', 'Brown', 1),
+    (8, 'student8', 'Ava', 'Miller', 2),
+    (9, 'student9', 'Sophia', 'Wilson', 3),
+    (10, 'student10', 'Isabella', 'Moore', 4),
+    (11, 'student11', 'Mia', 'Taylor', 5),
+    (12, 'student12', 'Charlotte', 'Anderson', 6),
+    (13, 'student13', 'Amelia', 'Thomas', 1),
+    (14, 'student14', 'Harper', 'Jackson', 2),
+    (15, 'student15', 'Evelyn', 'White', 3),
+    (16, 'student16', 'Abigail', 'Harris', 4),
+    (17, 'student17', 'Ella', 'Martin', 5),
+    (18, 'student18', 'Scarlett', 'Thompson', 6),
+    (19, 'student19', 'Grace', 'Martinez', 1),
+    (20, 'student20', 'Aria', 'Robinson', 2);
