@@ -5,6 +5,12 @@ import {Student} from "./Student";
 
 @Table({
     timestamps: false,
+    indexes: [
+        {
+            unique: true,
+            fields: ['studentId', 'classId', 'subClassId']
+        }
+    ]
 })
 export class StudentAssignment extends Model<StudentAssignment> {
     @Column({
