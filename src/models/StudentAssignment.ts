@@ -1,7 +1,7 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
-import { Class } from "./Class";
-import { SubClass } from "./SubClass";
-import { Student } from "./Student";
+import {BelongsTo, Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
+import {Class} from "./Class";
+import {SubClass} from "./SubClass";
+import {Student} from "./Student";
 
 @Table({
     timestamps: false,

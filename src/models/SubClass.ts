@@ -1,6 +1,5 @@
-import {Table, Column, Model, ForeignKey, DataType, BelongsTo, HasMany} from 'sequelize-typescript';
+import {BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table} from 'sequelize-typescript';
 import {Class} from "./Class";
-import {Student} from "./Student";
 import {StudentAssignment} from "./StudentAssignment";
 import {Lesson} from "./Lesson";
 

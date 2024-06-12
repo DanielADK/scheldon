@@ -1,6 +1,6 @@
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
-import { Sequelize } from 'sequelize-typescript';
+import {Sequelize} from 'sequelize-typescript';
 import dotenv from 'dotenv-flow';
 
 // configure dotenv
