@@ -1,8 +1,6 @@
-import {BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, Model, Table} from "sequelize-typescript";
+import {BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table} from "sequelize-typescript";
 import {Room} from "./Room";
 import {Employee} from "./Employee";
-import {Subject} from "./Subject";
-import {Student} from "./Student";
 import {Lesson} from "./Lesson";
 import {TimetableEntry} from "./TimetableEntry";
 import {SubClass} from "./SubClass";

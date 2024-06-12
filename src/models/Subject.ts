@@ -1,5 +1,4 @@
-import {BelongsToMany, Column, DataType, HasMany, Model, Table} from "sequelize-typescript";
-import {Class} from "./Class";
+import {Column, DataType, HasMany, Model, Table} from "sequelize-typescript";
 import {Lesson} from "./Lesson";
 import {TimetableEntry} from "./TimetableEntry";
 
