@@ -1,5 +1,6 @@
-import {BelongsTo, Column, DataType, ForeignKey, Model, Table} from "sequelize-typescript";
+import {BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table} from "sequelize-typescript";
 import {Class} from "./Class";
+import {StudentAssignment} from "./StudentAssignment";
 
 @Table({
     timestamps: false,
@@ -30,13 +31,6 @@ export class Student extends Model<Student> {
     })
     surname!: string
 
-    @ForeignKey(() => Class)
-    @Column({
-        type: DataType.INTEGER,
-        allowNull: false,
-    })
-    classId!: number;
-
-    @BelongsTo(() => Class)
-    class!: Class;
+    @HasMany(() => StudentAssignment)
+    studentAssignments!: StudentAssignment[];
 }
