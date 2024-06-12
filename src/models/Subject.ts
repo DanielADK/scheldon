@@ -1,5 +1,4 @@
 import {BelongsToMany, Column, DataType, HasMany, Model, Table} from "sequelize-typescript";
-import {SubjectPart} from "./SubjectPart";
 import {Class} from "./Class";
 import {Lesson} from "./Lesson";
 import {TimetableEntry} from "./TimetableEntry";
@@ -26,10 +25,6 @@ export class Subject extends Model<Subject> {
         unique: true
     })
     abbreviation!: string
-
-    // Subject parts
-    @HasMany(() => SubjectPart)
-    subjectParts!: SubjectPart[];
 
     // Timetables of subject
     @HasMany(() => TimetableEntry)

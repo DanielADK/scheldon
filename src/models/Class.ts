@@ -5,6 +5,8 @@ import {Subject} from "./Subject";
 import {Student} from "./Student";
 import {Lesson} from "./Lesson";
 import {TimetableEntry} from "./TimetableEntry";
+import {SubClass} from "./SubClass";
+import {StudentAssignment} from "./StudentAssignment";
 
 @Table({
     timestamps: false,
@@ -64,13 +66,15 @@ export class Class extends Model<Class> {
     @BelongsTo(() => Employee)
     employee!: Employee
 
-    // Students
-    @HasMany(() => Student)
-    students!: Student[]
-
     @HasMany(() => TimetableEntry)
     timetableEntries!: TimetableEntry[]
 
+    @HasMany(() => SubClass)
+    subClasses!: SubClass[];
+
     @HasMany(() => Lesson)
     lessons!: Lesson[]
+
+    @HasMany(() => StudentAssignment)
+    studentAssignments!: StudentAssignment[]
 }

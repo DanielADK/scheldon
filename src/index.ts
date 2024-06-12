@@ -23,7 +23,7 @@ const sequelize = new Sequelize({
 app.use(bodyParser());
 //app.use(router.routes().use(router.allowedMethods()));
 
-sequelize.sync({force: true})
+sequelize.sync({alter: true})
     .then(() => {
         app.listen(port, () => {
             console.log(`Server running on port ${port}`);

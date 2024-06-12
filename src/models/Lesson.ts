@@ -14,8 +14,8 @@ import {Subject} from './Subject';
 import {Employee} from './Employee';
 import {TimetableEntry} from './TimetableEntry';
 import {Attendance} from "./Attendance";
-import {SubjectPart} from "./SubjectPart";
 import {Room} from "./Room";
+import {SubClass} from "./SubClass";
 
 @Table({
     createdAt: true,
@@ -70,19 +70,19 @@ export class Lesson extends Model<Lesson> {
     })
     classId!: number;
 
+    @ForeignKey(() => SubClass)
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: true,
+    })
+    subClassId!: number;
+
     @ForeignKey(() => Subject)
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
     })
     subjectId!: number;
-
-    @ForeignKey(() => SubjectPart)
-    @Column({
-        type: DataType.INTEGER,
-        allowNull: true,
-    })
-    subjectPartId!: number;
 
     @ForeignKey(() => Employee)
     @Column({
@@ -102,11 +102,11 @@ export class Lesson extends Model<Lesson> {
     @BelongsTo(() => Class)
     class!: Class;
 
+    @BelongsTo(() => SubClass)
+    subClass!: SubClass;
+
     @BelongsTo(() => Subject)
     subject!: Subject;
-
-    @BelongsTo(() => SubjectPart)
-    subjectPart!: SubjectPart;
 
     @BelongsTo(() => Employee)
     teacher!: Employee;

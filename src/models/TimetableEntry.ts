@@ -14,7 +14,6 @@ import {Class} from './Class';
 import {Subject} from './Subject';
 import {Employee} from './Employee';
 import {Room} from './Room';
-import {SubjectPart} from "./SubjectPart";
 import {TimetableEntrySet} from "./TimetableEntrySet";
 
 @Table({
@@ -55,13 +54,6 @@ export class TimetableEntry extends Model<TimetableEntry> {
     })
     subjectId!: number;
 
-    @ForeignKey(() => SubjectPart)
-    @Column({
-        type: DataType.INTEGER,
-        allowNull: true,
-    })
-    subjectPartId!: number;
-
     @ForeignKey(() => Employee)
     @Column({
         type: DataType.INTEGER,
@@ -85,9 +77,6 @@ export class TimetableEntry extends Model<TimetableEntry> {
 
     @BelongsTo(() => Subject)
     subject!: Subject;
-
-    @BelongsTo(() => SubjectPart)
-    subjectPart!: SubjectPart;
 
     @BelongsTo(() => Employee)
     teacher!: Employee;
