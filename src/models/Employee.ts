@@ -11,47 +11,54 @@ export class Employee extends Model<Employee> {
     employeeId!: number;
 
     @Column({
-        type: DataType.STRING,
+        type: DataType.STRING(30),
         allowNull: false,
         unique: true
     })
     username!: string;
 
     @Column({
-        type: DataType.STRING,
+        type: DataType.STRING(50),
         allowNull: false,
     })
     name!: string
 
     @Column({
-        type: DataType.STRING,
+        type: DataType.STRING(40),
         allowNull: false,
     })
     surname!: string
 
     @Column({
-        type: DataType.STRING,
+        type: DataType.STRING(20),
         allowNull: true,
     })
     degreePre!: string
 
     @Column({
-        type: DataType.STRING,
+        type: DataType.STRING(20),
         allowNull: true,
     })
     degreePost!: string
 
     @Column({
+        type: DataType.STRING(2),
+        allowNull: true,
+        unique: true
+    })
+    declare abbreviation: string
+
+    @Column({
         type: DataType.BOOLEAN,
         allowNull: false,
-        defaultValue: false
+        defaultValue: false,
     })
-    isActive!: boolean
+    declare isActive: boolean
 
     @Column({
         type: DataType.BOOLEAN,
         allowNull: false,
         defaultValue: false
     })
-    isTeacher!: boolean
+    declare isTeacher: boolean
 }
