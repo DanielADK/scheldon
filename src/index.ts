@@ -32,7 +32,7 @@ app.use(router.routes());
 console.log(router.stack.map(i => i.path));
 app.use(router.allowedMethods());
 
-sequelize.sync({})
+sequelize.sync({force: true})
     .then(() => {
         app.listen(port, () => {
             console.log(`Server running on port ${port}`);
