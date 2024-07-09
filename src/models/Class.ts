@@ -1,44 +1,65 @@
-import {BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table} from "sequelize-typescript";
+import {
+    BeforeCreate, BeforeUpdate,
+    BelongsTo,
+    Column,
+    DataType,
+    ForeignKey,
+    HasMany,
+    Model,
+    Sequelize,
+    Table
+} from "sequelize-typescript";
 import {Room} from "./Room";
 import {Employee} from "./Employee";
 import {Lesson} from "./Lesson";
 import {TimetableEntry} from "./TimetableEntry";
 import {SubClass} from "./SubClass";
 import {StudentAssignment} from "./StudentAssignment";
+import {Op} from "sequelize";
 
 @Table({
-    timestamps: false,
+    timestamps: true,
+    createdAt: true,
+    updatedAt: false,
+    indexes: [
+        {
+            unique: true,
+            fields: ['name', 'date_from', 'date_to', 'roomId', 'employeeId']
+        }
+
+    ],
+    validate: {
+        datesAreValid(this: Class) {
+            if (new Date(this.date_from) > new Date(this.date_to)) {
+                throw new Error('date_from must be less than date_to');
+            }
+        }
+    }
 })
 export class Class extends Model<Class> {
     @Column({
         type: DataType.INTEGER,
         primaryKey: true,
     })
-    classId!: number;
+    declare classId: number;
 
     @Column({
-        type: DataType.STRING,
+        type: DataType.STRING(3),
         allowNull: true
     })
-    letter!: string;
-
-    @Column({
-        type: DataType.STRING,
-        allowNull: false,
-    })
-    prefix!: string
+    declare name: string;
 
     @Column({
         type: DataType.DATE,
         allowNull: false,
     })
-    date_from!: string
+    declare date_from: string
 
     @Column({
         type: DataType.DATE,
         allowNull: false,
     })
-    date_to!: string
+    declare date_to: string
 
     // Default Room
     @ForeignKey(() => Room)
@@ -47,10 +68,10 @@ export class Class extends Model<Class> {
         allowNull: false,
         unique: true
     })
-    roomId!: number
+    declare roomId: number
 
     @BelongsTo(() => Room)
-    room!: Room
+    declare room: Room
 
     // Class Teacher
     @ForeignKey(() => Employee)
@@ -59,20 +80,43 @@ export class Class extends Model<Class> {
         allowNull: false,
         unique: true
     })
-    employeeId!: number
+    declare employeeId: number
 
     @BelongsTo(() => Employee)
-    employee!: Employee
+    declare employee: Employee
 
     @HasMany(() => TimetableEntry)
-    timetableEntries!: TimetableEntry[]
+    declare timetableEntries: TimetableEntry[]
 
     @HasMany(() => SubClass)
-    subClasses!: SubClass[];
+    declare subClasses: SubClass[];
 
     @HasMany(() => Lesson)
-    lessons!: Lesson[]
+    declare lessons: Lesson[]
 
     @HasMany(() => StudentAssignment)
-    studentAssignments!: StudentAssignment[]
+    declare studentAssignments: StudentAssignment[]
+
+    // Virtual fields & validation
+    @BeforeCreate
+    @BeforeUpdate
+    static async validateClassInterval(instance: Class) {
+        const existingClass = await Class.findOne({
+            where: {
+                name: instance.name,
+                roomId: instance.roomId,
+                employeeId: instance.employeeId,
+                date_from: {
+                    [Op.lte]: instance.date_to
+                },
+                date_to: {
+                    [Op.gte]: instance.date_from
+                }
+            }
+        });
+
+        if (existingClass) {
+            throw new Error('Class interval is overlapping with another class');
+        }
+    }
 }

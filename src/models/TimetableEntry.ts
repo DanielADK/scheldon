@@ -18,6 +18,13 @@ import {TimetableEntrySet} from "./TimetableEntrySet";
 
 @Table({
     timestamps: false,
+    validate: {
+        employeeIsTeacher(this: TimetableEntry) {
+            if (this.teacherId === null) {
+                throw new Error('teacherId is required');
+            }
+        }
+    }
 })
 export class TimetableEntry extends Model<TimetableEntry> {
     @PrimaryKey

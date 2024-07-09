@@ -8,9 +8,10 @@ router.get('/classes', async (ctx) => {
     const offset = (Number(page) - 1) * Number(limit);
 
     const classes = await Class.findAndCountAll({
-        limit: Number(limit),
-        offset: offset,
-    });
+            limit: Number(limit),
+            offset: offset,
+            attributes: ['fullname', 'date_from', 'date_to'],
+        });
 
     ctx.body = {
         data: classes.rows,
