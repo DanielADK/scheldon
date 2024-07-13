@@ -16,25 +16,25 @@ const router = new Router();
  * - meta: An object containing pagination information.
  */
 router.get('/employees', async (ctx) => {
-    const { page = 1, limit = 10 } = ctx.query;
-    const offset = (Number(page) - 1) * Number(limit);
+  const { page = 1, limit = 10 } = ctx.query;
+  const offset = (Number(page) - 1) * Number(limit);
 
-    const employees = await Employee.findAndCountAll({
-        limit: Number(limit),
-        offset: offset,
-        where: {
-            isActive: true
-        }
-    });
+  const employees = await Employee.findAndCountAll({
+    limit: Number(limit),
+    offset: offset,
+    where: {
+      isActive: true,
+    },
+  });
 
-    ctx.body = {
-        data: employees.rows,
-        meta: {
-            total: employees.count,
-            page: Number(page),
-            limit: Number(limit),
-        },
-    };
+  ctx.body = {
+    data: employees.rows,
+    meta: {
+      total: employees.count,
+      page: Number(page),
+      limit: Number(limit),
+    },
+  };
 });
 
 /**
@@ -50,26 +50,26 @@ router.get('/employees', async (ctx) => {
  * - meta: An object containing pagination information.
  */
 router.get('/employees/teachers', async (ctx) => {
-    const { page = 1, limit = 10 } = ctx.query;
-    const offset = (Number(page) - 1) * Number(limit);
+  const { page = 1, limit = 10 } = ctx.query;
+  const offset = (Number(page) - 1) * Number(limit);
 
-    const employees = await Employee.findAndCountAll({
-        limit: Number(limit),
-        offset: offset,
-        where: {
-            isActive: true,
-            isTeacher: true,
-        }
-    });
+  const employees = await Employee.findAndCountAll({
+    limit: Number(limit),
+    offset: offset,
+    where: {
+      isActive: true,
+      isTeacher: true,
+    },
+  });
 
-    ctx.body = {
-        data: employees.rows,
-        meta: {
-            total: employees.count,
-            page: Number(page),
-            limit: Number(limit),
-        },
-    };
+  ctx.body = {
+    data: employees.rows,
+    meta: {
+      total: employees.count,
+      page: Number(page),
+      limit: Number(limit),
+    },
+  };
 });
 
 export default router;
