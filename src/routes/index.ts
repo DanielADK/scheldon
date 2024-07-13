@@ -1,9 +1,9 @@
 import Router from 'koa-router';
 import subjects from './subject';
 import students from './students';
-import employees from "./employee";
-import classes from "./class";
-import rooms from "./room";
+import employees from './employee';
+import classes from './class';
+import rooms from './room';
 
 const router = new Router();
 
