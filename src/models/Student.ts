@@ -2,31 +2,31 @@ import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
 import { StudentAssignment } from './StudentAssignment';
 
 @Table({
-  timestamps: false,
+  timestamps: false
 })
 export class Student extends Model<Student> {
   @Column({
     type: DataType.INTEGER,
-    primaryKey: true,
+    primaryKey: true
   })
   studentId!: number;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
-    unique: true,
+    unique: true
   })
   username!: string;
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
+    allowNull: false
   })
   name!: string;
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
+    allowNull: false
   })
   surname!: string;
 

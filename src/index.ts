@@ -20,7 +20,7 @@ const sequelize = new Sequelize({
   password: process.env.DB_PASS,
   host: process.env.DB_HOST,
   port: parseInt(process.env.DB_PORT || '5432'),
-  models: [__dirname + '/models'],
+  models: [__dirname + '/models']
 });
 
 app.use(bodyParser());

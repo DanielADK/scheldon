@@ -10,7 +10,7 @@ router.get('/subjects', async (ctx) => {
 
   const subjects = await Subject.findAndCountAll({
     limit: Number(limit),
-    offset: offset,
+    offset: offset
   });
 
   ctx.body = {
@@ -18,8 +18,8 @@ router.get('/subjects', async (ctx) => {
     meta: {
       total: subjects.count,
       page: Number(page),
-      limit: Number(limit),
-    },
+      limit: Number(limit)
+    }
   };
 });
 

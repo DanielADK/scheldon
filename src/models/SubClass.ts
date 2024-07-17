@@ -5,33 +5,33 @@ import {
   ForeignKey,
   HasMany,
   Model,
-  Table,
+  Table
 } from 'sequelize-typescript';
 import { Class } from './Class';
 import { StudentAssignment } from './StudentAssignment';
 import { Lesson } from './Lesson';
 
 @Table({
-  timestamps: false,
+  timestamps: false
 })
 export class SubClass extends Model<SubClass> {
   @Column({
     type: DataType.INTEGER,
     primaryKey: true,
-    autoIncrement: true,
+    autoIncrement: true
   })
   subClassId!: number;
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
+    allowNull: false
   })
   name!: string;
 
   @ForeignKey(() => Class)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   classId!: number;
 

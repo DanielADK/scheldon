@@ -4,7 +4,7 @@ import {
   DataType,
   ForeignKey,
   Model,
-  Table,
+  Table
 } from 'sequelize-typescript';
 import { Class } from './Class';
 import { SubClass } from './SubClass';
@@ -15,22 +15,22 @@ import { Student } from './Student';
   indexes: [
     {
       unique: true,
-      fields: ['studentId', 'classId', 'subClassId'],
-    },
-  ],
+      fields: ['studentId', 'classId', 'subClassId']
+    }
+  ]
 })
 export class StudentAssignment extends Model<StudentAssignment> {
   @Column({
     type: DataType.INTEGER,
     primaryKey: true,
-    autoIncrement: true,
+    autoIncrement: true
   })
   assignmentId!: number;
 
   @ForeignKey(() => Student)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   studentId!: number;
 
@@ -40,7 +40,7 @@ export class StudentAssignment extends Model<StudentAssignment> {
   @ForeignKey(() => Class)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   classId!: number;
 
@@ -50,7 +50,7 @@ export class StudentAssignment extends Model<StudentAssignment> {
   @ForeignKey(() => SubClass)
   @Column({
     type: DataType.INTEGER,
-    allowNull: true,
+    allowNull: true
   })
   subClassId!: number;
 

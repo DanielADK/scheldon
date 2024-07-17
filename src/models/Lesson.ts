@@ -7,7 +7,7 @@ import {
   HasMany,
   Model,
   PrimaryKey,
-  Table,
+  Table
 } from 'sequelize-typescript';
 import { Class } from './Class';
 import { Subject } from './Subject';
@@ -19,39 +19,39 @@ import { SubClass } from './SubClass';
 
 @Table({
   createdAt: true,
-  updatedAt: false,
+  updatedAt: false
 })
 export class Lesson extends Model<Lesson> {
   @PrimaryKey
   @AutoIncrement
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   lessonId!: number;
 
   @ForeignKey(() => TimetableEntry)
   @Column({
     type: DataType.INTEGER,
-    allowNull: true,
+    allowNull: true
   })
   timetableEntryId!: number;
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
+    allowNull: false
   })
   aim!: string;
 
   @Column({
     type: DataType.DATE,
-    allowNull: false,
+    allowNull: false
   })
   date!: Date;
 
   @Column({
     type: DataType.DATE,
-    allowNull: false,
+    allowNull: false
   })
   recordDate!: Date;
 
@@ -66,35 +66,35 @@ export class Lesson extends Model<Lesson> {
   @ForeignKey(() => Class)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   classId!: number;
 
   @ForeignKey(() => SubClass)
   @Column({
     type: DataType.INTEGER,
-    allowNull: true,
+    allowNull: true
   })
   subClassId!: number;
 
   @ForeignKey(() => Subject)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   subjectId!: number;
 
   @ForeignKey(() => Employee)
   @Column({
     type: DataType.INTEGER,
-    allowNull: true,
+    allowNull: true
   })
   teacherId!: number;
 
   @ForeignKey(() => Room)
   @Column({
     type: DataType.INTEGER,
-    allowNull: true,
+    allowNull: true
   })
   roomId!: number;
 

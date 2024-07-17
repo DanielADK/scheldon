@@ -7,8 +7,7 @@ import {
   ForeignKey,
   HasMany,
   Model,
-  Sequelize,
-  Table,
+  Table
 } from 'sequelize-typescript';
 import { Room } from './Room';
 import { Employee } from './Employee';
@@ -25,39 +24,39 @@ import { Op } from 'sequelize';
   indexes: [
     {
       unique: true,
-      fields: ['name', 'date_from', 'date_to', 'roomId', 'employeeId'],
-    },
+      fields: ['name', 'date_from', 'date_to', 'roomId', 'employeeId']
+    }
   ],
   validate: {
     datesAreValid(this: Class) {
       if (new Date(this.date_from) > new Date(this.date_to)) {
         throw new Error('date_from must be less than date_to');
       }
-    },
-  },
+    }
+  }
 })
 export class Class extends Model<Class> {
   @Column({
     type: DataType.INTEGER,
-    primaryKey: true,
+    primaryKey: true
   })
   declare classId: number;
 
   @Column({
     type: DataType.STRING(3),
-    allowNull: true,
+    allowNull: true
   })
   declare name: string;
 
   @Column({
     type: DataType.DATE,
-    allowNull: false,
+    allowNull: false
   })
   declare date_from: string;
 
   @Column({
     type: DataType.DATE,
-    allowNull: false,
+    allowNull: false
   })
   declare date_to: string;
 
@@ -66,7 +65,7 @@ export class Class extends Model<Class> {
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
-    unique: true,
+    unique: true
   })
   declare roomId: number;
 
@@ -78,7 +77,7 @@ export class Class extends Model<Class> {
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
-    unique: true,
+    unique: true
   })
   declare employeeId: number;
 
@@ -107,12 +106,12 @@ export class Class extends Model<Class> {
         roomId: instance.roomId,
         employeeId: instance.employeeId,
         date_from: {
-          [Op.lte]: instance.date_to,
+          [Op.lte]: instance.date_to
         },
         date_to: {
-          [Op.gte]: instance.date_from,
-        },
-      },
+          [Op.gte]: instance.date_from
+        }
+      }
     });
 
     if (existingClass) {

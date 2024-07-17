@@ -4,56 +4,56 @@ import {
   DataType,
   ForeignKey,
   Model,
-  Table,
+  Table
 } from 'sequelize-typescript';
 import { RoomType } from './types/RoomType';
 import { Employee } from './Employee';
 
 @Table({
-  timestamps: false,
+  timestamps: false
 })
 export class Room extends Model<Room> {
   @Column({
     type: DataType.INTEGER,
-    primaryKey: true,
+    primaryKey: true
   })
   roomId!: number;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.STRING
   })
   phone!: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
-    unique: true,
+    unique: true
   })
   name!: string;
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   floor!: number;
 
   @Column({
     type: DataType.ENUM(...Object.values(RoomType)),
-    allowNull: false,
+    allowNull: false
   })
   type!: RoomType;
 
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
-    defaultValue: 0,
+    defaultValue: 0
   })
   studentCapacity!: number;
 
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
-    defaultValue: 0,
+    defaultValue: 0
   })
   teacherCapacity!: number;
 
@@ -62,7 +62,7 @@ export class Room extends Model<Room> {
   @Column({
     type: DataType.INTEGER,
     allowNull: true,
-    defaultValue: null,
+    defaultValue: null
   })
   employeeId!: number;
 

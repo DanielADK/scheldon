@@ -10,7 +10,7 @@ router.get('/classes', async (ctx) => {
   const classes = await Class.findAndCountAll({
     limit: Number(limit),
     offset: offset,
-    attributes: ['fullname', 'date_from', 'date_to'],
+    attributes: ['fullname', 'date_from', 'date_to']
   });
 
   ctx.body = {
@@ -18,8 +18,8 @@ router.get('/classes', async (ctx) => {
     meta: {
       total: classes.count,
       page: Number(page),
-      limit: Number(limit),
-    },
+      limit: Number(limit)
+    }
   };
 });
 
