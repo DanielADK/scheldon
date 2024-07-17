@@ -9,7 +9,7 @@ router.get('/students', async (ctx) => {
 
   const students = await Student.findAndCountAll({
     limit: Number(limit),
-    offset: offset,
+    offset: offset
   });
 
   ctx.body = {
@@ -17,8 +17,8 @@ router.get('/students', async (ctx) => {
     meta: {
       total: students.count,
       page: Number(page),
-      limit: Number(limit),
-    },
+      limit: Number(limit)
+    }
   };
 });
 

@@ -23,8 +23,8 @@ router.get('/employees', async (ctx) => {
     limit: Number(limit),
     offset: offset,
     where: {
-      isActive: true,
-    },
+      isActive: true
+    }
   });
 
   ctx.body = {
@@ -32,8 +32,8 @@ router.get('/employees', async (ctx) => {
     meta: {
       total: employees.count,
       page: Number(page),
-      limit: Number(limit),
-    },
+      limit: Number(limit)
+    }
   };
 });
 
@@ -58,8 +58,8 @@ router.get('/employees/teachers', async (ctx) => {
     offset: offset,
     where: {
       isActive: true,
-      isTeacher: true,
-    },
+      isTeacher: true
+    }
   });
 
   ctx.body = {
@@ -67,8 +67,8 @@ router.get('/employees/teachers', async (ctx) => {
     meta: {
       total: employees.count,
       page: Number(page),
-      limit: Number(limit),
-    },
+      limit: Number(limit)
+    }
   };
 });
 

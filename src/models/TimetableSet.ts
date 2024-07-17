@@ -3,43 +3,43 @@ import {
   Column,
   DataType,
   Model,
-  Table,
+  Table
 } from 'sequelize-typescript';
 import { TimetableEntry } from './TimetableEntry';
 import { TimetableEntrySet } from './TimetableEntrySet';
 
 @Table({
-  timestamps: false,
+  timestamps: false
 })
 export class TimetableSet extends Model<TimetableSet> {
   @Column({
     type: DataType.INTEGER,
-    primaryKey: true,
+    primaryKey: true
   })
   timetableSetId!: number;
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
+    allowNull: false
   })
   name!: string;
 
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
-    unique: true,
+    unique: true
   })
   schoolYearId!: number;
 
   @Column({
     type: DataType.DATE,
-    allowNull: false,
+    allowNull: false
   })
   validFrom!: Date;
 
   @Column({
     type: DataType.DATE,
-    allowNull: false,
+    allowNull: false
   })
   validTo!: Date;
 

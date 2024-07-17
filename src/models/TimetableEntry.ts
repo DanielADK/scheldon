@@ -7,7 +7,7 @@ import {
   ForeignKey,
   Model,
   PrimaryKey,
-  Table,
+  Table
 } from 'sequelize-typescript';
 import { TimetableSet } from './TimetableSet';
 import { Class } from './Class';
@@ -23,55 +23,55 @@ import { TimetableEntrySet } from './TimetableEntrySet';
       if (this.teacherId === null) {
         throw new Error('teacherId is required');
       }
-    },
-  },
+    }
+  }
 })
 export class TimetableEntry extends Model<TimetableEntry> {
   @PrimaryKey
   @AutoIncrement
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   timetableEntryId!: number;
 
   @ForeignKey(() => Class)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   classId!: number;
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   dayInWeek!: number;
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   lessonNumber!: number;
 
   @ForeignKey(() => Subject)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   subjectId!: number;
 
   @ForeignKey(() => Employee)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   teacherId!: number;
 
   @ForeignKey(() => Room)
   @Column({
     type: DataType.INTEGER,
-    allowNull: true,
+    allowNull: true
   })
   roomId!: number;
 

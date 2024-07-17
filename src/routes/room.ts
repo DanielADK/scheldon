@@ -10,7 +10,7 @@ router.get('/rooms', async (ctx) => {
 
   const rooms = await Room.findAndCountAll({
     limit: Number(limit),
-    offset: offset,
+    offset: offset
   });
 
   ctx.body = {
@@ -18,8 +18,8 @@ router.get('/rooms', async (ctx) => {
     meta: {
       total: rooms.count,
       page: Number(page),
-      limit: Number(limit),
-    },
+      limit: Number(limit)
+    }
   };
 });
 

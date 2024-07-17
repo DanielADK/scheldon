@@ -6,42 +6,42 @@ import {
   ForeignKey,
   Model,
   PrimaryKey,
-  Table,
+  Table
 } from 'sequelize-typescript';
 import { Lesson } from './Lesson';
 import { Student } from './Student';
 import { AttendanceType } from './types/AttendanceType';
 
 @Table({
-  timestamps: false,
+  timestamps: false
 })
 export class Attendance extends Model<Attendance> {
   @PrimaryKey
   @AutoIncrement
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   attendanceId!: number;
 
   @ForeignKey(() => Lesson)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   lessonId!: number;
 
   @ForeignKey(() => Student)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: false
   })
   studentId!: number;
 
   @Column({
     type: DataType.ENUM(...Object.values(AttendanceType)),
     allowNull: false,
-    defaultValue: AttendanceType.PRESENT,
+    defaultValue: AttendanceType.PRESENT
   })
   attendance!: AttendanceType;
 

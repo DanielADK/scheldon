@@ -3,25 +3,25 @@ import { Lesson } from './Lesson';
 import { TimetableEntry } from './TimetableEntry';
 
 @Table({
-  timestamps: false,
+  timestamps: false
 })
 export class Subject extends Model<Subject> {
   @Column({
     type: DataType.INTEGER,
-    primaryKey: true,
+    primaryKey: true
   })
   subjectId!: number;
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
+    allowNull: false
   })
   name!: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
-    unique: true,
+    unique: true
   })
   abbreviation!: string;
 
