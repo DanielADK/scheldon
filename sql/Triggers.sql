@@ -1,50 +1,74 @@
 -- Vytvoření funkce pro kontrolu teacherId
-CREATE OR REPLACE FUNCTION validate_teacher_id()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW."employeeId" IS NOT NULL THEN
-    IF NOT EXISTS (SELECT 1 FROM "Employees" WHERE "employeeId" = NEW."employeeId" AND "isTeacher" = TRUE) THEN
-      RAISE EXCEPTION 'Třídní učitel třídy musí být evidován jako učitel. Tento není.';
-END IF;
-END IF;
-RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+DELIMITER //
 
--- Vytvoření triggeru pro tabulku Class
-DROP TRIGGER IF EXISTS trg_validate_teacher_id ON "Classes";
 CREATE TRIGGER trg_validate_teacher_id
-    BEFORE INSERT OR UPDATE ON "Classes"
-        FOR EACH ROW
-        EXECUTE FUNCTION validate_teacher_id();
-
-CREATE OR REPLACE FUNCTION check_unique_employee_username()
-    RETURNS TRIGGER AS $$
+    BEFORE INSERT ON Classes
+    FOR EACH ROW
 BEGIN
-    IF EXISTS (SELECT 1 FROM public."Students" WHERE username = NEW.username) THEN
-        RAISE EXCEPTION 'Username already exists in Students';
+    DECLARE teacher_exists INT;
+    IF NEW.employeeId IS NOT NULL THEN
+        SET teacher_exists = (SELECT COUNT(*) FROM Employees WHERE employeeId = NEW.employeeId AND isTeacher = TRUE);
+        IF teacher_exists = 0 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Třídní učitel třídy musí být evidován jako učitel. Tento není.';
+        END IF;
     END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+END //
+
+DELIMITER ;
+
+-- Kontrola unikátního username v Employees
+DELIMITER //
 
 CREATE TRIGGER trg_unique_employee_username
-    BEFORE INSERT OR UPDATE ON public."Employees"
+    BEFORE INSERT ON Employees
     FOR EACH ROW
-EXECUTE FUNCTION check_unique_employee_username();
-
-CREATE OR REPLACE FUNCTION check_unique_student_username()
-    RETURNS TRIGGER AS $$
 BEGIN
-    IF EXISTS (SELECT 1 FROM public."Employees" WHERE username = NEW.username) THEN
-        RAISE EXCEPTION 'Username already exists in Employees';
+    DECLARE username_exists INT;
+    SET username_exists = (SELECT COUNT(*) FROM Students WHERE username = NEW.username);
+    IF username_exists > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Username already exists in Students';
     END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+END //
+
+DELIMITER ;
+
+-- Kontrola unikátního username ve Students
+DELIMITER //
 
 CREATE TRIGGER trg_unique_student_username
-    BEFORE INSERT OR UPDATE ON public."Students"
+    BEFORE INSERT ON Students
     FOR EACH ROW
-EXECUTE FUNCTION check_unique_student_username();
+BEGIN
+    DECLARE username_exists INT;
+    SET username_exists = (SELECT COUNT(*) FROM Employees WHERE username = NEW.username);
+    IF username_exists > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Username already exists in Employees';
+    END IF;
+END //
 
+DELIMITER ;
+
+-- Vytvoření triggeru pro tabulku StudentAssignments
+DELIMITER //
+
+CREATE TRIGGER validate_student_assignment_trigger
+    BEFORE INSERT ON StudentAssignments
+    FOR EACH ROW
+BEGIN
+    DECLARE class_exists INT;
+    DECLARE subclass_exists INT;
+
+    SET class_exists = (SELECT COUNT(*) FROM Classes WHERE classId = NEW.classId);
+    IF class_exists = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Class does not exist';
+    END IF;
+
+    IF NEW.subClassId IS NOT NULL THEN
+        SET subclass_exists = (SELECT COUNT(*) FROM SubClasses WHERE subClassId = NEW.subClassId);
+        IF subclass_exists = 0 THEN
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'SubClass does not exist';
+        END IF;
+    END IF;
+END //
+
+DELIMITER ;

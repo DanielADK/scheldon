@@ -1,30 +1,63 @@
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (1, 'pmcgunley0', 'Marylène', 'McGunley', true, false);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (2, 'cdunkerton1', 'Maïly', 'Dunkerton', true, true);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (3, 'lreddan2', 'Maïté', 'Reddan', true, false);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (4, 'tedess3', 'Adélaïde', 'Edess', true, false);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (5, 'cdeekes4', 'Torbjörn', 'Deekes', true, true);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (6, 'jbean5', 'Mélinda', 'Bean', true, true);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (7, 'klabba6', 'Yè', 'Labba', true, false);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (8, 'hgliddon7', 'Félicie', 'Gliddon', true, true);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (9, 'ggwin8', 'Léane', 'Gwin', true, false);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (10, 'eellard9', 'Illustrée', 'Ellard', true, false);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (11, 'lgergusa', 'Eliès', 'Gergus', true, false);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (12, 'gwybronb', 'Maéna', 'Wybron', true, false);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (13, 'bcalterac', 'Solène', 'Caltera', true, false);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (14, 'geastcottd', 'Anaël', 'Eastcott', true, true);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (15, 'wwhyleye', 'Publicité', 'Whyley', true, true);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (16, 'btwiggef', 'Åslög', 'Twigge', true, true);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (17, 'sbuyeg', 'Audréanne', 'Buye', true, true);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (18, 'kprinh', 'Françoise', 'Prin', true, false);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (19, 'eboyeri', 'Yú', 'Boyer', true, false);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (20, 'cdavidovskyj', 'Renée', 'Davidovsky', true, true);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (21, 'vraynhamk', 'Lauréna', 'Raynham', true, false);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (22, 'nharpl', 'Océane', 'Harp', true, true);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (23, 'dheddem', 'Marie-noël', 'Hedde', true, true);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (24, 'gbrighteyn', 'Mén', 'Brightey', true, true);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (25, 'ggookeo', 'Léana', 'Gooke', true, true);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (26, 'jgoncavesp', 'Yáo', 'Goncaves', true, true);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (27, 'tsongistq', 'Léane', 'Songist', true, true);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (28, 'vblofeldr', 'Hélèna', 'Blofeld', true, false);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (29, 'dmollenes', 'Almérinda', 'Mollene', true, true);
-insert into public."Employees" ("employeeId", username, name, surname, "isActive", "isTeacher") values (30, 'dcourtoist', 'Örjan', 'Courtois', true, false);
+INSERT INTO Employees (employeeId, abbreviation, username, name, surname, degreePre, degreePost, isActive, isTeacher) VALUES
+(01, 'Mr', 'pmarek', 'Petr', 'Marek', NULL, NULL, false, true),
+(02, 'Ma', 'amarek', 'AleS', 'Marek', 'Doc. Ing.', 'PhD.', false, true),
+(03, 'Ur', 'aurban', 'Adam', 'Urban', 'Bc.', NULL, false, true),
+(04, 'No', 'dnovotny', 'Daniel', 'Novotny', NULL, NULL, false, true),
+(05, 'Pr', 'pprochazka', 'Peter', 'Prochazka', 'Ing.', NULL, false, true),
+(06, 'Po', 'jprochazka', 'Jindfiska', 'Prochazka', 'Bo.', NULL, false, true),
+(07, 'Ru', 'jruzicka', 'Jana', 'Ruzicka', 'Ing.', NULL, false, true),
+(08, 'Si', 'zsimek', 'Zdenek', 'Simek', 'Ing.', NULL, false, true),
+(09, 'Ps', 'jpospisil', 'Jan', 'Pospisil', 'Ing.', NULL, false, true),
+(10, 'Lo', 'plopocha', 'Pavel', 'Lopocha', 'Mgr.', NULL, false, true),
+(11, 'Ko', 'pkovac', 'Peter', 'Kovac', 'Ing.', NULL, false, true),
+(12, 'Ju', 'tjuchelka', 'Tomas', 'Juchelka', 'Ing.', NULL, false, true),
+(13, 'Uh', 'kuhlirova', 'Karolina', 'Uhlirova', NULL, NULL, false, true),
+(14, 'Va', 'vvana', 'Vladimir', 'Vana', 'Ing. Mgr.', 'CSc.', false, true),
+(15, 'Ja', 'mjanecka', 'Martin', 'Janecka', 'Mgr. et Mgr.', 'Ph.D.', false, true),
+(16, 'Na', 'mnarusevych', 'Mykyta', 'Narusevych', 'Mgr.', NULL, false, true),
+(17, 'Je', 'jjedlicka', 'Jiri', 'Jedlicka', 'Ing.', NULL, false, true),
+(18, 'Jz', 'zjezek', 'Zbynek', 'Jezek', 'Mgr.', NULL, false, true),
+(19, 'Ra', 'lrasek', 'Luboš', 'Rasek', 'RNDr.', NULL, false, true),
+(20, 'Me', 'mmeitnerova', 'Michaela', 'Meitnerova', NULL, NULL, false, true),
+(21, 'Ka', 'ikantnerova', 'Ivana', 'Kantnerova', 'Ing.', NULL, false, true),
+(22, 'Re', 'areichlova', 'Alena', 'Reichlova', 'Mgr.', NULL, false, true),
+(23, 'Ne', 'vnemec', 'Vratislav', 'Nemec', NULL, NULL, false, true),
+(24, 'Kl', 'fkallmunzer', 'Filip', 'Kallmunzer', 'Ing.', NULL, false, true),
+(25, 'Se', 'osevelova', 'Olga', 'Sevelova', 'Ing.', NULL, false, true),
+(26, 'He', 'jherout', 'Jiri', 'Herout', 'Ing.', NULL, false, true),
+(27, 'Nu', 'eneugebauerova', 'Eva', 'Neugebauerova', 'Mgr.', NULL, false, true),
+(28, 'Kv', 'okvapilova', 'Olga', 'Kvapilova', 'RNDr.', NULL, false, true),
+(29, 'Vl', 'jvalcharova', 'Jana', 'Valcharova', 'Ing.', 'DrSc.', false, true),
+(30, 'Vn', 'mvana', 'Martin', 'Vana', NULL, NULL, false, true),
+(31, 'Br', 'lbrunova', 'Lenka', 'Brunova', 'Mgr.', NULL, false, true),
+(32, 'Pa', 'spaltikova', 'Sarka', 'Paltikova', 'Ing. Bc.', NULL, false, true),
+(33, 'Sd', 'jsedova', 'Jana', 'Sedova', 'Ing.', NULL, false, true),
+(34, 'Mo', 'jmolic', 'Jan', 'Molic', NULL, NULL, false, true),
+(35, 'Km', 'mkmonickova', 'Marie', 'Kmonickova', 'Mgr.', NULL, false, true),
+(36, 'Ki', 'tklima', 'Tomas', 'Klima', NULL, NULL, false, true),
+(37, 'Nv', 'jnovotny', 'Jan', 'Novotny', 'Ing.', 'Ph.D.', false, true),
+(38, 'Mz', 'jmazuch', 'Jakub', 'Mazuch', 'Mgr.', NULL, false, true),
+(39, 'Ba', 'jbarta', 'Jiri', 'Barta', NULL, NULL, false, true),
+(40, 'Ke', 'sklemova', 'Svatava', 'Klemova', 'Mgr.', NULL, false, true),
+(41, 'Ia', 'iiarosciuc', 'Iulia', 'Iarosciuc', 'Mgr.', NULL, false, true),
+(42, 'Sk', 'lskalicka', 'Libuse', 'Skalicka', 'Ing.', NULL, false, true),
+(43, 'Ms', 'lmasopust', 'Lukas', 'Masopust', 'Ing.', NULL, false, true),
+(44, 'Bc', 'lbrcakova', 'Lucie', 'Brcakova', 'Ing.', NULL, false, true),
+(45, 'Vo', 'avobecky', 'Antonin', 'Vobecky', 'Ing.', NULL, false, true),
+(46, 'So', 'osivkov', 'Oleg', 'Sivkov', 'Ing.', 'Ph.D', false, true),
+(47, 'St', 'bstibingerova', 'Bozena', 'Stibingerova', 'Mgr.', NULL, false, true),
+(48, 'Mu', 'mmusecova', 'Martina', 'Musecova', 'Mgr.', NULL, false, true),
+(49, 'Hr', 'lhrabalova', 'Libuse', 'Hrabalova', 'Mgr.', NULL, false, true),
+(50, 'Ce', 'rcerny', 'Richard', 'Cerny', 'Ing.', 'CSc.', false, true),
+(51, 'Be', 'jbenda', 'Jaroslav', 'Benda', 'Ing.', NULL, false, true),
+(52, 'Su', 'kstudenkova', 'Kristina', 'Studenkova', 'MUDr.', NULL, false, true),
+(53, 'Ji', 'ojezil', 'Ondrej', 'Jezil', 'Mgr.', NULL, false, true),
+(54, 'Nk', 'dnovak', 'David', 'Novak', 'Bc.', NULL, false, true),
+(55, 'Pe', 'mpeter', 'Martin', 'Peter', 'Ing.', NULL, false, true),
+(56, 'Sm', 'vsimek', 'Vaclav', 'Simek', NULL, NULL, false, true),
+(57, 'Zd', 'vzdenek', 'Vaclav', 'Zdenek', NULL, NULL, false, true),
+(58, 'Jl', 'jjelinek', 'Jindfich', 'Jelinek', 'Ing.', NULL, false, true),
+(59, 'Sb', 'jsvoboda', 'Jan', 'Svoboda', 'Mgr.', NULL, false, true),
+(60, 'Nj', 'jnovak', 'Jiri', 'Novak', NULL, NULL, false, true),
+(61, 'Rz', 'jruza', 'Jaroslav', 'Ruza', 'Ing.', NULL, false, true),
+(62, 'Dv', 'jdvorak', 'Jan', 'Dvorak', 'Mgr.', NULL, false, true);

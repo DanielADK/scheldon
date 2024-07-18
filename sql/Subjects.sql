@@ -1,19 +1,33 @@
-insert into public."Subjects" ("subjectId", name, abbreviation) values (1, 'Culinary Arts', 'OC');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (2, 'English', 'EU');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (3, 'Philosophy', 'NA');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (5, 'Geography', 'GE');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (6, 'Physics', 'PHY');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (10, 'Philosophy', 'PHI');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (11, 'Music', 'MU');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (14, 'Film Studies', 'FS');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (16, 'Physical Education', 'PE');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (17, 'Economics', 'EC');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (18, 'Architecture', 'SA');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (22, 'Psychology', 'AF');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (23, 'Fashion Design', 'FD');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (24, 'Business', 'BUS');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (25, 'History', 'H');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (26, 'Spanish', 'SP');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (28, 'Business', 'B');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (29, 'Mathematics', 'M');
-insert into public."Subjects" ("subjectId", name, abbreviation) values (30, 'Engineering', 'ENG');
+INSERT INTO Subjects (subjectId, name, abbreviation) VALUES (1, 'Praxe', 'DC'),
+    (2, 'Technické dokumentace', 'TD'),
+    (3, 'Multimédia a vývoj her', 'MVH'),
+    (4, 'Informační a komunikační technologie', 'IT'),
+    (5, 'Matematika', 'M'),
+    (6, 'Aplikovaná matematika', 'AM'),
+    (7, 'Databázové systémy', 'DS'),
+    (8, 'Webové aplikace', 'WA'),
+    (9, 'Programové vybavení', 'PV'),
+    (10, 'Teoretická informatika', 'TI'),
+    (11, 'Elektrotechnická měření', 'EM'),
+    (12, 'Elektronika a mikroelektronika', 'EnM'),
+    (13, 'Elektrotechnika', 'Ele'),
+    (14, 'Základy elektrotechniky', 'ZE'),
+    (15, 'Cvičení z elektrotechniky', 'CEL'),
+    (16, 'Fyzika', 'F'),
+    (17, 'Český jazyk a literatura', 'C'),
+    (18, 'Dějepis', 'D'),
+    (19, 'Cvičení z automatizace a robotiky', 'CAu'),
+    (20, 'Mikroprocesorová technika', 'MT'),
+    (21, 'Tělesná výchova', 'TV'),
+    (22, 'Cvičení ze správy IT', 'CIT'),
+    (23, 'Elektronické počítače', 'EP'),
+    (24, 'Základy společenských věd', 'ZSV'),
+    (25, 'Anglický jazyk', 'A'),
+    (26, 'Počítačové systémy a sítě', 'PSS'),
+    (27, 'Hardware', 'HW'),
+    (28, 'Podnikové informační systémy', 'PIS'),
+    (29, 'Automatizační technika a robotika', 'AuR'),
+    (30, 'Číslicová technika', 'CT'),
+    (31, 'Technický projekt', 'TP'),
+    (32, 'Chemie', 'CH'),
+    (33, 'Ekonomika', 'EK');
