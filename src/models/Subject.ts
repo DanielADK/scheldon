@@ -1,34 +1,34 @@
-import {Column, DataType, HasMany, Model, Table} from "sequelize-typescript";
-import {Lesson} from "./Lesson";
-import {TimetableEntry} from "./TimetableEntry";
+import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
+import { Lesson } from './Lesson';
+import { TimetableEntry } from './TimetableEntry';
 
 @Table({
-    timestamps: false,
+  timestamps: false
 })
 export class Subject extends Model<Subject> {
-    @Column({
-        type: DataType.INTEGER,
-        primaryKey: true,
-    })
-    subjectId!: number;
+  @Column({
+    type: DataType.INTEGER,
+    primaryKey: true
+  })
+  subjectId!: number;
 
-    @Column({
-        type: DataType.STRING,
-        allowNull: false,
-    })
-    name!: string;
+  @Column({
+    type: DataType.STRING,
+    allowNull: false
+  })
+  name!: string;
 
-    @Column({
-        type: DataType.STRING,
-        allowNull: false,
-        unique: true
-    })
-    abbreviation!: string
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    unique: true
+  })
+  abbreviation!: string;
 
-    // Timetables of subject
-    @HasMany(() => TimetableEntry)
-    timetableEntries!: TimetableEntry[];
+  // Timetables of subject
+  @HasMany(() => TimetableEntry)
+  timetableEntries!: TimetableEntry[];
 
-    @HasMany(() => Lesson)
-    lessons!: Lesson[];
+  @HasMany(() => Lesson)
+  lessons!: Lesson[];
 }

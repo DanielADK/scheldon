@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Installing source NPM dependencies...
+      - npm install
+  pre_build:
+    commands:
+      - echo Run tests...
+      - npm test
+  build:
+    commands:
+      - echo Building...
+      - npm run build
+  post_build:
+    commands:
+      - echo Deploying...
+      - eb deploy
