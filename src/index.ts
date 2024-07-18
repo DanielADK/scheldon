@@ -15,7 +15,7 @@ const port = process.env.PORT || 3000;
 // Initialize sequelize
 const sequelize = new Sequelize({
   database: process.env.DB_NAME,
-  dialect: 'postgres',
+  dialect: 'mysql',
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   host: process.env.DB_HOST,
@@ -33,7 +33,7 @@ console.log(router.stack.map((i) => i.path));
 app.use(router.allowedMethods());
 
 sequelize
-  .sync({ force: true })
+  .sync({ alter: true })
   .then(() => {
     app.listen(port, () => {
       console.log(`Server running on port ${port}`);

@@ -18,19 +18,17 @@ import { StudentAssignment } from './StudentAssignment';
 import { Op } from 'sequelize';
 
 @Table({
-  timestamps: true,
-  createdAt: true,
-  updatedAt: false,
+  timestamps: false,
   indexes: [
     {
       unique: true,
-      fields: ['name', 'date_from', 'date_to', 'roomId', 'employeeId']
+      fields: ['name', 'dateFrom', 'dateTo', 'roomId', 'employeeId']
     }
   ],
   validate: {
     datesAreValid(this: Class) {
-      if (new Date(this.date_from) > new Date(this.date_to)) {
-        throw new Error('date_from must be less than date_to');
+      if (new Date(this.dateFrom) > new Date(this.dateTo)) {
+        throw new Error('dateFrom must be less than dateTo');
       }
     }
   }
@@ -38,34 +36,38 @@ import { Op } from 'sequelize';
 export class Class extends Model<Class> {
   @Column({
     type: DataType.INTEGER,
-    primaryKey: true
+    primaryKey: true,
+    autoIncrement: true
   })
   declare classId: number;
 
   @Column({
     type: DataType.STRING(3),
-    allowNull: true
+    allowNull: true,
+    unique: false
   })
   declare name: string;
 
   @Column({
     type: DataType.DATE,
-    allowNull: false
+    allowNull: false,
+    unique: false
   })
-  declare date_from: string;
+  declare dateFrom: string;
 
   @Column({
     type: DataType.DATE,
-    allowNull: false
+    allowNull: false,
+    unique: false
   })
-  declare date_to: string;
+  declare dateTo: string;
 
   // Default Room
   @ForeignKey(() => Room)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
-    unique: true
+    unique: false
   })
   declare roomId: number;
 
@@ -77,9 +79,16 @@ export class Class extends Model<Class> {
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
-    unique: true
+    unique: false
   })
   declare employeeId: number;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+    defaultValue: DataType.NOW
+  })
+  declare createdAt: string;
 
   @BelongsTo(() => Employee)
   declare employee: Employee;
@@ -105,11 +114,11 @@ export class Class extends Model<Class> {
         name: instance.name,
         roomId: instance.roomId,
         employeeId: instance.employeeId,
-        date_from: {
-          [Op.lte]: instance.date_to
+        dateFrom: {
+          [Op.lte]: instance.dateTo
         },
-        date_to: {
-          [Op.gte]: instance.date_from
+        dateTo: {
+          [Op.gte]: instance.dateFrom
         }
       }
     });
