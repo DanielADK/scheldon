@@ -22,13 +22,13 @@ import { Op } from 'sequelize';
   indexes: [
     {
       unique: true,
-      fields: ['name', 'dateFrom', 'dateTo', 'roomId', 'employeeId']
+      fields: ['name', 'validFrom', 'validTo', 'roomId', 'employeeId']
     }
   ],
   validate: {
     datesAreValid(this: Class) {
-      if (new Date(this.dateFrom) > new Date(this.dateTo)) {
-        throw new Error('dateFrom must be less than dateTo');
+      if (new Date(this.validFrom) > new Date(this.validTo)) {
+        throw new Error('validFrom must be less than validTo');
       }
     }
   }
@@ -53,14 +53,14 @@ export class Class extends Model<Class> {
     allowNull: false,
     unique: false
   })
-  declare dateFrom: string;
+  declare validFrom: string;
 
   @Column({
     type: DataType.DATE,
     allowNull: false,
     unique: false
   })
-  declare dateTo: string;
+  declare validTo: string;
 
   // Default Room
   @ForeignKey(() => Room)
@@ -114,11 +114,11 @@ export class Class extends Model<Class> {
         name: instance.name,
         roomId: instance.roomId,
         employeeId: instance.employeeId,
-        dateFrom: {
-          [Op.lte]: instance.dateTo
+        validFrom: {
+          [Op.lte]: instance.validTo
         },
-        dateTo: {
-          [Op.gte]: instance.dateFrom
+        validTo: {
+          [Op.gte]: instance.validFrom
         }
       }
     });
