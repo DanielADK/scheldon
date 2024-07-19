@@ -4,7 +4,7 @@ import Joi from 'joi';
 
 // Schema for creating a subject
 const createSubjectSchema = Joi.object({
-  name: Joi.string().required().alphanum().min(3).max(30),
+  name: Joi.string().required().min(3).max(30),
   abbreviation: Joi.string().required().alphanum().min(1).max(3)
 });
 
@@ -22,10 +22,14 @@ export const createSubject = async (ctx: Context) => {
     return;
   }
 
-  const subject = await subjectService.createSubject(value);
-
-  ctx.status = 201;
-  ctx.body = subject;
+  try {
+    const subject = await subjectService.createSubject(value);
+    ctx.status = 201;
+    ctx.body = subject;
+  } catch (error: Error | any) {
+    ctx.status = 400;
+    ctx.body = { error: error.message };
+  }
 };
 
 // Schema for getting a subjects
