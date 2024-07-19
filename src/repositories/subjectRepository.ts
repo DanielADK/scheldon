@@ -13,6 +13,12 @@ export interface SubjectDTO {
  * @param data
  */
 export const createSubject = async (data: SubjectDTO): Promise<Subject> => {
+  const existingSubject = await Subject.findOne({
+    where: { abbreviation: data.abbreviation }
+  });
+  if (existingSubject) {
+    throw new Error('This abbreviation is already in use.');
+  }
   return await Subject.create(data as Subject);
 };
 

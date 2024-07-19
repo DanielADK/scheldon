@@ -8,27 +8,28 @@ import { TimetableEntry } from './TimetableEntry';
 export class Subject extends Model<Subject> {
   @Column({
     type: DataType.INTEGER,
-    primaryKey: true
+    primaryKey: true,
+    autoIncrement: true
   })
-  subjectId!: number;
+  declare subjectId: number;
 
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
-  name!: string;
+  declare name: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
     unique: true
   })
-  abbreviation!: string;
+  declare abbreviation: string;
 
   // Timetables of subject
   @HasMany(() => TimetableEntry)
-  timetableEntries!: TimetableEntry[];
+  declare timetableEntries: TimetableEntry[];
 
   @HasMany(() => Lesson)
-  lessons!: Lesson[];
+  declare lessons: Lesson[];
 }
