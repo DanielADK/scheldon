@@ -6,7 +6,8 @@ import { Column, DataType, Model, Table } from 'sequelize-typescript';
 export class Employee extends Model<Employee> {
   @Column({
     type: DataType.INTEGER,
-    primaryKey: true
+    primaryKey: true,
+    autoIncrement: true
   })
   declare employeeId: number;
 

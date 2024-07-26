@@ -1,13 +1,51 @@
-import * as employeeRepository from '../repositories/employeeRepository';
+import * as employeeService from '../services/employeeService';
 import { Context } from 'koa';
+import Joi from 'joi';
+import { EmployeeDTO } from '../repositories/employeeRepository';
 
+const createEmployeeSchema: Joi.ObjectSchema<EmployeeDTO> = Joi.object({
+  username: Joi.string().required().min(3).max(30),
+  name: Joi.string().required().min(3).max(50),
+  surname: Joi.string().required().min(3).max(40),
+  degreePre: Joi.string().allow(null).max(20),
+  degreePost: Joi.string().allow(null).max(20),
+  abbreviation: Joi.string().allow(null).max(2),
+  isTeacher: Joi.boolean().required()
+});
+
+/**
+ * Create a new employee
+ * POST /employee
+ * @param ctx
+ */
+export const createEmployee = async (ctx: Context): Promise<void> => {
+  // Validate request
+  const { error, value } = createEmployeeSchema.validate(ctx.request.body);
+
+  if (error) {
+    ctx.status = 400;
+    ctx.body = { error: error.details[0].message };
+    return;
+  }
+
+  try {
+    const employee = await employeeService.createEmployee(value);
+    ctx.status = 201;
+    ctx.body = employee;
+  } catch (error: Error | any) {
+    ctx.status = 400;
+    ctx.body = { error: error.message };
+  }
+};
+
+// Get all employees
 export const getAllEmployees = async (ctx: Context): Promise<void> => {
   // Pagination
   const page = parseInt(ctx.query.page as string) || 1;
   const limit = parseInt(ctx.query.limit as string) || 10;
 
   // Get all employees
-  const employees = await employeeRepository.getEmployees(
+  const employees = await employeeService.getAllEmployees(
     limit,
     (page - 1) * limit
   );
