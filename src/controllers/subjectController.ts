@@ -44,8 +44,10 @@ export const getAllSubjects = async (ctx: Context) => {
   ctx.status = 201;
   ctx.body = {
     data: subjects.rows,
-    total: subjects.count,
-    page,
-    limit
+    meta: {
+      total: subjects.count,
+      page,
+      limit
+    }
   };
 };

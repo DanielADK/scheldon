@@ -8,38 +8,38 @@ export class Employee extends Model<Employee> {
     type: DataType.INTEGER,
     primaryKey: true
   })
-  employeeId!: number;
+  declare employeeId: number;
 
   @Column({
     type: DataType.STRING(30),
     allowNull: false,
     unique: true
   })
-  username!: string;
+  declare username: string;
 
   @Column({
     type: DataType.STRING(50),
     allowNull: false
   })
-  name!: string;
+  declare name: string;
 
   @Column({
     type: DataType.STRING(40),
     allowNull: false
   })
-  surname!: string;
+  declare surname: string;
 
   @Column({
     type: DataType.STRING(20),
     allowNull: true
   })
-  degreePre!: string;
+  declare degreePre: string;
 
   @Column({
     type: DataType.STRING(20),
     allowNull: true
   })
-  degreePost!: string;
+  declare degreePost: string;
 
   @Column({
     type: DataType.STRING(2),
