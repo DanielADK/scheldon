@@ -37,3 +37,16 @@ export const getSubjects = async (
 
   return { rows, count };
 };
+
+/**
+ * Get a subject by abbreviation
+ * @param abbreviation
+ */
+export const getSubjectByAbbreviation = async (
+  abbreviation: string
+): Promise<Subject | null> => {
+  return await Subject.findOne({
+    where: { abbreviation },
+    attributes: [['subjectId', 'id'], 'name', 'abbreviation']
+  });
+};

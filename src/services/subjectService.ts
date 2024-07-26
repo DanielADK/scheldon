@@ -16,3 +16,11 @@ export const getAllSubjects = async (page: number, limit: number) => {
   const offset = (page - 1) * limit;
   return await subjectRepository.getSubjects(limit, offset);
 };
+
+/**
+ * Get a subject by abbreviation
+ * @param abbreviation
+ */
+export const getSubjectByAbbreviation = async (abbreviation: string) => {
+  return await subjectRepository.getSubjectByAbbreviation(abbreviation);
+};

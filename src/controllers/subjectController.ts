@@ -51,3 +51,19 @@ export const getAllSubjects = async (ctx: Context) => {
     }
   };
 };
+
+// Schema for getting a subject by abbreviation
+export const getSubjectByAbbreviation = async (ctx: Context) => {
+  const abbreviation = ctx.params.abbreviation as string;
+
+  const subject = await subjectService.getSubjectByAbbreviation(abbreviation);
+
+  if (!subject) {
+    ctx.status = 404;
+    ctx.body = { error: 'Subject not found' };
+    return;
+  }
+
+  ctx.status = 200;
+  ctx.body = subject;
+};
