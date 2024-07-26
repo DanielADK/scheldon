@@ -1,4 +1,5 @@
 import { Subject } from '../models/Subject';
+import { FindAttributeOptions } from 'sequelize';
 
 /**
  * SubjectDTO interface
@@ -7,6 +8,12 @@ export interface SubjectDTO {
   name: string;
   abbreviation: string;
 }
+
+const subjectAttributes: FindAttributeOptions = [
+  ['subjectId', 'id'],
+  'name',
+  'abbreviation'
+];
 
 /**
  * Create a new subject
@@ -32,7 +39,7 @@ export const getSubjects = async (
   const { rows, count } = await Subject.findAndCountAll({
     limit,
     offset,
-    attributes: [['subjectId', 'id'], 'name', 'abbreviation']
+    attributes: subjectAttributes
   });
 
   return { rows, count };
@@ -47,6 +54,6 @@ export const getSubjectByAbbreviation = async (
 ): Promise<Subject | null> => {
   return await Subject.findOne({
     where: { abbreviation },
-    attributes: [['subjectId', 'id'], 'name', 'abbreviation']
+    attributes: subjectAttributes
   });
 };
