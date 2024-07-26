@@ -39,4 +39,11 @@ describe('Subjects API', () => {
     expect(response.data).to.have.property('page', 1);
     expect(response.data).to.have.property('limit', 5);
   });
+
+  it('should get a subject by abbreviation', async () => {
+    const response = await axios.get('http://localhost:3000/subjects/WA');
+    expect(response.status).to.equal(200);
+    expect(response.data).to.have.property('abbreviation', 'WA');
+    expect(response.data).to.have.property('name', 'Webové aplikace');
+  });
 });
