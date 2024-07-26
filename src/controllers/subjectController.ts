@@ -1,9 +1,10 @@
 import * as subjectService from '../services/subjectService';
 import { Context } from 'koa';
 import Joi from 'joi';
+import { SubjectDTO } from '../repositories/subjectRepository';
 
 // Schema for creating a subject
-const createSubjectSchema = Joi.object({
+const createSubjectSchema: Joi.ObjectSchema<SubjectDTO> = Joi.object({
   name: Joi.string().required().min(3).max(30),
   abbreviation: Joi.string().required().alphanum().min(1).max(3)
 });

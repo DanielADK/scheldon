@@ -4,13 +4,13 @@ import * as subjectController from '../controllers/subjectController';
 const router = new Router();
 
 // All subjects
-router.get('/subjects', subjectController.getAllSubjects);
+router.get('/subject', subjectController.getAllSubjects);
 // Get a subject by abbreviation
 router.get(
-  '/subjects/:abbreviation',
+  '/subject/:abbreviation',
   subjectController.getSubjectByAbbreviation
 );
 // Create a new subject
-router.post('/subjects', subjectController.createSubject);
+router.post('/subject', subjectController.createSubject);
 
 export default router;
