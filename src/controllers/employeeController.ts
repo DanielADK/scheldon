@@ -60,3 +60,19 @@ export const getAllEmployees = async (ctx: Context): Promise<void> => {
     }
   };
 };
+
+// Get employee by username
+export const getEmployeeById = async (ctx: Context): Promise<void> => {
+  const identifier = ctx.params.id as string;
+
+  const employee = await employeeService.getEmployeeById(identifier);
+
+  if (!employee) {
+    ctx.status = 404;
+    ctx.body = { error: 'Employee not found' };
+    return;
+  }
+
+  ctx.status = 200;
+  ctx.body = employee;
+};
