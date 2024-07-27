@@ -49,10 +49,27 @@ export const getEmployees = async (
       'surname',
       'username',
       'abbreviation',
-      ['isTeacher', 'teacher']
+      'isTeacher'
     ],
     where: { isActive: true }
   });
 
   return { rows, count };
+};
+
+/**
+ * Get employee by username
+ * @param identifier
+ */
+export const getEmployeeById = async (
+  identifier: string
+): Promise<Employee | null> => {
+  return await Employee.findOne({
+    where: {
+      [Op.or]: {
+        username: identifier,
+        abbreviation: identifier
+      }
+    }
+  });
 };
