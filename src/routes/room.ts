@@ -33,6 +33,8 @@ const router = new Router();
  *           example: 1
  * /rooms:
  *   post:
+ *     tags:
+ *        - Room
  *     summary: Create a new room
  *     requestBody:
  *       required: true
@@ -52,6 +54,8 @@ router.post('/room', roomController.createRoom);
  * @openapi
  * /rooms:
  *   get:
+ *     tags:
+ *        - Room
  *     description: Get all rooms
  *     responses:
  *       200:
@@ -63,6 +67,8 @@ router.get('/room', roomController.getAllRooms);
  * @openapi
  * /rooms/{id}:
  *   get:
+ *     tags:
+ *        - Room
  *     summary: Get a room by ID
  *     parameters:
  *         in: path
@@ -84,6 +90,8 @@ router.get('/room/:id', roomController.getRoomById);
  * @openapi
  * /rooms/{id}:
  *   put:
+ *     tags:
+ *        - Room
  *     summary: Update a room
  *     parameters:
  *       - in: path
@@ -113,6 +121,8 @@ router.put('/room/:id', roomController.updateRoom);
  * @openapi
  * /rooms/{id}:
  *   delete:
+ *     tags:
+ *        - Room
  *     summary: Delete a room
  *     parameters:
  *       - in: path
