@@ -10,7 +10,8 @@ const employeeSchema: Joi.ObjectSchema<EmployeeDTO> = Joi.object({
   degreePre: Joi.string().allow(null).max(20),
   degreePost: Joi.string().allow(null).max(20),
   abbreviation: Joi.string().allow(null).max(2),
-  isTeacher: Joi.boolean().required()
+  isTeacher: Joi.boolean().required(),
+  isActive: Joi.boolean().allow(null)
 });
 
 /**
