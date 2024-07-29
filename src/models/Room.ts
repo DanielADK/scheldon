@@ -15,12 +15,15 @@ import { Employee } from './Employee';
 export class Room extends Model<Room> {
   @Column({
     type: DataType.INTEGER,
-    primaryKey: true
+    primaryKey: true,
+    autoIncrement: true
   })
   roomId!: number;
 
   @Column({
-    type: DataType.STRING
+    type: DataType.STRING,
+    allowNull: true,
+    unique: true
   })
   phone!: string;
 
@@ -50,13 +53,6 @@ export class Room extends Model<Room> {
   })
   studentCapacity!: number;
 
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-    defaultValue: 0
-  })
-  teacherCapacity!: number;
-
   // Room administrator
   @ForeignKey(() => Employee)
   @Column({
@@ -64,9 +60,9 @@ export class Room extends Model<Room> {
     allowNull: true,
     defaultValue: null
   })
-  employeeId!: number;
+  administratorId!: number;
 
   // Mapping
   @BelongsTo(() => Employee)
-  employee!: Employee;
+  administrator!: Employee;
 }
