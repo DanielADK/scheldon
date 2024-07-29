@@ -4,8 +4,8 @@ import Joi from 'joi';
 import { SubjectDTO } from '../repositories/subjectRepository';
 
 // Schema for creating a subject
-const createSubjectSchema: Joi.ObjectSchema<SubjectDTO> = Joi.object({
-  name: Joi.string().required().min(3).max(30),
+const subjectSchema: Joi.ObjectSchema<SubjectDTO> = Joi.object({
+  name: Joi.string().required().min(3).max(50),
   abbreviation: Joi.string().required().alphanum().min(1).max(3)
 });
 
@@ -15,7 +15,7 @@ const createSubjectSchema: Joi.ObjectSchema<SubjectDTO> = Joi.object({
  */
 export const createSubject = async (ctx: Context) => {
   // Validate request
-  const { error, value } = createSubjectSchema.validate(ctx.request.body);
+  const { error, value } = subjectSchema.validate(ctx.request.body);
 
   if (error) {
     ctx.status = 400;

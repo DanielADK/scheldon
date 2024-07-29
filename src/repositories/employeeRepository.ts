@@ -12,6 +12,7 @@ export interface EmployeeDTO {
   degreePost?: string;
   abbreviation?: string;
   isTeacher: boolean;
+  isActive?: boolean;
 }
 
 const employeeAttributes: FindAttributeOptions = [
