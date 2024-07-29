@@ -3,7 +3,7 @@ import { Context } from 'koa';
 import Joi from 'joi';
 import { EmployeeDTO } from '../repositories/employeeRepository';
 
-const createEmployeeSchema: Joi.ObjectSchema<EmployeeDTO> = Joi.object({
+const employeeSchema: Joi.ObjectSchema<EmployeeDTO> = Joi.object({
   username: Joi.string().required().min(3).max(30),
   name: Joi.string().required().min(3).max(50),
   surname: Joi.string().required().min(3).max(40),
@@ -20,7 +20,7 @@ const createEmployeeSchema: Joi.ObjectSchema<EmployeeDTO> = Joi.object({
  */
 export const createEmployee = async (ctx: Context): Promise<void> => {
   // Validate request
-  const { error, value } = createEmployeeSchema.validate(ctx.request.body);
+  const { error, value } = employeeSchema.validate(ctx.request.body);
 
   if (error) {
     ctx.status = 400;
@@ -61,7 +61,7 @@ export const getAllEmployees = async (ctx: Context): Promise<void> => {
   };
 };
 
-// Get employee by username
+// Get employee by id
 export const getEmployeeById = async (ctx: Context): Promise<void> => {
   const identifier = ctx.params.id as string;
 
@@ -75,4 +75,81 @@ export const getEmployeeById = async (ctx: Context): Promise<void> => {
 
   ctx.status = 200;
   ctx.body = employee;
+};
+
+// Get employee by username
+export const getEmployeeByUsername = async (ctx: Context): Promise<void> => {
+  const username = ctx.params.username as string;
+
+  const employee = await employeeService.getEmployeeByUsername(username);
+
+  if (!employee) {
+    ctx.status = 404;
+    ctx.body = { error: 'Employee not found' };
+    return;
+  }
+
+  ctx.status = 200;
+  ctx.body = employee;
+};
+
+// Get employee by abbreviation
+export const getEmployeeByAbbreviation = async (
+  ctx: Context
+): Promise<void> => {
+  const abbreviation = ctx.params.abbreviation as string;
+
+  const employee =
+    await employeeService.getEmployeeByAbbreviation(abbreviation);
+
+  if (!employee) {
+    ctx.status = 404;
+    ctx.body = { error: 'Employee not found' };
+    return;
+  }
+
+  ctx.status = 200;
+  ctx.body = employee;
+};
+
+// Update an employee
+export const updateEmployee = async (ctx: Context): Promise<void> => {
+  const id = ctx.params.id as string;
+  const { error, value } = employeeSchema.validate(ctx.request.body);
+
+  if (error) {
+    ctx.status = 400;
+    ctx.body = { error: error.details[0].message };
+    return;
+  }
+
+  try {
+    const [affectedCount] = await employeeService.updateEmployee(id, value);
+
+    if (affectedCount === 0) {
+      ctx.status = 404;
+      ctx.body = { error: 'Employee not found' };
+      return;
+    }
+
+    ctx.status = 204;
+  } catch (error: Error | any) {
+    ctx.status = 400;
+    ctx.body = { error: error.message };
+  }
+};
+
+// Delete an employee
+export const deleteEmployee = async (ctx: Context): Promise<void> => {
+  const id = ctx.params.id as string;
+
+  const deletedCount = await employeeService.deleteEmployee(id);
+
+  if (deletedCount === 0) {
+    ctx.status = 404;
+    ctx.body = { error: 'Employee not found' };
+    return;
+  }
+
+  ctx.status = 204;
 };
