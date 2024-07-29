@@ -10,7 +10,11 @@ const options = {
     info: {
       title: 'Scheldon API',
       version: '1.0.0',
-      description: 'API for school timetable management system and class books'
+      description: 'API for school timetable management system and class books',
+      contact: {
+        name: 'Daniel Adámek',
+        email: 'adamek@spsejecna.cz'
+      }
     }
   },
   apis: ['./src/routes/*.ts']
