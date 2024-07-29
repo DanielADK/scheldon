@@ -14,13 +14,13 @@ export class Subject extends Model<Subject> {
   declare subjectId: number;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.STRING(50),
     allowNull: false
   })
   declare name: string;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.STRING(3),
     allowNull: false,
     unique: true
   })

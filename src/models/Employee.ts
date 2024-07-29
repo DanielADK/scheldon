@@ -12,7 +12,7 @@ export class Employee extends Model<Employee> {
   declare employeeId: number;
 
   @Column({
-    type: DataType.STRING(30),
+    type: DataType.STRING(50),
     allowNull: false,
     unique: true
   })
@@ -25,7 +25,7 @@ export class Employee extends Model<Employee> {
   declare name: string;
 
   @Column({
-    type: DataType.STRING(40),
+    type: DataType.STRING(50),
     allowNull: false
   })
   declare surname: string;
