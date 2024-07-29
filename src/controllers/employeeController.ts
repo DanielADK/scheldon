@@ -4,9 +4,9 @@ import Joi from 'joi';
 import { EmployeeDTO } from '../repositories/employeeRepository';
 
 const employeeSchema: Joi.ObjectSchema<EmployeeDTO> = Joi.object({
-  username: Joi.string().required().min(3).max(30),
-  name: Joi.string().required().min(3).max(50),
-  surname: Joi.string().required().min(3).max(40),
+  username: Joi.string().required().min(2).max(50),
+  name: Joi.string().required().min(2).max(50),
+  surname: Joi.string().required().min(2).max(50),
   degreePre: Joi.string().allow(null).max(20),
   degreePost: Joi.string().allow(null).max(20),
   abbreviation: Joi.string().allow(null).max(2),

@@ -10,7 +10,7 @@ export interface EmployeeDTO {
   surname: string;
   degreePre?: string;
   degreePost?: string;
-  abbreviation: string;
+  abbreviation?: string;
   isTeacher: boolean;
 }
 
