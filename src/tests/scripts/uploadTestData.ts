@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { testSubjects } from '../data/subjectsData';
+import { subjects } from '../data/subjectsData';
+import { employee } from '../data/employeeData';
 // import other data sets as needed
 
 const uploadData = async (url: string, data: any[]) => {
@@ -17,7 +18,8 @@ const uploadData = async (url: string, data: any[]) => {
 };
 
 const uploadTestData = async () => {
-  await uploadData('http://localhost:3000/subjects', testSubjects);
+  await uploadData('http://localhost:3000/subjects', subjects);
+  await uploadData('http://localhost:3000/employee', employee);
   // Add more calls to uploadData for other data sets
 };
 
