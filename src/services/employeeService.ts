@@ -22,10 +22,48 @@ export const getAllEmployees = async (page: number, limit: number) => {
 
 /**
  * Get employee by identifier
- * @param identifier
+ * @param id
  */
-export const getEmployeeById = async (
-  identifier: string
+export const getEmployeeById = async (id: string): Promise<Employee | null> => {
+  return await employeeRepository.getEmployeeById(id);
+};
+
+/**
+ * Get employee by username
+ * @param username
+ */
+export const getEmployeeByUsername = async (
+  username: string
 ): Promise<Employee | null> => {
-  return await employeeRepository.getEmployeeById(identifier);
+  return await employeeRepository.getEmployeeByUsername(username);
+};
+
+/**
+ * Get employee by abbreviation
+ * @param abbreviation
+ */
+export const getEmployeeByAbbreviation = async (
+  abbreviation: string
+): Promise<Employee | null> => {
+  return await employeeRepository.getEmployeeByAbbreviation(abbreviation);
+};
+
+/**
+ * Update an employee
+ * @param id
+ * @param data
+ */
+export const updateEmployee = async (
+  id: string,
+  data: Partial<Employee>
+): Promise<[number, Employee[]]> => {
+  return await employeeRepository.updateEmployee(id, data);
+};
+
+/**
+ * Delete an employee
+ * @param id
+ */
+export const deleteEmployee = async (id: string): Promise<number> => {
+  return await employeeRepository.deleteEmployee(id);
 };
