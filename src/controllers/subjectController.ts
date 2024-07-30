@@ -53,6 +53,22 @@ export const getAllSubjects = async (ctx: Context) => {
   };
 };
 
+// Schema for getting a subject by ID
+export const getSubjectById = async (ctx: Context) => {
+  const subjectId = parseInt(ctx.params.id as string);
+
+  const subject = await subjectService.getSubjectById(subjectId);
+
+  if (!subject) {
+    ctx.status = 404;
+    ctx.body = { error: 'Subject not found' };
+    return;
+  }
+
+  ctx.status = 200;
+  ctx.body = subject;
+};
+
 // Schema for getting a subject by abbreviation
 export const getSubjectByAbbreviation = async (ctx: Context) => {
   const abbreviation = ctx.params.abbreviation as string;
@@ -67,4 +83,51 @@ export const getSubjectByAbbreviation = async (ctx: Context) => {
 
   ctx.status = 200;
   ctx.body = subject;
+};
+
+// Schema for deleting a subject
+export const updateSubject = async (ctx: Context) => {
+  const subjectId = parseInt(ctx.params.id as string);
+
+  // Validate request
+  const { error, value } = subjectSchema.validate(ctx.request.body);
+
+  if (error) {
+    ctx.status = 400;
+    ctx.body = { error: error.details[0].message };
+    return;
+  }
+
+  try {
+    const [affectedCount] = await subjectService.updateSubject(
+      subjectId,
+      value
+    );
+
+    if (affectedCount > 0) {
+      ctx.status = 200;
+      ctx.body = { message: 'Subject updated' };
+    } else {
+      ctx.status = 404;
+      ctx.body = { error: 'Subject not found' };
+    }
+  } catch (error: Error | any) {
+    ctx.status = 400;
+    ctx.body = { error: error.message };
+  }
+};
+
+// Schema for deleting a subject
+export const deleteSubject = async (ctx: Context) => {
+  const subjectId = parseInt(ctx.params.id as string);
+
+  const deletedCount = await subjectService.deleteSubject(subjectId);
+
+  if (deletedCount === 0) {
+    ctx.status = 404;
+    ctx.body = { error: 'Subject not found' };
+    return;
+  }
+
+  ctx.status = 204;
 };
