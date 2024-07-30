@@ -1,5 +1,5 @@
 import { Employee } from '../models/Employee';
-import { FindAttributeOptions } from 'sequelize';
+import { FindAttributeOptions, Op } from 'sequelize';
 
 /**
  * EmployeeDTO interface
@@ -31,6 +31,14 @@ const employeeAttributes: FindAttributeOptions = [
  * @param data
  */
 export const createEmployee = async (data: EmployeeDTO): Promise<Employee> => {
+  const existingEmployee = await Employee.findOne({
+    where: {
+      [Op.or]: { username: data.username, abbreviation: data.abbreviation }
+    }
+  });
+  if (existingEmployee) {
+    throw new Error('This username or abbreviation is already in use.');
+  }
   return await Employee.create(data as Employee);
 };
 

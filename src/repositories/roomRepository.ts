@@ -17,6 +17,12 @@ export interface RoomDTO {
  * @param data
  */
 export const createRoom = async (data: RoomDTO): Promise<Room> => {
+  const existingRoom = await Room.findOne({
+    where: { name: data.name }
+  });
+  if (existingRoom) {
+    throw new Error('This room name is already in use.');
+  }
   return await Room.create(data as Room);
 };
 
