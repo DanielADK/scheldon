@@ -46,6 +46,19 @@ export const getSubjects = async (
 };
 
 /**
+ * Get a subject by ID
+ * @param subjectId
+ */
+export const getSubjectById = async (
+  subjectId: number
+): Promise<Subject | null> => {
+  return await Subject.findOne({
+    where: { abbreviation: subjectId },
+    attributes: subjectAttributes
+  });
+};
+
+/**
  * Get a subject by abbreviation
  * @param abbreviation
  */
@@ -53,7 +66,31 @@ export const getSubjectByAbbreviation = async (
   abbreviation: string
 ): Promise<Subject | null> => {
   return await Subject.findOne({
-    where: { abbreviation },
+    where: { abbreviation: abbreviation },
     attributes: subjectAttributes
+  });
+};
+
+/**
+ * Update a subject
+ * @param subjectId
+ * @param data
+ */
+export const updateSubject = async (
+  subjectId: number,
+  data: SubjectDTO
+): Promise<[affectedRows: number]> => {
+  return await Subject.update(data, {
+    where: { subjectId: subjectId }
+  });
+};
+
+/**
+ * Delete a subject
+ * @param subjectId
+ */
+export const deleteSubject = async (subjectId: number): Promise<number> => {
+  return await Subject.destroy({
+    where: { subjectId: subjectId }
   });
 };
