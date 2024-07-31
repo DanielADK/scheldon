@@ -34,20 +34,20 @@ export class Employee extends Model<Employee> {
     type: DataType.STRING(20),
     allowNull: true
   })
-  declare degreePre: string;
+  declare degreePre: string | null;
 
   @Column({
     type: DataType.STRING(20),
     allowNull: true
   })
-  declare degreePost: string;
+  declare degreePost: string | null;
 
   @Column({
     type: DataType.STRING(2),
     allowNull: true,
     unique: true
   })
-  declare abbreviation: string;
+  declare abbreviation: string | null;
 
   @Column({
     type: DataType.BOOLEAN,
@@ -63,3 +63,5 @@ export class Employee extends Model<Employee> {
   })
   declare isTeacher: boolean;
 }
+
+// TODO: validate isTeacher only with not null abbreviation

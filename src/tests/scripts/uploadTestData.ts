@@ -3,9 +3,14 @@ import { subjects } from '../data/subjectsData';
 import { employees } from '../data/employeeData';
 import { rooms } from '../data/roomData';
 import { classes } from '../data/classData';
-// import other data sets as needed
+import { SubjectDTO } from '../../repositories/subjectRepository';
+import { EmployeeDTO } from '../../repositories/employeeRepository';
+import { RoomDTO } from '../../repositories/roomRepository';
+import { ClassDTO } from '../../repositories/classRepository';
 
-const uploadData = async (url: string, entity: string, data: any[]) => {
+type entries = SubjectDTO | EmployeeDTO | RoomDTO | ClassDTO;
+
+const uploadData = async (url: string, entity: string, data: entries[]) => {
   try {
     for (const item of data) {
       const response = await axios.post(url, item);
