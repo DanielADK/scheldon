@@ -15,6 +15,7 @@ import { Subject } from './Subject';
 import { Employee } from './Employee';
 import { Room } from './Room';
 import { TimetableEntrySet } from './TimetableEntrySet';
+import { SubClass } from './SubClass';
 
 @Table({
   timestamps: false,
@@ -33,20 +34,27 @@ export class TimetableEntry extends Model<TimetableEntry> {
     type: DataType.INTEGER,
     allowNull: false
   })
-  timetableEntryId!: number;
+  declare timetableEntryId: number;
 
   @ForeignKey(() => Class)
   @Column({
     type: DataType.INTEGER,
     allowNull: false
   })
-  classId!: number;
+  declare classId: number;
+
+  @ForeignKey(() => SubClass)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true
+  })
+  declare subClassId: number;
 
   @Column({
     type: DataType.INTEGER,
     allowNull: false
   })
-  dayInWeek!: number;
+  declare dayInWeek: number;
 
   @Column({
     type: DataType.INTEGER,
