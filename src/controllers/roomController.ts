@@ -7,7 +7,7 @@ import { RoomType } from '../models/types/RoomType';
 
 // Schema for creating and updating a room
 const roomSchema: Joi.ObjectSchema<RoomDTO> = Joi.object({
-  name: Joi.string().required().min(3).max(30),
+  name: Joi.string().required().min(1).max(30),
   type: Joi.string()
     .valid(...Object.values(RoomType))
     .required(),

@@ -5,7 +5,7 @@ import { ClassDTO } from '../repositories/classRepository';
 
 // Schema for creating and updating a class
 const classSchema: Joi.ObjectSchema<ClassDTO> = Joi.object({
-  name: Joi.string().required().min(1).max(3),
+  name: Joi.string().required().min(1).max(50),
   validFrom: Joi.date().required(),
   validTo: Joi.date().required(),
   roomId: Joi.number().required(),

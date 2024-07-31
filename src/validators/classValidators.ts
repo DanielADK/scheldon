@@ -47,6 +47,7 @@ export const validateClassName = async (instance: Class) => {
 export const validateClassInterval = async (instance: Class) => {
   const existingClass = await Class.findOne({
     where: {
+      name: instance.name,
       roomId: instance.roomId,
       employeeId: instance.employeeId,
       validFrom: {

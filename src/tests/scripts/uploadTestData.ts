@@ -1,14 +1,15 @@
 import axios from 'axios';
 import { subjects } from '../data/subjectsData';
-import { employee } from '../data/employeeData';
+import { employees } from '../data/employeeData';
 import { rooms } from '../data/roomData';
+import { classes } from '../data/classData';
 // import other data sets as needed
 
-const uploadData = async (url: string, data: any[]) => {
+const uploadData = async (url: string, entity: string, data: any[]) => {
   try {
     for (const item of data) {
       const response = await axios.post(url, item);
-      console.log(`Uploaded: ${response.data.name}`);
+      console.log(`Uploaded [${entity}]: ${response.data.name}`);
     }
   } catch (error: any) {
     console.error(
@@ -19,9 +20,10 @@ const uploadData = async (url: string, data: any[]) => {
 };
 
 const uploadTestData = async () => {
-  await uploadData('http://localhost:3000/subjects', subjects);
-  await uploadData('http://localhost:3000/employee', employee);
-  await uploadData('http://localhost:3000/room', rooms);
+  await uploadData('http://localhost:3000/subjects', 'Subject', subjects);
+  await uploadData('http://localhost:3000/employee', 'Employee', employees);
+  await uploadData('http://localhost:3000/room', 'Room', rooms);
+  await uploadData('http://localhost:3000/classes', 'Class', classes);
   // Add more calls to uploadData for other data sets
 };
 
