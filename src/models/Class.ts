@@ -43,8 +43,8 @@ export class Class extends Model<Class> {
   declare classId: number;
 
   @Column({
-    type: DataType.STRING(3),
-    allowNull: true,
+    type: DataType.STRING(50),
+    allowNull: false,
     unique: false
   })
   declare name: string;
