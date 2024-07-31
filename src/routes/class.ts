@@ -103,6 +103,8 @@ router.get('/classes/:id', classController.getClassById);
  * @openapi
  * /classes/at-time/{time}:
  *   get:
+ *     tags:
+ *        - Class
  *     summary: Get classes at a specific time
  *     parameters:
  *       - in: path
