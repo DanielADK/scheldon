@@ -15,7 +15,15 @@ import { Lesson } from './Lesson';
 import { TimetableEntry } from './TimetableEntry';
 import { SubClass } from './SubClass';
 import { StudentAssignment } from './StudentAssignment';
-import { Op } from 'sequelize';
+import {
+  validateClassDates,
+  validateClassInterval,
+  validateClassName,
+  validateEmployeeExistence,
+  validateEmployeeSchedule,
+  validateRoomExistence,
+  validateRoomSchedule
+} from '../validators/classValidators';
 
 @Table({
   timestamps: false,
@@ -24,14 +32,7 @@ import { Op } from 'sequelize';
       unique: true,
       fields: ['name', 'validFrom', 'validTo', 'roomId', 'employeeId']
     }
-  ],
-  validate: {
-    datesAreValid(this: Class) {
-      if (new Date(this.validFrom) > new Date(this.validTo)) {
-        throw new Error('validFrom must be less than validTo');
-      }
-    }
-  }
+  ]
 })
 export class Class extends Model<Class> {
   @Column({
@@ -108,23 +109,16 @@ export class Class extends Model<Class> {
   // Virtual fields & validation
   @BeforeCreate
   @BeforeUpdate
-  static async validateClassInterval(instance: Class) {
-    const existingClass = await Class.findOne({
-      where: {
-        name: instance.name,
-        roomId: instance.roomId,
-        employeeId: instance.employeeId,
-        validFrom: {
-          [Op.lte]: instance.validTo
-        },
-        validTo: {
-          [Op.gte]: instance.validFrom
-        }
-      }
-    });
-
-    if (existingClass) {
-      throw new Error('Class interval is overlapping with another class');
-    }
+  // Hooks for validation
+  @BeforeCreate
+  @BeforeUpdate
+  static async validate(instance: Class) {
+    await validateClassDates(instance);
+    await validateClassName(instance);
+    await validateClassInterval(instance);
+    await validateEmployeeExistence(instance);
+    await validateRoomExistence(instance);
+    await validateEmployeeSchedule(instance);
+    await validateRoomSchedule(instance);
   }
 }
