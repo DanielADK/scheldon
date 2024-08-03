@@ -19,10 +19,10 @@ import {
   validateClassDates,
   validateClassInterval,
   validateClassName,
-  validateEmployeeExistence,
-  validateEmployeeSchedule,
   validateRoomExistence,
-  validateRoomSchedule
+  validateRoomSchedule,
+  validateTeacherExistence,
+  validateTeacherSchedule
 } from '../validators/classValidators';
 
 @Table({
@@ -116,9 +116,9 @@ export class Class extends Model<Class> {
     await validateClassDates(instance);
     await validateClassName(instance);
     await validateClassInterval(instance);
-    await validateEmployeeExistence(instance);
+    await validateTeacherExistence(instance);
     await validateRoomExistence(instance);
-    await validateEmployeeSchedule(instance);
+    await validateTeacherSchedule(instance);
     await validateRoomSchedule(instance);
   }
 }
