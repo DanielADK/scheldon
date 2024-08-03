@@ -43,30 +43,30 @@ export class StudentAssignment extends Model<StudentAssignment> {
     type: DataType.INTEGER,
     allowNull: false
   })
-  studentId!: number;
+  declare studentId: number;
 
   @BelongsTo(() => Student)
-  student!: Student;
+  declare student: Student;
 
   @ForeignKey(() => Class)
   @Column({
     type: DataType.INTEGER,
     allowNull: false
   })
-  classId!: number;
+  declare classId: number;
 
   @BelongsTo(() => Class)
-  class!: Class;
+  declare class: Class;
 
   @ForeignKey(() => SubClass)
   @Column({
     type: DataType.INTEGER,
     allowNull: true
   })
-  subClassId!: number;
+  declare subClassId: number;
 
   @BelongsTo(() => SubClass)
-  subClass!: SubClass;
+  declare subClass: SubClass;
 
   // Connection validation range
   @Column({
