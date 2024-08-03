@@ -2,6 +2,8 @@ import { StudentAssignment } from '../models/StudentAssignment';
 import { Class } from '../models/Class';
 import { SubClass } from '../models/SubClass';
 import { Transaction } from 'sequelize';
+import * as subClassRepository from '../repositories/subClassRepository';
+import { SubClassDTO } from '../repositories/subClassRepository';
 
 /**
  * Transfer subClasses from existing Class to new Class
@@ -84,4 +86,55 @@ export const transferSubClassAssignments = async (
       { transaction: transaction }
     );
   }
+};
+
+/**
+ * Create a new subclass
+ * @param data
+ */
+export const createSubClass = async (data: SubClassDTO) => {
+  return await subClassRepository.createSubClass(data);
+};
+
+/**
+ * Get all subclasses
+ */
+export const getSubClasses = async () => {
+  return await subClassRepository.getSubClasses();
+};
+
+/**
+ * Get a subclass by ID
+ * @param subClassId
+ */
+export const getSubClassById = async (subClassId: number) => {
+  return await subClassRepository.getSubClassById(subClassId);
+};
+
+/**
+ * Get all subclasses of a specific class
+ * @param classId
+ */
+export const getSubClassesByClassId = async (classId: number) => {
+  return await subClassRepository.getSubClassesByClassId(classId);
+};
+
+/**
+ * Update a subclass by ID
+ * @param subClassId
+ * @param data
+ */
+export const updateSubClass = async (
+  subClassId: number,
+  data: Partial<SubClassDTO>
+) => {
+  return await subClassRepository.updateSubClass(subClassId, data);
+};
+
+/**
+ * Delete a subclass by ID
+ * @param subClassId
+ */
+export const deleteSubClass = async (subClassId: number) => {
+  return await subClassRepository.deleteSubClass(subClassId);
 };

@@ -31,7 +31,8 @@ export class SubClass extends Model<SubClass> {
   @ForeignKey(() => Class)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false
+    allowNull: false,
+    unique: false
   })
   classId!: number;
 
