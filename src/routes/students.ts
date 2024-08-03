@@ -48,6 +48,8 @@ const router = new Router();
  *         - surname
  * /students:
  *   post:
+ *     tags:
+ *       - Student
  *     summary: Create a new student
  *     requestBody:
  *       required: true
@@ -121,6 +123,8 @@ router.get('/student/:id/history', studentController.getStudentsHistory);
  * @openapi
  * /students/{id}:
  *   put:
+ *     tags:
+ *       - Student
  *     summary: Update a student by ID
  *     parameters:
  *       - in: path
@@ -150,6 +154,8 @@ router.put('/student/:id', studentController.updateStudent);
  * @openapi
  * /students/{id}:
  *   delete:
+ *     tags:
+ *       - Student
  *     summary: Delete a student by ID
  *     parameters:
  *       - in: path
