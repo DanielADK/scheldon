@@ -12,6 +12,9 @@ const router = new Router();
  *     Employee:
  *       type: object
  *       properties:
+ *         employeeId:
+ *           type: integer
+ *           example: 1
  *         username:
  *           type: string
  *           example: "jdoe"
@@ -33,6 +36,42 @@ const router = new Router();
  *         isTeacher:
  *           type: boolean
  *           example: true
+ *       required:
+ *         - employeeId
+ *         - username
+ *         - name
+ *         - surname
+ *         - isTeacher
+ *
+ *     EmployeeDTO:
+ *       type: object
+ *       properties:
+ *         username:
+ *           type: string
+ *           example: "jdoe"
+ *         name:
+ *           type: string
+ *           example: "John"
+ *         surname:
+ *           type: string
+ *           example: "Doe"
+ *         degreePre:
+ *           type: string
+ *           example: "Dr."
+ *         degreePost:
+ *           type: string
+ *           example: "PhD"
+ *         abbreviation:
+ *           type: string
+ *           example: "JD"
+ *         isTeacher:
+ *           type: boolean
+ *           example: true
+ *       required:
+ *         - username
+ *         - name
+ *         - surname
+ *         - isTeacher
  * /employees:
  *   post:
  *     tags:
@@ -43,7 +82,7 @@ const router = new Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Employee'
+ *             $ref: '#/components/schemas/EmployeeDTO'
  *     responses:
  *       201:
  *         description: Employee created
@@ -96,6 +135,10 @@ router.get('/employee', employeeController.getAllEmployees);
  *     responses:
  *       200:
  *         description: Employee data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Employee'
  *       404:
  *         description: Employee not found
  */

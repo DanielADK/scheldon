@@ -12,6 +12,9 @@ const router = new Router();
  *     Room:
  *       type: object
  *       properties:
+ *         roomId:
+ *           type: integer
+ *           example: 1
  *         name:
  *           type: string
  *           example: "Classroom 101"
@@ -31,6 +34,40 @@ const router = new Router();
  *         administratorId:
  *           type: integer
  *           example: 1
+ *       required:
+ *         - roomId
+ *         - name
+ *         - type
+ *         - floor
+ *         - administratorId
+ *
+ *     RoomDTO:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *           example: "Classroom 101"
+ *         type:
+ *           type: string
+ *           enum:
+ *             - CLASSROOM
+ *             - LAB
+ *             - OFFICE
+ *           example: "CLASSROOM"
+ *         floor:
+ *           type: integer
+ *           example: 1
+ *         studentCapacity:
+ *           type: integer
+ *           example: 30
+ *         administratorId:
+ *           type: integer
+ *           example: 1
+ *       required:
+ *         - name
+ *         - type
+ *         - floor
+ *         - administratorId
  * /rooms:
  *   post:
  *     tags:
@@ -41,7 +78,7 @@ const router = new Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Room'
+ *             $ref: '#/components/schemas/RoomDTO'
  *     responses:
  *       201:
  *         description: Room created
@@ -79,6 +116,10 @@ router.get('/room', roomController.getAllRooms);
  *     responses:
  *       200:
  *         description: Room data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Room'
  *       404:
  *         description: Room not found
  */
@@ -104,7 +145,7 @@ router.get('/room/:id', roomController.getRoomById);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Room'
+ *             $ref: '#/components/schemas/RoomDTO'
  *     responses:
  *       200:
  *         description: Room updated

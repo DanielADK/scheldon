@@ -12,12 +12,32 @@ const router = new Router();
  *     Subject:
  *       type: object
  *       properties:
+ *         subjectId:
+ *           type: integer
+ *           example: 1
  *         name:
  *           type: string
  *           example: "Mathematics"
  *         abbreviation:
  *           type: string
- *           example: "MATH"
+ *           example: "M"
+ *       required:
+ *         - subjectId
+ *         - name
+ *         - abbreviation
+ *
+ *     SubjectDTO:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *           example: "Mathematics"
+ *         abbreviation:
+ *           type: string
+ *           example: "M"
+ *       required:
+ *         - name
+ *         - abbreviation
  * /subjects:
  *   post:
  *     tags:
@@ -28,7 +48,7 @@ const router = new Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Subject'
+ *             $ref: '#/components/schemas/SubjectDTO'
  *     responses:
  *       201:
  *         description: Subject created
@@ -79,6 +99,12 @@ router.get('/subjects', subjectController.getAllSubjects);
  *     responses:
  *       200:
  *         description: Subject data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Subject'
  *       404:
  *         description: Subject not found
  */
@@ -101,6 +127,12 @@ router.get('/subjects/:id', subjectController.getSubjectById);
  *     responses:
  *       200:
  *         description: Subject data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Subject'
  *       404:
  *         description: Subject not found
  */
@@ -128,7 +160,7 @@ router.get(
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Subject'
+ *             $ref: '#/components/schemas/SubjectDTO'
  *     responses:
  *       200:
  *         description: Subject updated

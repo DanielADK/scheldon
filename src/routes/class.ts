@@ -9,7 +9,7 @@ const router = new Router();
  * @openapi
  * components:
  *   schemas:
- *     Class:
+ *     ClassDTO:
  *       type: object
  *       properties:
  *         name:
@@ -29,6 +29,43 @@ const router = new Router();
  *         employeeId:
  *           type: integer
  *           example: 1
+ *       required:
+ *         - name
+ *         - validFrom
+ *         - validTo
+ *         - roomId
+ *         - employeeId
+ *
+ *     Class:
+ *       type: object
+ *       properties:
+ *         classId:
+ *           type: integer
+ *           example: 1
+ *         name:
+ *           type: string
+ *           example: "A1"
+ *         validFrom:
+ *           type: string
+ *           format: date
+ *           example: "2023-09-01"
+ *         validTo:
+ *           type: string
+ *           format: date
+ *           example: "2024-06-30"
+ *         roomId:
+ *           type: integer
+ *           example: 1
+ *         employeeId:
+ *           type: integer
+ *           example: 1
+ *       required:
+ *         - classId
+ *         - name
+ *         - validFrom
+ *         - validTo
+ *         - roomId
+ *         - employeeId
  * /classes:
  *   post:
  *     tags:
@@ -39,7 +76,7 @@ const router = new Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Class'
+ *             $ref: '#/components/schemas/ClassDTO'
  *     responses:
  *       201:
  *         description: Class created
