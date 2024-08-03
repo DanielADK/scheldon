@@ -71,23 +71,13 @@ export const validateClassInterval = async (instance: Class) => {
  * Validate employee existence
  * @param instance
  */
-export const validateEmployeeExistence = async (instance: Class) => {
-  const employee = await Employee.findByPk(instance.employeeId);
+export const validateTeacherExistence = async (instance: Class) => {
+  const teacher = await Employee.findOne({
+    where: { employeeId: instance.employeeId, isTeacher: true }
+  });
 
-  if (!employee) {
-    throw new Error('Employee does not exist');
-  }
-};
-
-/**
- * Validate room existence
- * @param instance
- */
-export const validateRoomExistence = async (instance: Class) => {
-  const room = await Room.findByPk(instance.roomId);
-
-  if (!room) {
-    throw new Error('Room does not exist');
+  if (!teacher) {
+    throw new Error('Teacher does not exist');
   }
 };
 
@@ -95,8 +85,8 @@ export const validateRoomExistence = async (instance: Class) => {
  * Validate employee schedule
  * @param instance
  */
-export const validateEmployeeSchedule = async (instance: Class) => {
-  const existingClass = await Class.findOne({
+export const validateTeacherSchedule = async (instance: Class) => {
+  const existingTeacher = await Class.findOne({
     where: {
       employeeId: instance.employeeId,
       validFrom: {
@@ -111,10 +101,27 @@ export const validateEmployeeSchedule = async (instance: Class) => {
     }
   });
 
-  if (existingClass) {
+  if (existingTeacher) {
     throw new Error(
-      'Employee is already assigned to another class within the validity period'
+      'Teacher is already assigned to another class within the validity period'
     );
+  }
+};
+
+/**
+ * Validate room existence
+ * @param instance
+ */
+export const validateRoomExistence = async (instance: Class) => {
+  const room = await Room.findOne({
+    where: {
+      roomId: instance.roomId,
+      type: 'classroom'
+    }
+  });
+
+  if (!room) {
+    throw new Error('Room does not exist');
   }
 };
 
@@ -123,22 +130,16 @@ export const validateEmployeeSchedule = async (instance: Class) => {
  * @param instance
  */
 export const validateRoomSchedule = async (instance: Class) => {
-  const existingClass = await Class.findOne({
+  const existingRoom = await Class.findOne({
     where: {
       roomId: instance.roomId,
-      validFrom: {
-        [Op.lte]: instance.validTo
-      },
-      validTo: {
-        [Op.gte]: instance.validFrom
-      },
-      classId: {
-        [Op.ne]: instance.classId // Ignore current instance during update
-      }
+      validFrom: { [Op.lte]: instance.validTo },
+      validTo: { [Op.gte]: instance.validFrom },
+      classId: { [Op.ne]: instance.classId }
     }
   });
 
-  if (existingClass) {
+  if (existingRoom) {
     throw new Error(
       'Room is already assigned to another class within the validity period'
     );
