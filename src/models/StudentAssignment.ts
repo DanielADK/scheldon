@@ -38,13 +38,6 @@ import { Op } from 'sequelize';
   }
 })
 export class StudentAssignment extends Model<StudentAssignment> {
-  @Column({
-    type: DataType.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  })
-  assignmentId!: number;
-
   @ForeignKey(() => Student)
   @Column({
     type: DataType.INTEGER,
