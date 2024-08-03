@@ -56,7 +56,7 @@ export const getAllRooms = async (
  */
 export const updateRoom = async (
   id: number,
-  data: Partial<Room>
+  data: RoomDTO
 ): Promise<[affectedCount: number]> => {
   return await Room.update(data, { where: { roomId: id } });
 };
