@@ -112,8 +112,6 @@ router.get('/student/:id', studentController.getStudentById);
  *         description: Student's class and subclass history
  *       404:
  *         description: Student not found
- *        404:
- *        description: Student has no history
  */
 router.get('/student/:id/history', studentController.getStudentsHistory);
 
