@@ -4,11 +4,11 @@ import { employees } from '../data/employeeData';
 import { rooms } from '../data/roomData';
 import { classes } from '../data/classData';
 import { subClasses } from '../data/subClassData';
-import { SubjectDTO } from '../../repositories/subjectRepository';
-import { EmployeeDTO } from '../../repositories/employeeRepository';
-import { RoomDTO } from '../../repositories/roomRepository';
-import { ClassDTO } from '../../repositories/classRepository';
-import { SubClassDTO } from '../../repositories/subClassRepository';
+import { SubjectDTO } from '@repositories/subjectRepository';
+import { EmployeeDTO } from '@repositories/employeeRepository';
+import { RoomDTO } from '@repositories/roomRepository';
+import { ClassDTO } from '@repositories/classRepository';
+import { SubClassDTO } from '@repositories/subclassRepository';
 
 type entries = SubjectDTO | EmployeeDTO | RoomDTO | ClassDTO | SubClassDTO;
 

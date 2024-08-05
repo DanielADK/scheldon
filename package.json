@@ -6,7 +6,8 @@
     "start": "NODE_ENV=production ts-node src/index.ts",
     "dev": "NODE_ENV=local nodemon src/index.ts",
     "test": "mocha --require ts-node/register src/tests/**/*.test.ts",
-    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
+    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+    "profile": "NODE_ENV=local nodemon --prof src/index.ts"
   },
   "keywords": [
     "SPSE Jecna",
