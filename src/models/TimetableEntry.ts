@@ -1,5 +1,7 @@
 import {
   AutoIncrement,
+  BeforeCreate,
+  BeforeUpdate,
   BelongsTo,
   BelongsToMany,
   Column,
@@ -16,6 +18,12 @@ import { Employee } from '@models/Employee';
 import { Room } from '@models/Room';
 import { TimetableEntrySet } from '@models/TimetableEntrySet';
 import { SubClass } from '@models/SubClass';
+import {
+  validateDayInWeekRange,
+  validateHourInDayRange,
+  validateSubClassInClass,
+  validateTeacherRole
+} from '@validators/TimetableEntryValidators';
 
 @Table({
   timestamps: false,
@@ -60,42 +68,54 @@ export class TimetableEntry extends Model<TimetableEntry> {
     type: DataType.INTEGER,
     allowNull: false
   })
-  lessonNumber!: number;
+  declare hourInDay: number;
 
   @ForeignKey(() => Subject)
   @Column({
     type: DataType.INTEGER,
     allowNull: false
   })
-  subjectId!: number;
+  declare subjectId: number;
 
   @ForeignKey(() => Employee)
   @Column({
     type: DataType.INTEGER,
     allowNull: false
   })
-  teacherId!: number;
+  declare teacherId: number;
 
   @ForeignKey(() => Room)
   @Column({
     type: DataType.INTEGER,
     allowNull: true
   })
-  roomId!: number;
+  declare roomId: number;
 
   // Mappings
   @BelongsToMany(() => TimetableSet, () => TimetableEntrySet)
-  timetableSets!: TimetableSet[];
+  declare timetableSets: TimetableSet[];
 
   @BelongsTo(() => Class)
-  class!: Class;
+  declare class: Class;
+
+  @BelongsTo(() => SubClass)
+  declare subclass: SubClass;
 
   @BelongsTo(() => Subject)
-  subject!: Subject;
+  declare subject: Subject;
 
   @BelongsTo(() => Employee)
-  teacher!: Employee;
+  declare teacher: Employee;
 
   @BelongsTo(() => Room)
-  room!: Room;
+  declare room: Room;
+
+  @BeforeCreate
+  @BeforeUpdate
+  static async validate(instance: TimetableEntry): Promise<void> {
+    await validateTeacherRole(instance);
+    await validateDayInWeekRange(instance);
+    await validateHourInDayRange(instance);
+    await validateSubClassInClass(instance);
+  }
 }
