@@ -1,7 +1,7 @@
 // Schema for creating and updating a subclass
 import Joi from 'joi';
-import { SubClassDTO } from '../repositories/subclassRepository';
-import * as subClassService from '../services/subclassService';
+import { SubClassDTO } from '@repositories/subclassRepository';
+import * as subClassService from '@services/subclassService';
 import { Context } from 'koa';
 
 const subClassSchema: Joi.ObjectSchema<SubClassDTO> = Joi.object({
