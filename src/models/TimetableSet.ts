@@ -1,4 +1,6 @@
 import {
+  BeforeCreate,
+  BeforeUpdate,
   BelongsToMany,
   Column,
   DataType,
@@ -7,6 +9,10 @@ import {
 } from 'sequelize-typescript';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { TimetableEntrySet } from '@models/TimetableEntrySet';
+import {
+  validateDates,
+  validateUniqueInterval
+} from '@validators/timetableSetValidator';
 
 @Table({
   timestamps: false
@@ -16,34 +22,35 @@ export class TimetableSet extends Model<TimetableSet> {
     type: DataType.INTEGER,
     primaryKey: true
   })
-  timetableSetId!: number;
+  declare timetableSetId: number;
 
   @Column({
     type: DataType.STRING,
-    allowNull: false
-  })
-  name!: string;
-
-  @Column({
-    type: DataType.INTEGER,
     allowNull: false,
     unique: true
   })
-  schoolYearId!: number;
+  declare name: string;
 
   @Column({
     type: DataType.DATE,
     allowNull: false
   })
-  validFrom!: Date;
+  declare validFrom: Date;
 
   @Column({
     type: DataType.DATE,
     allowNull: false
   })
-  validTo!: Date;
+  declare validTo: Date;
 
   // Mapping
   @BelongsToMany(() => TimetableEntry, () => TimetableEntrySet)
-  timetableEntries!: TimetableEntry[];
+  declare timetableEntries: TimetableEntry[];
+
+  @BeforeCreate
+  @BeforeUpdate
+  static async validate(instance: TimetableSet): Promise<void> {
+    await validateDates(instance);
+    await validateUniqueInterval(instance);
+  }
 }

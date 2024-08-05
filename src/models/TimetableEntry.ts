@@ -23,7 +23,7 @@ import {
   validateHourInDayRange,
   validateSubClassInClass,
   validateTeacherRole
-} from '@validators/TimetableEntryValidators';
+} from '@validators/timetableEntryValidators';
 
 @Table({
   timestamps: false,
