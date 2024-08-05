@@ -19,7 +19,7 @@ export class TimetableEntrySet extends Model<TimetableEntrySet> {
     type: DataType.INTEGER,
     allowNull: false
   })
-  timetableEntryId!: number;
+  declare timetableEntryId: number;
 
   @PrimaryKey
   @ForeignKey(() => TimetableSet)
@@ -27,5 +27,5 @@ export class TimetableEntrySet extends Model<TimetableEntrySet> {
     type: DataType.INTEGER,
     allowNull: false
   })
-  timetableSetId!: number;
+  declare timetableSetId: number;
 }
