@@ -106,9 +106,6 @@ export class Class extends Model<Class> {
   @HasMany(() => StudentAssignment)
   declare studentAssignments: StudentAssignment[];
 
-  // Virtual fields & validation
-  @BeforeCreate
-  @BeforeUpdate
   // Hooks for validation
   @BeforeCreate
   @BeforeUpdate
