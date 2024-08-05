@@ -1,6 +1,6 @@
-import { Room } from '../models/Room';
-import * as roomRepository from '../repositories/roomRepository';
-import { RoomDTO } from '../repositories/roomRepository';
+import { Room } from '@models/Room';
+import * as roomRepository from '@repositories/roomRepository';
+import { RoomDTO } from '@repositories/roomRepository';
 
 /**
  * Create a new room

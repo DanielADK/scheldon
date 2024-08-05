@@ -1,6 +1,6 @@
-import * as employeeRepository from '../repositories/employeeRepository';
-import { EmployeeDTO } from '../repositories/employeeRepository';
-import { Employee } from '../models/Employee';
+import * as employeeRepository from '@repositories/employeeRepository';
+import { EmployeeDTO } from '@repositories/employeeRepository';
+import { Employee } from '@models/Employee';
 
 /**
  * Create a new employee

@@ -1,4 +1,4 @@
-import { SubClassDTO } from '../../repositories/subClassRepository';
+import { SubClassDTO } from '@repositories/subclassRepository';
 
 export const subClasses: SubClassDTO[] = [
   { name: '1/2', classId: 1 },

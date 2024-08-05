@@ -1,11 +1,11 @@
 import Router from 'koa-router';
-import subjects from './subject';
-import students from './students';
-import employees from './employee';
-import classes from './class';
-import rooms from './room';
-import swagger from './swagger';
-import subclass from './subclass';
+import subjects from '@routes/subject';
+import students from '@routes/students';
+import employees from '@routes/employee';
+import classes from '@routes/class';
+import rooms from '@routes/room';
+import swagger from '@routes/swagger';
+import subclass from '@routes/subclass';
 
 const router = new Router();
 

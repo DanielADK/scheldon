@@ -1,5 +1,5 @@
-import { Room } from '../models/Room';
-import { RoomType } from '../models/types/RoomType';
+import { Room } from '@models/Room';
+import { RoomType } from '@models/types/RoomType';
 
 /**
  * RoomDTO interface

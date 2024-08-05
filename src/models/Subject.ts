@@ -1,6 +1,6 @@
 import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
-import { Lesson } from './Lesson';
-import { TimetableEntry } from './TimetableEntry';
+import { Lesson } from '@models/Lesson';
+import { TimetableEntry } from '@models/TimetableEntry';
 
 @Table({
   timestamps: false

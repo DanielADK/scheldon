@@ -1,4 +1,4 @@
-import { RoomType } from '../../models/types/RoomType';
+import { RoomType } from '@models/types/RoomType';
 
 export const rooms = [
   {

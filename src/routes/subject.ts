@@ -1,5 +1,5 @@
 import Router from 'koa-router';
-import * as subjectController from '../controllers/subjectController';
+import * as subjectController from '@controllers/subjectController';
 
 const router = new Router();
 

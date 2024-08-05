@@ -1,4 +1,6 @@
-export const subjects = [
+import { SubjectDTO } from '@repositories/subjectRepository';
+
+export const subjects: SubjectDTO[] = [
   { name: 'Praxe', abbreviation: 'DC' },
   { name: 'Technické dokumentace', abbreviation: 'TD' },
   { name: 'Multimédia a vývoj her', abbreviation: 'MVH' },

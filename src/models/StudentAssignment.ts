@@ -8,9 +8,9 @@ import {
   Model,
   Table
 } from 'sequelize-typescript';
-import { Class } from './Class';
-import { SubClass } from './SubClass';
-import { Student } from './Student';
+import { Class } from '@models/Class';
+import { SubClass } from '@models/SubClass';
+import { Student } from '@models/Student';
 import { Op } from 'sequelize';
 
 @Table({

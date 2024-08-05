@@ -9,12 +9,12 @@ import {
   Model,
   Table
 } from 'sequelize-typescript';
-import { Room } from './Room';
-import { Employee } from './Employee';
-import { Lesson } from './Lesson';
-import { TimetableEntry } from './TimetableEntry';
-import { SubClass } from './SubClass';
-import { StudentAssignment } from './StudentAssignment';
+import { Room } from '@models/Room';
+import { Employee } from '@models/Employee';
+import { Lesson } from '@models/Lesson';
+import { TimetableEntry } from '@models/TimetableEntry';
+import { SubClass } from '@models/SubClass';
+import { StudentAssignment } from '@models/StudentAssignment';
 import {
   validateClassDates,
   validateClassInterval,
@@ -23,7 +23,7 @@ import {
   validateRoomSchedule,
   validateTeacherExistence,
   validateTeacherSchedule
-} from '../validators/classValidators';
+} from '@validators/classValidators';
 
 @Table({
   timestamps: false,

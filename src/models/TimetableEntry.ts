@@ -9,13 +9,13 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript';
-import { TimetableSet } from './TimetableSet';
-import { Class } from './Class';
-import { Subject } from './Subject';
-import { Employee } from './Employee';
-import { Room } from './Room';
-import { TimetableEntrySet } from './TimetableEntrySet';
-import { SubClass } from './SubClass';
+import { TimetableSet } from '@models/TimetableSet';
+import { Class } from '@models/Class';
+import { Subject } from '@models/Subject';
+import { Employee } from '@models/Employee';
+import { Room } from '@models/Room';
+import { TimetableEntrySet } from '@models/TimetableEntrySet';
+import { SubClass } from '@models/SubClass';
 
 @Table({
   timestamps: false,

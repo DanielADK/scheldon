@@ -1,4 +1,4 @@
-import { ClassDTO } from '../../repositories/classRepository';
+import { ClassDTO } from '@repositories/classRepository';
 
 export const classes: ClassDTO[] = [
   {

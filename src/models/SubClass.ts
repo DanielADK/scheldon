@@ -7,9 +7,9 @@ import {
   Model,
   Table
 } from 'sequelize-typescript';
-import { Class } from './Class';
-import { StudentAssignment } from './StudentAssignment';
-import { Lesson } from './Lesson';
+import { Class } from '@models/Class';
+import { StudentAssignment } from '@models/StudentAssignment';
+import { Lesson } from '@models/Lesson';
 
 @Table({
   timestamps: false

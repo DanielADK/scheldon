@@ -8,9 +8,9 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript';
-import { Lesson } from './Lesson';
-import { Student } from './Student';
-import { AttendanceType } from './types/AttendanceType';
+import { Lesson } from '@models/Lesson';
+import { Student } from '@models/Student';
+import { AttendanceType } from '@models/types/AttendanceType';
 
 @Table({
   timestamps: false

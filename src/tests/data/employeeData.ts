@@ -1,4 +1,6 @@
-export const employees = [
+import { EmployeeDTO } from '@repositories/employeeRepository';
+
+export const employees: EmployeeDTO[] = [
   {
     username: 'jnovak',
     name: 'Jan',
@@ -23,8 +25,6 @@ export const employees = [
     username: 'mprochazka',
     name: 'Martin',
     surname: 'Procházka',
-    degreePre: null,
-    degreePost: null,
     abbreviation: 'MP',
     isTeacher: false,
     isActive: false
@@ -44,7 +44,6 @@ export const employees = [
     name: 'Karolína',
     surname: 'Něspoř',
     degreePre: 'Mgr.',
-    degreePost: null,
     abbreviation: 'KN',
     isTeacher: false,
     isActive: false
@@ -54,7 +53,6 @@ export const employees = [
     name: 'Simona',
     surname: 'Janda',
     degreePre: 'Ing.',
-    degreePost: null,
     abbreviation: 'SJ',
     isTeacher: false,
     isActive: false
@@ -73,7 +71,6 @@ export const employees = [
     username: 'psevcik',
     name: 'Pavel',
     surname: 'Ševčík',
-    degreePre: null,
     degreePost: 'Ing.',
     abbreviation: 'PS',
     isTeacher: true,
@@ -84,7 +81,6 @@ export const employees = [
     name: 'Alena',
     surname: 'Holub',
     degreePre: 'Bc.',
-    degreePost: null,
     abbreviation: 'AH',
     isTeacher: false,
     isActive: true
@@ -104,7 +100,6 @@ export const employees = [
     name: 'Filip',
     surname: 'Liška',
     degreePre: 'Bc.',
-    degreePost: null,
     abbreviation: 'FL',
     isTeacher: true,
     isActive: false
@@ -114,7 +109,6 @@ export const employees = [
     name: 'David',
     surname: 'Srámeček',
     degreePre: 'Ing.',
-    degreePost: null,
     abbreviation: 'DS',
     isTeacher: false,
     isActive: true
@@ -134,7 +128,6 @@ export const employees = [
     name: 'Zdeněk',
     surname: 'Tichý',
     degreePre: 'Bc.',
-    degreePost: null,
     abbreviation: 'ZT',
     isTeacher: false,
     isActive: true
@@ -143,7 +136,6 @@ export const employees = [
     username: 'kvybiral',
     name: 'Karel',
     surname: 'Výbíral',
-    degreePre: null,
     degreePost: 'Mgr.',
     abbreviation: 'KV',
     isTeacher: false,
@@ -164,7 +156,6 @@ export const employees = [
     name: 'Světlana',
     surname: 'Pospíšil',
     degreePre: 'Bc.',
-    degreePost: null,
     abbreviation: 'SP',
     isTeacher: false,
     isActive: true
@@ -174,7 +165,6 @@ export const employees = [
     name: 'Václav',
     surname: 'Horák',
     degreePre: 'Ing.',
-    degreePost: null,
     abbreviation: 'VH',
     isTeacher: true,
     isActive: false
@@ -204,7 +194,6 @@ export const employees = [
     name: 'Radek',
     surname: 'Jurík',
     degreePre: 'Bc.',
-    degreePost: null,
     abbreviation: 'RJ',
     isTeacher: false,
     isActive: true
@@ -244,7 +233,6 @@ export const employees = [
     name: 'Eva',
     surname: 'Jelínek',
     degreePre: 'Mgr.',
-    degreePost: null,
     abbreviation: 'EJ',
     isTeacher: false,
     isActive: true
@@ -274,7 +262,6 @@ export const employees = [
     name: 'Ivana',
     surname: 'Michalová',
     degreePre: 'Bc.',
-    degreePost: null,
     abbreviation: 'IM',
     isTeacher: true,
     isActive: false
@@ -294,7 +281,6 @@ export const employees = [
     name: 'Vojtěch',
     surname: 'Lukeš',
     degreePre: 'Ing.',
-    degreePost: null,
     abbreviation: 'VL',
     isTeacher: true,
     isActive: false
@@ -314,7 +300,6 @@ export const employees = [
     name: 'Marek',
     surname: 'Doležal',
     degreePre: 'Bc.',
-    degreePost: null,
     abbreviation: 'MD',
     isTeacher: true,
     isActive: false
@@ -324,7 +309,6 @@ export const employees = [
     name: 'Renáta',
     surname: 'Svoboda',
     degreePre: 'Ing.',
-    degreePost: null,
     abbreviation: 'RS',
     isTeacher: false,
     isActive: true
@@ -354,7 +338,6 @@ export const employees = [
     name: 'Monika',
     surname: 'Janoušek',
     degreePre: 'Bc.',
-    degreePost: null,
     abbreviation: 'MJ',
     isTeacher: false,
     isActive: true
@@ -364,7 +347,6 @@ export const employees = [
     name: 'Tomáš',
     surname: 'Turek',
     degreePre: 'Bc.',
-    degreePost: null,
     abbreviation: 'TT',
     isTeacher: false,
     isActive: true
@@ -394,7 +376,6 @@ export const employees = [
     name: 'František',
     surname: 'Strnad',
     degreePre: 'Bc.',
-    degreePost: null,
     abbreviation: 'FS',
     isTeacher: false,
     isActive: true
@@ -414,7 +395,6 @@ export const employees = [
     name: 'Kamil',
     surname: 'Pokorný',
     degreePre: 'Bc.',
-    degreePost: null,
     abbreviation: 'KP',
     isTeacher: false,
     isActive: true
@@ -434,7 +414,6 @@ export const employees = [
     name: 'Pavel',
     surname: 'Prokop',
     degreePre: 'Bc.',
-    degreePost: null,
     abbreviation: 'PP',
     isTeacher: true,
     isActive: false
@@ -444,7 +423,6 @@ export const employees = [
     name: 'Denisa',
     surname: 'Liška',
     degreePre: 'Mgr.',
-    degreePost: null,
     abbreviation: 'DL',
     isTeacher: false,
     isActive: true
@@ -474,7 +452,6 @@ export const employees = [
     name: 'Ladislav',
     surname: 'Výbíral',
     degreePre: 'Bc.',
-    degreePost: null,
     abbreviation: 'LV',
     isTeacher: true,
     isActive: false
@@ -514,7 +491,6 @@ export const employees = [
     name: 'Tomáš',
     surname: 'Dvořák',
     degreePre: 'Ing.',
-    degreePost: null,
     abbreviation: 'TD',
     isTeacher: false,
     isActive: true
@@ -534,7 +510,6 @@ export const employees = [
     name: 'Ivana',
     surname: 'Krejčí',
     degreePre: 'Mgr.',
-    degreePost: null,
     abbreviation: 'IK',
     isTeacher: false,
     isActive: true
@@ -564,7 +539,6 @@ export const employees = [
     name: 'Radka',
     surname: 'Kovář',
     degreePre: 'Bc.',
-    degreePost: null,
     abbreviation: 'RK',
     isTeacher: true,
     isActive: false
@@ -584,7 +558,6 @@ export const employees = [
     name: 'Dana',
     surname: 'Jurík',
     degreePre: 'Ing.',
-    degreePost: null,
     abbreviation: 'DJ',
     isTeacher: false,
     isActive: true
@@ -604,7 +577,6 @@ export const employees = [
     name: 'Zuzana',
     surname: 'Prokop',
     degreePre: 'Mgr.',
-    degreePost: null,
     abbreviation: 'ZP',
     isTeacher: false,
     isActive: true
@@ -624,7 +596,6 @@ export const employees = [
     name: 'Martin',
     surname: 'Chalupová',
     degreePre: 'Bc.',
-    degreePost: null,
     abbreviation: 'MC',
     isTeacher: false,
     isActive: true
@@ -644,7 +615,6 @@ export const employees = [
     name: 'Viktor',
     surname: 'Tichý',
     degreePre: 'Ing.',
-    degreePost: null,
     abbreviation: 'VT',
     isTeacher: false,
     isActive: true
@@ -654,7 +624,6 @@ export const employees = [
     name: 'Jana',
     surname: 'Král',
     degreePre: 'Mgr.',
-    degreePost: null,
     abbreviation: 'JK',
     isTeacher: false,
     isActive: true
