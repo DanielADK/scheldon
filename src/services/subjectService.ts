@@ -1,5 +1,5 @@
-import * as subjectRepository from '../repositories/subjectRepository';
-import { SubjectDTO } from '../repositories/subjectRepository';
+import * as subjectRepository from '@repositories/subjectRepository';
+import { SubjectDTO } from '@repositories/subjectRepository';
 
 /**
  * Create a new subject

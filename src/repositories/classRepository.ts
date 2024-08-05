@@ -1,6 +1,6 @@
 import { FindAttributeOptions } from 'sequelize';
-import { Class } from '../models/Class';
-import { SubClass } from '../models/SubClass';
+import { Class } from '@models/Class';
+import { SubClass } from '@models/SubClass';
 
 /**
  * ClassDTO interface

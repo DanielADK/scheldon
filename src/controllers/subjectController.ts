@@ -1,7 +1,7 @@
-import * as subjectService from '../services/subjectService';
+import * as subjectService from '@services/subjectService';
 import { Context } from 'koa';
 import Joi from 'joi';
-import { SubjectDTO } from '../repositories/subjectRepository';
+import { SubjectDTO } from '@repositories/subjectRepository';
 
 // Schema for creating a subject
 const subjectSchema: Joi.ObjectSchema<SubjectDTO> = Joi.object({

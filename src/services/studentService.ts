@@ -1,6 +1,6 @@
-import * as studentRepository from '../repositories/studentRepository';
-import { StudentDTO } from '../repositories/studentRepository';
-import { StudentAssignment } from '../models/StudentAssignment';
+import * as studentRepository from '@repositories/studentRepository';
+import { StudentDTO } from '@repositories/studentRepository';
+import { StudentAssignment } from '@models/StudentAssignment';
 
 /**
  * Create a new student

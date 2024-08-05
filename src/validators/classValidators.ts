@@ -1,7 +1,7 @@
 import { Op } from 'sequelize';
-import { Class } from '../models/Class';
-import { Room } from '../models/Room';
-import { Employee } from '../models/Employee';
+import { Class } from '@models/Class';
+import { Room } from '@models/Room';
+import { Employee } from '@models/Employee';
 
 /**
  * Validate class dates

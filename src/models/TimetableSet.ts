@@ -5,8 +5,8 @@ import {
   Model,
   Table
 } from 'sequelize-typescript';
-import { TimetableEntry } from './TimetableEntry';
-import { TimetableEntrySet } from './TimetableEntrySet';
+import { TimetableEntry } from '@models/TimetableEntry';
+import { TimetableEntrySet } from '@models/TimetableEntrySet';
 
 @Table({
   timestamps: false

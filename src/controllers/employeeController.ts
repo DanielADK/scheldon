@@ -1,7 +1,7 @@
-import * as employeeService from '../services/employeeService';
+import * as employeeService from '@services/employeeService';
 import { Context } from 'koa';
 import Joi from 'joi';
-import { EmployeeDTO } from '../repositories/employeeRepository';
+import { EmployeeDTO } from '@repositories/employeeRepository';
 
 const employeeSchema: Joi.ObjectSchema<EmployeeDTO> = Joi.object({
   username: Joi.string().required().min(2).max(50),

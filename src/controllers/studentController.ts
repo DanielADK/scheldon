@@ -1,7 +1,7 @@
 import { Context } from 'koa';
-import * as studentService from '../services/studentService';
+import * as studentService from '@services/studentService';
 import Joi from 'joi';
-import { StudentDTO } from '../repositories/studentRepository';
+import { StudentDTO } from '@repositories/studentRepository';
 
 // Schema for creating and updating a student
 const studentSchema: Joi.ObjectSchema<StudentDTO> = Joi.object({

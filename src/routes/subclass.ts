@@ -1,5 +1,5 @@
 import Router from 'koa-router';
-import * as subClassController from '../controllers/subClassController';
+import * as subClassController from '@controllers/subclassController';
 
 const router = new Router();
 

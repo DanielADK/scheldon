@@ -1,4 +1,4 @@
-import { SubClass } from '../models/SubClass';
+import { SubClass } from '@models/SubClass';
 
 /**
  * SubClassDTO interface

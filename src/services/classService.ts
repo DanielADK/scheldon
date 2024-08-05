@@ -1,7 +1,7 @@
-import * as classRepository from '../repositories/classRepository';
-import { ClassDTO } from '../repositories/classRepository';
-import * as subClassService from './subClassService';
-import { Class } from '../models/Class';
+import * as classRepository from '@repositories/classRepository';
+import { ClassDTO } from '@repositories/classRepository';
+import * as subClassService from './subclassService';
+import { Class } from '@models/Class';
 import { sequelize } from '../index';
 import { Transaction } from 'sequelize';
 

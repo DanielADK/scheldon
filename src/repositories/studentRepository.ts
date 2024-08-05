@@ -1,7 +1,7 @@
-import { Student } from '../models/Student';
-import { StudentAssignment } from '../models/StudentAssignment';
-import { Class } from '../models/Class';
-import { SubClass } from '../models/SubClass';
+import { Student } from '@models/Student';
+import { StudentAssignment } from '@models/StudentAssignment';
+import { Class } from '@models/Class';
+import { SubClass } from '@models/SubClass';
 
 /**
  * StudentDTO interface

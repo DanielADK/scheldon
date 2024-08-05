@@ -1,9 +1,9 @@
-import { StudentAssignment } from '../models/StudentAssignment';
-import { Class } from '../models/Class';
-import { SubClass } from '../models/SubClass';
+import { StudentAssignment } from '@models/StudentAssignment';
+import { Class } from '@models/Class';
+import { SubClass } from '@models/SubClass';
 import { Transaction } from 'sequelize';
-import * as subClassRepository from '../repositories/subClassRepository';
-import { SubClassDTO } from '../repositories/subClassRepository';
+import * as subClassRepository from '@repositories/subclassRepository';
+import { SubClassDTO } from '@repositories/subclassRepository';
 
 /**
  * Transfer subClasses from existing Class to new Class

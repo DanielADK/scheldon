@@ -1,9 +1,9 @@
 import { Context } from 'koa';
-import { Room } from '../models/Room';
-import * as roomService from '../services/roomService';
+import { Room } from '@models/Room';
+import * as roomService from '@services/roomService';
 import Joi from 'joi';
-import { RoomDTO } from '../repositories/roomRepository';
-import { RoomType } from '../models/types/RoomType';
+import { RoomDTO } from '@repositories/roomRepository';
+import { RoomType } from '@models/types/RoomType';
 
 // Schema for creating and updating a room
 const roomSchema: Joi.ObjectSchema<RoomDTO> = Joi.object({

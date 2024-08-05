@@ -6,8 +6,8 @@ import {
   Model,
   Table
 } from 'sequelize-typescript';
-import { RoomType } from './types/RoomType';
-import { Employee } from './Employee';
+import { RoomType } from '@models/types/RoomType';
+import { Employee } from '@models/Employee';
 
 @Table({
   timestamps: false
