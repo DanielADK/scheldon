@@ -24,7 +24,7 @@ export const getStudentById = async (id: number) => {
  */
 export const getStudentsHistory = async (
   id: number
-): Promise<StudentAssignment | null> => {
+): Promise<StudentAssignment[] | null> => {
   return await studentRepository.getStudentsHistory(id);
 };
 

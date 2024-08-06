@@ -45,14 +45,7 @@ export const getStudentById = async (id: number): Promise<Student | null> => {
         include: [
           {
             model: Class,
-            attributes: [
-              'classId',
-              'name',
-              'validFrom',
-              'validTo',
-              'roomId',
-              'employeeId'
-            ]
+            attributes: ['classId', 'name', 'roomId', 'employeeId']
           },
           {
             model: SubClass,
@@ -70,19 +63,20 @@ export const getStudentById = async (id: number): Promise<Student | null> => {
  */
 export const getStudentsHistory = async (
   id: number
-): Promise<StudentAssignment | null> => {
-  return await StudentAssignment.findOne({
+): Promise<StudentAssignment[] | null> => {
+  return await StudentAssignment.findAll({
+    attributes: ['validFrom', 'validTo'],
     where: {
       studentId: id
     },
     include: [
       {
         model: Class,
-        as: 'class'
+        attributes: ['classId', 'name', 'roomId', 'employeeId']
       },
       {
         model: SubClass,
-        as: 'subClasses'
+        attributes: ['subClassId', 'name']
       }
     ]
   });
