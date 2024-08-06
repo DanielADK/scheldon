@@ -7,29 +7,30 @@ import { StudentAssignment } from '@models/StudentAssignment';
 export class Student extends Model<Student> {
   @Column({
     type: DataType.INTEGER,
-    primaryKey: true
+    primaryKey: true,
+    autoIncrement: true
   })
-  studentId!: number;
+  declare studentId: number;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.STRING(50),
     allowNull: false,
     unique: true
   })
-  username!: string;
+  declare username: string;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.STRING(50),
     allowNull: false
   })
-  name!: string;
+  declare name: string;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.STRING(50),
     allowNull: false
   })
-  surname!: string;
+  declare surname: string;
 
   @HasMany(() => StudentAssignment)
-  studentAssignments!: StudentAssignment[];
+  declare studentAssignments: StudentAssignment[];
 }
