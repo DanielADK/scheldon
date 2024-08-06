@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "start": "NODE_ENV=production ts-node src/index.ts",
-    "dev": "NODE_ENV=local nodemon src/index.ts",
+    "start": "NODE_ENV=production ts-node -r tsconfig-paths/register src/index.ts",
+    "dev": "NODE_ENV=local nodemon -r tsconfig-paths/register src/index.ts",
     "test": "mocha --require ts-node/register src/tests/**/*.test.ts",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "profile": "NODE_ENV=local nodemon --prof src/index.ts"
@@ -33,6 +33,7 @@
     "globals": "^15.8.0",
     "prettier": "^3.3.2",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.5.3",
     "typescript-eslint": "8.0.0-alpha.54"
   },
