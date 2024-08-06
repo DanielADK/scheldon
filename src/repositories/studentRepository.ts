@@ -2,6 +2,7 @@ import { Student } from '@models/Student';
 import { StudentAssignment } from '@models/StudentAssignment';
 import { Class } from '@models/Class';
 import { SubClass } from '@models/SubClass';
+import { Op } from 'sequelize';
 
 /**
  * StudentDTO interface
@@ -31,16 +32,33 @@ export const createStudent = async (data: StudentDTO): Promise<Student> => {
  * @param id
  */
 export const getStudentById = async (id: number): Promise<Student | null> => {
-  return await Student.findOne({
-    where: { studentId: id },
+  return await Student.findByPk(id, {
     include: [
       {
         model: StudentAssignment,
-        as: 'assignments',
+        attributes: ['validFrom', 'validTo'],
+        required: false,
         where: {
-          validFrom: { lte: new Date() },
-          validTo: { gte: new Date() }
-        }
+          validFrom: { [Op.lte]: new Date() },
+          validTo: { [Op.gte]: new Date() }
+        },
+        include: [
+          {
+            model: Class,
+            attributes: [
+              'classId',
+              'name',
+              'validFrom',
+              'validTo',
+              'roomId',
+              'employeeId'
+            ]
+          },
+          {
+            model: SubClass,
+            attributes: ['subClassId', 'name']
+          }
+        ]
       }
     ]
   });
