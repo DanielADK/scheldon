@@ -6,6 +6,7 @@ import classes from '@routes/class';
 import rooms from '@routes/room';
 import swagger from '@routes/swagger';
 import subclass from '@routes/subclass';
+import timetable from '@routes/timetable';
 
 const router = new Router();
 
@@ -15,6 +16,7 @@ router.use(employees.routes());
 router.use(classes.routes());
 router.use(subclass.routes());
 router.use(rooms.routes());
+router.use(timetable.routes());
 // Swagger
 router.use(swagger.routes());
 
