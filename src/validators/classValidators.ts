@@ -28,7 +28,7 @@ export const validateClassName = async (instance: Class) => {
         [Op.gte]: instance.validFrom
       },
       classId: {
-        [Op.ne]: instance.classId // Ignore current instance during update
+        [Op.ne]: instance.classId
       }
     }
   });

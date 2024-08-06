@@ -1,4 +1,6 @@
 import {
+  BeforeCreate,
+  BeforeUpdate,
   BelongsTo,
   Column,
   DataType,
@@ -10,9 +12,16 @@ import {
 import { Class } from '@models/Class';
 import { StudentAssignment } from '@models/StudentAssignment';
 import { Lesson } from '@models/Lesson';
+import { validateSubClassNameAndClass } from '@validators/subClassValidators';
 
 @Table({
-  timestamps: false
+  timestamps: false,
+  indexes: [
+    {
+      unique: true,
+      fields: ['name', 'classId']
+    }
+  ]
 })
 export class SubClass extends Model<SubClass> {
   @Column({
@@ -20,13 +29,13 @@ export class SubClass extends Model<SubClass> {
     primaryKey: true,
     autoIncrement: true
   })
-  subClassId!: number;
+  declare subClassId: number;
 
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
-  name!: string;
+  declare name: string;
 
   @ForeignKey(() => Class)
   @Column({
@@ -34,14 +43,20 @@ export class SubClass extends Model<SubClass> {
     allowNull: false,
     unique: false
   })
-  classId!: number;
+  declare classId: number;
 
   @BelongsTo(() => Class)
-  class!: Class;
+  declare class: Class;
 
   @HasMany(() => StudentAssignment)
-  studentAssignments!: StudentAssignment[];
+  declare studentAssignments: StudentAssignment[];
 
   @HasMany(() => Lesson)
-  lessons!: Lesson[];
+  declare lessons: Lesson[];
+
+  @BeforeCreate
+  @BeforeUpdate
+  static async validate(instance: SubClass) {
+    await validateSubClassNameAndClass(instance);
+  }
 }

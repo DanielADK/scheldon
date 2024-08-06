@@ -5,7 +5,7 @@ import { StudentDTO } from '@repositories/studentRepository';
 
 // Schema for creating and updating a student
 const studentSchema: Joi.ObjectSchema<StudentDTO> = Joi.object({
-  username: Joi.string().required().min(3).max(30),
+  username: Joi.string().required().min(3).max(50),
   name: Joi.string().required().min(3).max(50),
   surname: Joi.string().required().min(3).max(50)
 });

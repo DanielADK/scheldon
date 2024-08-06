@@ -63,7 +63,7 @@ const router = new Router();
  *       400:
  *         description: Invalid input
  */
-router.post('/student', studentController.createStudent);
+router.post('/students', studentController.createStudent);
 
 /**
  * Get a student by ID
@@ -90,7 +90,7 @@ router.post('/student', studentController.createStudent);
  *       404:
  *         description: Student not found
  */
-router.get('/student/:id', studentController.getStudentById);
+router.get('/students/:id', studentController.getStudentById);
 
 /**
  * Get student's history
@@ -113,7 +113,7 @@ router.get('/student/:id', studentController.getStudentById);
  *       404:
  *         description: Student not found
  */
-router.get('/student/:id/history', studentController.getStudentsHistory);
+router.get('/students/:id/history', studentController.getStudentsHistory);
 
 /**
  * Update a student by ID
@@ -144,7 +144,7 @@ router.get('/student/:id/history', studentController.getStudentsHistory);
  *       404:
  *         description: Student not found
  */
-router.put('/student/:id', studentController.updateStudent);
+router.put('/students/:id', studentController.updateStudent);
 
 /**
  * Delete a student by ID
@@ -167,6 +167,6 @@ router.put('/student/:id', studentController.updateStudent);
  *       404:
  *         description: Student not found
  */
-router.delete('/student/:id', studentController.deleteStudent);
+router.delete('/students/:id', studentController.deleteStudent);
 
 export default router;
