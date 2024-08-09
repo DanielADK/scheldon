@@ -14,7 +14,7 @@ import { Student } from '@models/Student';
 import {
   validateClassDates,
   validateClassExistsWhenSubClass,
-  validateInterval,
+  validateExclusiveClassAssignment,
   validateSubClassBelongsToClass
 } from '@validators/studentAssignmentValidators';
 
@@ -79,7 +79,7 @@ export class StudentAssignment extends Model<StudentAssignment> {
   static async validate(instance: StudentAssignment) {
     await validateSubClassBelongsToClass(instance);
     await validateClassDates(instance);
-    await validateInterval(instance);
+    await validateExclusiveClassAssignment(instance);
     await validateClassExistsWhenSubClass(instance);
   }
 }
