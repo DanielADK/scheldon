@@ -29,12 +29,13 @@ export const validateClassDates = async (instance: StudentAssignment) => {
   }
 };
 
-export const validateInterval = async (instance: StudentAssignment) => {
+export const validateExclusiveClassAssignment = async (
+  instance: StudentAssignment
+) => {
   const actualAssignments = await StudentAssignment.findOne({
     where: {
       studentId: instance.studentId,
-      classId: instance.classId,
-      subClassId: instance.subClassId,
+      subClassId: { [Op.is]: null },
       validTo: {
         [Op.gte]: instance.validFrom
       },
