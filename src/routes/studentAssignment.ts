@@ -92,7 +92,7 @@ router.post(
 /**
  * @openapi
  * /students/{studentId}/unassign:
- *   put:
+ *   delete:
  *     tags:
  *       - Student Assignment
  *     summary: Unassign a student from a class or subclass
