@@ -1,6 +1,7 @@
 import Joi from 'joi';
 import { Context } from 'koa';
 import * as studentAssignmentService from '@services/studentAssignmentService';
+import { getIdFromParam } from '../lib/controllerTools';
 
 // Schema for assigning a student to a class/subclass
 const assignStudentSchema = Joi.object({
@@ -66,17 +67,4 @@ export const unassignStudent = async (ctx: Context) => {
     ctx.status = 400;
     ctx.body = { error: error.message };
   }
-};
-
-/**
- * Get ID from request.
- * @param id
- * @throws Error if ID is invalid
- */
-const getIdFromParam = async (id: string): Promise<number> => {
-  const idNum = parseInt(id);
-  if (isNaN(idNum)) {
-    throw new Error('Invalid ID');
-  }
-  return idNum;
 };

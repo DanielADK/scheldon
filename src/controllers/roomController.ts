@@ -4,6 +4,7 @@ import * as roomService from '@services/roomService';
 import Joi from 'joi';
 import { RoomDTO } from '@repositories/roomRepository';
 import { RoomType } from '@models/types/RoomType';
+import { getIdFromParam } from '../lib/controllerTools';
 
 // Schema for creating and updating a room
 const roomSchema: Joi.ObjectSchema<RoomDTO> = Joi.object({
@@ -122,17 +123,4 @@ export const deleteRoom = async (ctx: Context): Promise<void> => {
   }
 
   ctx.status = 204;
-};
-
-/**
- * Get ID from request.
- * @param id
- * @throws Error if ID is invalid
- */
-const getIdFromParam = async (id: string): Promise<number> => {
-  const idNum = parseInt(id);
-  if (isNaN(idNum)) {
-    throw new Error('Invalid ID');
-  }
-  return idNum;
 };
