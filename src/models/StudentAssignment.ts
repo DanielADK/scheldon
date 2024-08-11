@@ -80,6 +80,10 @@ export class StudentAssignment extends Model<StudentAssignment> {
     await validateSubClassBelongsToClass(instance);
     await validateClassDates(instance);
     await validateExclusiveClassAssignment(instance);
-    await validateClassExistsWhenSubClass(instance);
+
+    // Validate only if subClassId is provided
+    if (instance.subClassId) {
+      await validateClassExistsWhenSubClass(instance);
+    }
   }
 }

@@ -22,7 +22,7 @@ const unassignStudentSchema = Joi.object({
  * POST /students/:studentId/assign
  */
 export const assignStudent = async (ctx: Context) => {
-  const studentId = parseInt(ctx.params.studentIdas as string);
+  const studentId = parseInt(ctx.params.studentId as string);
   const { error, value } = assignStudentSchema.validate(ctx.request.body);
 
   if (error) {

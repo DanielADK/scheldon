@@ -8,6 +8,10 @@ import { Op } from 'sequelize';
 export const validateSubClassBelongsToClass = async (
   instance: StudentAssignment
 ) => {
+  if (!instance.subClass) {
+    instance.subClass = await instance.$get('subClass');
+  }
+
   if (instance.subClass && instance.subClass.classId !== instance.classId) {
     throw new Error('Subclass must belong to the class');
   }
@@ -18,13 +22,19 @@ export const validateSubClassBelongsToClass = async (
  * @param instance
  */
 export const validateClassDates = async (instance: StudentAssignment) => {
+  const fetchedClass = await instance.$get('class');
+  if (!fetchedClass) {
+    throw new Error('Class not found');
+  }
+
   if (new Date(instance.validFrom) > new Date(instance.validTo)) {
     throw new Error('validFrom must be less than validTo');
   }
-  if (new Date(instance.validFrom) < new Date(instance.class.validFrom)) {
+
+  if (new Date(instance.validFrom) < new Date(fetchedClass.validFrom)) {
     throw new Error('validFrom must be greater than class validFrom');
   }
-  if (new Date(instance.validTo) > new Date(instance.class.validTo)) {
+  if (new Date(instance.validTo) > new Date(fetchedClass.validTo)) {
     throw new Error('validTo must be less than class validTo');
   }
 };

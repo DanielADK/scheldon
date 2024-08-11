@@ -58,8 +58,8 @@ export const createAssignment = async (
     studentId: studentId,
     classId: data.classId,
     subClassId: null,
-    validFrom: data.validFrom ?? new Date(),
-    validTo: data.validTo ?? new Date()
+    validFrom: data.validFrom,
+    validTo: data.validTo
   } as unknown as StudentAssignment);
 };
 
