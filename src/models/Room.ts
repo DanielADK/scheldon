@@ -18,40 +18,40 @@ export class Room extends Model<Room> {
     primaryKey: true,
     autoIncrement: true
   })
-  roomId!: number;
+  declare roomId: number;
 
   @Column({
     type: DataType.STRING,
     allowNull: true,
     unique: true
   })
-  phone!: string;
+  declare phone: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
     unique: true
   })
-  name!: string;
+  declare name: string;
 
   @Column({
     type: DataType.INTEGER,
     allowNull: false
   })
-  floor!: number;
+  declare floor: number;
 
   @Column({
     type: DataType.ENUM(...Object.values(RoomType)),
     allowNull: false
   })
-  type!: RoomType;
+  declare type: RoomType;
 
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
     defaultValue: 0
   })
-  studentCapacity!: number;
+  declare studentCapacity: number;
 
   // Room administrator
   @ForeignKey(() => Employee)
@@ -60,9 +60,9 @@ export class Room extends Model<Room> {
     allowNull: true,
     defaultValue: null
   })
-  administratorId!: number;
+  declare administratorId: number;
 
   // Mapping
   @BelongsTo(() => Employee)
-  administrator!: Employee;
+  declare administrator: Employee;
 }
