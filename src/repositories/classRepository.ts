@@ -68,7 +68,8 @@ export const getClassById = async (classId: number): Promise<Class | null> => {
     include: [
       {
         model: SubClass,
-        as: 'subClasses'
+        as: 'subClasses',
+        attributes: ['subClassId', 'name']
       }
     ]
   });
