@@ -59,7 +59,7 @@ export const getAllClasses = async (ctx: Context) => {
  * Get class with the specified ID
  */
 export const getClassById = async (ctx: Context) => {
-  const classId = parseInt(ctx.params.id as string);
+  const classId = await getIdFromParam(ctx.params.id as string);
 
   const classObj = await classService.getClassById(classId);
 
@@ -102,7 +102,7 @@ export const getClassesAtTime = async (ctx: Context) => {
 };
 
 export const updateClass = async (ctx: Context) => {
-  const classId = parseInt(ctx.params.id as string);
+  const classId = await getIdFromParam(ctx.params.id as string);
 
   // Validate request
   const { error, value } = classSchema.validate(ctx.request.body);
@@ -133,7 +133,7 @@ export const updateClass = async (ctx: Context) => {
  * Delete class with the specified ID
  */
 export const deleteClass = async (ctx: Context) => {
-  const classId = parseInt(ctx.params.id as string);
+  const classId = await getIdFromParam(ctx.params.id as string);
 
   const deletedCount = await classService.deleteClass(classId);
 
@@ -144,4 +144,17 @@ export const deleteClass = async (ctx: Context) => {
   }
 
   ctx.status = 204;
+};
+
+/**
+ * Get ID from request.
+ * @param id
+ * @throws Error if ID is invalid
+ */
+const getIdFromParam = async (id: string): Promise<number> => {
+  const idNum = parseInt(id);
+  if (isNaN(idNum)) {
+    throw new Error('Invalid ID');
+  }
+  return idNum;
 };

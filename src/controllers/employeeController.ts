@@ -64,9 +64,9 @@ export const getAllEmployees = async (ctx: Context): Promise<void> => {
 
 // Get employee by id
 export const getEmployeeById = async (ctx: Context): Promise<void> => {
-  const identifier = ctx.params.id as string;
+  const id = await getIdFromParam(ctx.params.id as string);
 
-  const employee = await employeeService.getEmployeeById(identifier);
+  const employee = await employeeService.getEmployeeById(id);
 
   if (!employee) {
     ctx.status = 404;
@@ -115,7 +115,7 @@ export const getEmployeeByAbbreviation = async (
 
 // Update an employee
 export const updateEmployee = async (ctx: Context): Promise<void> => {
-  const id = ctx.params.id as string;
+  const id = await getIdFromParam(ctx.params.id as string);
   const { error, value } = employeeSchema.validate(ctx.request.body);
 
   if (error) {
@@ -140,7 +140,10 @@ export const updateEmployee = async (ctx: Context): Promise<void> => {
   }
 };
 
-// Delete an employee
+/**
+ * Delete an employee
+ * @param ctx
+ */
 export const deleteEmployee = async (ctx: Context): Promise<void> => {
   const id = ctx.params.id as string;
 
@@ -153,4 +156,17 @@ export const deleteEmployee = async (ctx: Context): Promise<void> => {
   }
 
   ctx.status = 204;
+};
+
+/**
+ * Get ID from request.
+ * @param id
+ * @throws Error if ID is invalid
+ */
+const getIdFromParam = async (id: string): Promise<number> => {
+  const idNum = parseInt(id);
+  if (isNaN(idNum)) {
+    throw new Error('Invalid ID');
+  }
+  return idNum;
 };

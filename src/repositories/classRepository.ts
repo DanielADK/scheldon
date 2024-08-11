@@ -1,4 +1,4 @@
-import { FindAttributeOptions } from 'sequelize';
+import { FindAttributeOptions, Op } from 'sequelize';
 import { Class } from '@models/Class';
 import { SubClass } from '@models/SubClass';
 
@@ -84,14 +84,15 @@ export const getClassesAtTime = async (
 ): Promise<Class[] | null> => {
   return await Class.findAll({
     where: {
-      validFrom: { lte: time },
-      validTo: { gte: time }
+      validFrom: { [Op.lte]: time },
+      validTo: { [Op.gte]: time }
     },
     attributes: classAttributes,
     include: [
       {
         model: SubClass,
-        as: 'subClasses'
+        as: 'subClasses',
+        attributes: ['subClassId', 'name']
       }
     ]
   });

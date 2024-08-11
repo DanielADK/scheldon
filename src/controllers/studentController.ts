@@ -38,7 +38,7 @@ export const createStudent = async (ctx: Context) => {
  * @param {Context} ctx - The Koa request/response context object
  */
 export const getStudentById = async (ctx: Context) => {
-  const studentId = parseInt(ctx.params.id as string);
+  const studentId = await getIdFromParam(ctx.params.id as string);
 
   const student = await studentService.getStudentById(studentId);
 
@@ -53,7 +53,7 @@ export const getStudentById = async (ctx: Context) => {
 };
 
 export const getStudentsHistory = async (ctx: Context) => {
-  const studentId = parseInt(ctx.params.id as string);
+  const studentId = await getIdFromParam(ctx.params.id as string);
 
   // Try to get the student
   const student = await studentService.getStudentById(studentId);
@@ -79,7 +79,7 @@ export const getStudentsHistory = async (ctx: Context) => {
  * @param {Context} ctx - The Koa request/response context object
  */
 export const updateStudent = async (ctx: Context) => {
-  const studentId = parseInt(ctx.params.id as string);
+  const studentId = await getIdFromParam(ctx.params.id as string);
   const { error, value } = studentSchema.validate(ctx.request.body);
 
   if (error) {
@@ -110,7 +110,7 @@ export const updateStudent = async (ctx: Context) => {
  * @param {Context} ctx - The Koa request/response context object
  */
 export const deleteStudent = async (ctx: Context) => {
-  const studentId = parseInt(ctx.params.id as string);
+  const studentId = await getIdFromParam(ctx.params.id as string);
 
   try {
     const deleted = await studentService.deleteStudent(studentId);
@@ -127,4 +127,17 @@ export const deleteStudent = async (ctx: Context) => {
     ctx.status = 400;
     ctx.body = { error: error.message };
   }
+};
+
+/**
+ * Get ID from request.
+ * @param id
+ * @throws Error if ID is invalid
+ */
+const getIdFromParam = async (id: string): Promise<number> => {
+  const idNum = parseInt(id);
+  if (isNaN(idNum)) {
+    throw new Error('Invalid ID');
+  }
+  return idNum;
 };

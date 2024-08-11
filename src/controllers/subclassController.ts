@@ -47,7 +47,7 @@ export const getSubClasses = async (ctx: Context) => {
  * @param ctx
  */
 export const getSubClassById = async (ctx: Context) => {
-  const subClassId = parseInt(ctx.params.id as string);
+  const subClassId = await getIdFromParam(ctx.params.id as string);
 
   const subClass = await subClassService.getSubClassById(subClassId);
 
@@ -66,7 +66,7 @@ export const getSubClassById = async (ctx: Context) => {
  * @param ctx
  */
 export const getSubClassesByClassId = async (ctx: Context) => {
-  const classId = parseInt(ctx.params.classId as string);
+  const classId = await getIdFromParam(ctx.params.classId as string);
 
   const subClasses = await subClassService.getSubClassesByClassId(classId);
 
@@ -85,7 +85,7 @@ export const getSubClassesByClassId = async (ctx: Context) => {
  * @param ctx
  */
 export const updateSubClass = async (ctx: Context) => {
-  const subClassId = parseInt(ctx.params.id as string);
+  const subClassId = await getIdFromParam(ctx.params.id as string);
   const { error, value } = subClassSchema.validate(ctx.request.body);
 
   if (error) {
@@ -116,7 +116,7 @@ export const updateSubClass = async (ctx: Context) => {
  * @param ctx
  */
 export const deleteSubClass = async (ctx: Context) => {
-  const subClassId = parseInt(ctx.params.id as string);
+  const subClassId = await getIdFromParam(ctx.params.id as string);
 
   try {
     const deleted = await subClassService.deleteSubClass(subClassId);
@@ -133,4 +133,17 @@ export const deleteSubClass = async (ctx: Context) => {
     ctx.status = 400;
     ctx.body = { error: error.message };
   }
+};
+
+/**
+ * Get ID from request.
+ * @param id
+ * @throws Error if ID is invalid
+ */
+const getIdFromParam = async (id: string): Promise<number> => {
+  const idNum = parseInt(id);
+  if (isNaN(idNum)) {
+    throw new Error('Invalid ID');
+  }
+  return idNum;
 };

@@ -69,7 +69,7 @@ export const getAllRooms = async (ctx: Context): Promise<void> => {
  * Get room by id
  */
 export const getRoomById = async (ctx: Context): Promise<void> => {
-  const id: number = parseInt(ctx.params.id, 10);
+  const id: number = await getIdFromParam(ctx.params.id);
   const room: Room | null = await roomService.getRoomById(id);
   if (room) {
     ctx.body = room;
@@ -83,7 +83,7 @@ export const getRoomById = async (ctx: Context): Promise<void> => {
  * Update room
  */
 export const updateRoom = async (ctx: Context): Promise<void> => {
-  const id: number = parseInt(ctx.params.id, 10);
+  const id: number = await getIdFromParam(ctx.params.id);
   const { error, value } = roomSchema.validate(ctx.request.body);
 
   if (error) {
@@ -112,7 +112,7 @@ export const updateRoom = async (ctx: Context): Promise<void> => {
  * Delete room
  */
 export const deleteRoom = async (ctx: Context): Promise<void> => {
-  const roomId: number = parseInt(ctx.params.id, 10);
+  const roomId: number = await getIdFromParam(ctx.params.id);
   const deletedCount = await roomService.deleteRoom(roomId);
 
   if (deletedCount === 0) {
@@ -122,4 +122,17 @@ export const deleteRoom = async (ctx: Context): Promise<void> => {
   }
 
   ctx.status = 204;
+};
+
+/**
+ * Get ID from request.
+ * @param id
+ * @throws Error if ID is invalid
+ */
+const getIdFromParam = async (id: string): Promise<number> => {
+  const idNum = parseInt(id);
+  if (isNaN(idNum)) {
+    throw new Error('Invalid ID');
+  }
+  return idNum;
 };

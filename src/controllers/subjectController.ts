@@ -55,7 +55,7 @@ export const getAllSubjects = async (ctx: Context) => {
 
 // Schema for getting a subject by ID
 export const getSubjectById = async (ctx: Context) => {
-  const subjectId = parseInt(ctx.params.id as string);
+  const subjectId = await getIdFromParam(ctx.params.id as string);
 
   const subject = await subjectService.getSubjectById(subjectId);
 
@@ -87,7 +87,12 @@ export const getSubjectByAbbreviation = async (ctx: Context) => {
 
 // Schema for deleting a subject
 export const updateSubject = async (ctx: Context) => {
-  const subjectId = parseInt(ctx.params.id as string);
+  const subjectId = await getIdFromParam(ctx.params.id as string);
+  if (isNaN(subjectId)) {
+    ctx.status = 400;
+    ctx.body = { error: 'Invalid subject ID' };
+    return;
+  }
 
   // Validate request
   const { error, value } = subjectSchema.validate(ctx.request.body);
@@ -119,7 +124,12 @@ export const updateSubject = async (ctx: Context) => {
 
 // Schema for deleting a subject
 export const deleteSubject = async (ctx: Context) => {
-  const subjectId = parseInt(ctx.params.id as string);
+  const subjectId = await getIdFromParam(ctx.params.id as string);
+  if (isNaN(subjectId)) {
+    ctx.status = 400;
+    ctx.body = { error: 'Invalid subject ID' };
+    return;
+  }
 
   const deletedCount = await subjectService.deleteSubject(subjectId);
 
@@ -130,4 +140,17 @@ export const deleteSubject = async (ctx: Context) => {
   }
 
   ctx.status = 204;
+};
+
+/**
+ * Get ID from request.
+ * @param id
+ * @throws Error if ID is invalid
+ */
+const getIdFromParam = async (id: string): Promise<number> => {
+  const idNum = parseInt(id);
+  if (isNaN(idNum)) {
+    throw new Error('Invalid ID');
+  }
+  return idNum;
 };
