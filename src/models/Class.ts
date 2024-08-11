@@ -31,7 +31,13 @@ import {
     {
       unique: true,
       fields: ['name', 'validFrom', 'validTo', 'roomId', 'employeeId']
-    }
+    },
+    {
+      name: 'validity_range',
+      fields: ['validFrom', 'validTo'],
+      using: 'BTREE'
+    },
+    { name: 'name', fields: ['name'], using: 'BTREE' }
   ]
 })
 export class Class extends Model<Class> {

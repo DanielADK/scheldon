@@ -22,8 +22,29 @@ import {
   timestamps: false,
   indexes: [
     {
+      name: 'unique_assignment',
       unique: true,
       fields: ['studentId', 'classId', 'subClassId']
+    },
+    {
+      name: 'validity_range',
+      fields: ['validFrom', 'validTo'],
+      using: 'BTREE'
+    },
+    {
+      name: 'studentid',
+      fields: ['studentId'],
+      using: 'HASH'
+    },
+    {
+      name: 'classid',
+      fields: ['classId'],
+      using: 'HASH'
+    },
+    {
+      name: 'subclassid',
+      fields: ['subClassId'],
+      using: 'HASH'
     }
   ]
 })
