@@ -6,6 +6,12 @@ import { TimetableEntry } from '@models/TimetableEntry';
 export const validateTeacherRole = async (
   instance: TimetableEntry
 ): Promise<void> => {
+  const fetchedTeacher = await instance.$get('teacher');
+  if (!fetchedTeacher) {
+    throw new Error('Teacher not found');
+  }
+  instance.teacher = fetchedTeacher;
+
   if (!instance.teacher.isTeacher) {
     throw new Error('Employee is not a teacher');
   }
@@ -17,7 +23,10 @@ export const validateTeacherRole = async (
 export const validateSubClassInClass = async (
   instance: TimetableEntry
 ): Promise<void> => {
-  if (instance.subclass && instance.classId !== instance.subclass.classId) {
+  if (!instance.subClass) {
+    instance.subClass = await instance.$get('subClass');
+  }
+  if (instance.subClass && instance.classId !== instance.subClass.classId) {
     throw new Error('Subclass is not in the class');
   }
 };

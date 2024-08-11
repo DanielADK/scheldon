@@ -26,15 +26,16 @@ export const validateClassDates = async (instance: StudentAssignment) => {
   if (!fetchedClass) {
     throw new Error('Class not found');
   }
+  instance.class = fetchedClass;
 
   if (new Date(instance.validFrom) > new Date(instance.validTo)) {
     throw new Error('validFrom must be less than validTo');
   }
 
-  if (new Date(instance.validFrom) < new Date(fetchedClass.validFrom)) {
+  if (new Date(instance.validFrom) < new Date(instance.class.validFrom)) {
     throw new Error('validFrom must be greater than class validFrom');
   }
-  if (new Date(instance.validTo) > new Date(fetchedClass.validTo)) {
+  if (new Date(instance.validTo) > new Date(instance.class.validTo)) {
     throw new Error('validTo must be less than class validTo');
   }
 };
