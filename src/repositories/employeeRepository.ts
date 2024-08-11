@@ -65,7 +65,7 @@ export const getEmployees = async (
  * Get employee by id
  * @param id
  */
-export const getEmployeeById = async (id: string): Promise<Employee | null> => {
+export const getEmployeeById = async (id: number): Promise<Employee | null> => {
   return await Employee.findOne({
     where: { employeeId: id },
     attributes: employeeAttributes
@@ -104,7 +104,7 @@ export const getEmployeeByAbbreviation = async (
  * @param data
  */
 export const updateEmployee = async (
-  id: string,
+  id: number,
   data: Partial<Employee>
 ): Promise<[number, Employee[]]> => {
   return await Employee.update(data, {

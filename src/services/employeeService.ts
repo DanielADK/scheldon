@@ -24,7 +24,7 @@ export const getAllEmployees = async (page: number, limit: number) => {
  * Get employee by identifier
  * @param id
  */
-export const getEmployeeById = async (id: string): Promise<Employee | null> => {
+export const getEmployeeById = async (id: number): Promise<Employee | null> => {
   return await employeeRepository.getEmployeeById(id);
 };
 
@@ -54,7 +54,7 @@ export const getEmployeeByAbbreviation = async (
  * @param data
  */
 export const updateEmployee = async (
-  id: string,
+  id: number,
   data: Partial<Employee>
 ): Promise<[number, Employee[]]> => {
   return await employeeRepository.updateEmployee(id, data);

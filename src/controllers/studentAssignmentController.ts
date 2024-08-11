@@ -22,7 +22,7 @@ const unassignStudentSchema = Joi.object({
  * POST /students/:studentId/assign
  */
 export const assignStudent = async (ctx: Context) => {
-  const studentId = parseInt(ctx.params.studentId as string);
+  const studentId = await getIdFromParam(ctx.params.studentId as string);
   const { error, value } = assignStudentSchema.validate(ctx.request.body);
 
   if (error) {
@@ -45,8 +45,12 @@ export const assignStudent = async (ctx: Context) => {
   }
 };
 
+/**
+ * Unassign a student from a class
+ * @param ctx - The Koa request/response context object DELETE /students/:studentId/unassign
+ */
 export const unassignStudent = async (ctx: Context) => {
-  const studentId = parseInt(ctx.params.studentId as string);
+  const studentId = await getIdFromParam(ctx.params.studentId as string);
   const { error, value } = unassignStudentSchema.validate(ctx.request.body);
 
   if (error) {
@@ -62,4 +66,17 @@ export const unassignStudent = async (ctx: Context) => {
     ctx.status = 400;
     ctx.body = { error: error.message };
   }
+};
+
+/**
+ * Get ID from request.
+ * @param id
+ * @throws Error if ID is invalid
+ */
+const getIdFromParam = async (id: string): Promise<number> => {
+  const idNum = parseInt(id);
+  if (isNaN(idNum)) {
+    throw new Error('Invalid ID');
+  }
+  return idNum;
 };
