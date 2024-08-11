@@ -99,7 +99,7 @@ export class TimetableEntry extends Model<TimetableEntry> {
   declare class: Class;
 
   @BelongsTo(() => SubClass)
-  declare subclass: SubClass;
+  declare subClass: SubClass | null;
 
   @BelongsTo(() => Subject)
   declare subject: Subject;
@@ -116,6 +116,9 @@ export class TimetableEntry extends Model<TimetableEntry> {
     await validateTeacherRole(instance);
     await validateDayInWeekRange(instance);
     await validateHourInDayRange(instance);
-    await validateSubClassInClass(instance);
+
+    if (instance.subClassId) {
+      await validateSubClassInClass(instance);
+    }
   }
 }
