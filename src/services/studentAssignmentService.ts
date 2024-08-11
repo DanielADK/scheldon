@@ -31,7 +31,7 @@ export const createAssignment = async (
     classId: data.classId,
     validFrom: validFrom,
     validTo: validTo
-  });
+  } as StudentAssignmentDTO);
 };
 
 /**
