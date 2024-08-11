@@ -2,6 +2,7 @@ import * as subjectService from '@services/subjectService';
 import { Context } from 'koa';
 import Joi from 'joi';
 import { SubjectDTO } from '@repositories/subjectRepository';
+import { getIdFromParam } from '../lib/controllerTools';
 
 // Schema for creating a subject
 const subjectSchema: Joi.ObjectSchema<SubjectDTO> = Joi.object({
@@ -140,17 +141,4 @@ export const deleteSubject = async (ctx: Context) => {
   }
 
   ctx.status = 204;
-};
-
-/**
- * Get ID from request.
- * @param id
- * @throws Error if ID is invalid
- */
-const getIdFromParam = async (id: string): Promise<number> => {
-  const idNum = parseInt(id);
-  if (isNaN(idNum)) {
-    throw new Error('Invalid ID');
-  }
-  return idNum;
 };

@@ -2,6 +2,7 @@ import * as employeeService from '@services/employeeService';
 import { Context } from 'koa';
 import Joi from 'joi';
 import { EmployeeDTO } from '@repositories/employeeRepository';
+import { getIdFromParam } from '../lib/controllerTools';
 
 const employeeSchema: Joi.ObjectSchema<EmployeeDTO> = Joi.object({
   username: Joi.string().required().min(2).max(50),
@@ -145,7 +146,7 @@ export const updateEmployee = async (ctx: Context): Promise<void> => {
  * @param ctx
  */
 export const deleteEmployee = async (ctx: Context): Promise<void> => {
-  const id = ctx.params.id as string;
+  const id = await getIdFromParam(ctx.params.id as string);
 
   const deletedCount = await employeeService.deleteEmployee(id);
 
@@ -156,17 +157,4 @@ export const deleteEmployee = async (ctx: Context): Promise<void> => {
   }
 
   ctx.status = 204;
-};
-
-/**
- * Get ID from request.
- * @param id
- * @throws Error if ID is invalid
- */
-const getIdFromParam = async (id: string): Promise<number> => {
-  const idNum = parseInt(id);
-  if (isNaN(idNum)) {
-    throw new Error('Invalid ID');
-  }
-  return idNum;
 };

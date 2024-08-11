@@ -2,6 +2,7 @@ import { Context } from 'koa';
 import * as classService from '@services/classService';
 import Joi from 'joi';
 import { ClassDTO } from '@repositories/classRepository';
+import { getIdFromParam } from '../lib/controllerTools';
 
 // Schema for creating and updating a class
 const classSchema: Joi.ObjectSchema<ClassDTO> = Joi.object({
@@ -144,17 +145,4 @@ export const deleteClass = async (ctx: Context) => {
   }
 
   ctx.status = 204;
-};
-
-/**
- * Get ID from request.
- * @param id
- * @throws Error if ID is invalid
- */
-const getIdFromParam = async (id: string): Promise<number> => {
-  const idNum = parseInt(id);
-  if (isNaN(idNum)) {
-    throw new Error('Invalid ID');
-  }
-  return idNum;
 };

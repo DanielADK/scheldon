@@ -64,6 +64,6 @@ export const updateEmployee = async (
  * Delete an employee
  * @param id
  */
-export const deleteEmployee = async (id: string): Promise<number> => {
+export const deleteEmployee = async (id: number): Promise<number> => {
   return await employeeRepository.deleteEmployee(id);
 };

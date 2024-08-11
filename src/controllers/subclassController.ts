@@ -3,6 +3,7 @@ import Joi from 'joi';
 import { SubClassDTO } from '@repositories/subclassRepository';
 import * as subClassService from '@services/subclassService';
 import { Context } from 'koa';
+import { getIdFromParam } from '../lib/controllerTools';
 
 const subClassSchema: Joi.ObjectSchema<SubClassDTO> = Joi.object({
   name: Joi.string().required().min(1).max(100),
@@ -133,17 +134,4 @@ export const deleteSubClass = async (ctx: Context) => {
     ctx.status = 400;
     ctx.body = { error: error.message };
   }
-};
-
-/**
- * Get ID from request.
- * @param id
- * @throws Error if ID is invalid
- */
-const getIdFromParam = async (id: string): Promise<number> => {
-  const idNum = parseInt(id);
-  if (isNaN(idNum)) {
-    throw new Error('Invalid ID');
-  }
-  return idNum;
 };
