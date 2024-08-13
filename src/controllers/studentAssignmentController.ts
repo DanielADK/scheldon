@@ -1,7 +1,7 @@
 import Joi from 'joi';
 import { Context } from 'koa';
 import * as studentAssignmentService from '@services/studentAssignmentService';
-import { getIdFromParam } from '../lib/controllerTools';
+import { getIdFromParam, handleCreationError } from '../lib/controllerTools';
 
 // Schema for assigning a student to a class/subclass
 const assignStudentSchema = Joi.object({
@@ -40,9 +40,8 @@ export const assignStudent = async (ctx: Context) => {
 
     ctx.status = 201;
     ctx.body = assignment;
-  } catch (error: Error | any) {
-    ctx.status = 400;
-    ctx.body = { error: error.message };
+  } catch (error) {
+    handleCreationError(ctx, error);
   }
 };
 
@@ -63,8 +62,7 @@ export const unassignStudent = async (ctx: Context) => {
     await studentAssignmentService.terminateAssignment(studentId, value);
 
     ctx.status = 204;
-  } catch (error: Error | any) {
-    ctx.status = 400;
-    ctx.body = { error: error.message };
+  } catch (error) {
+    handleCreationError(ctx, error);
   }
 };

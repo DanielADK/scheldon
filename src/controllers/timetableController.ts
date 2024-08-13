@@ -1,6 +1,6 @@
 import { Context } from 'koa';
 import * as timetableService from '@services/timetableService';
-import { getIdFromParam } from '../lib/controllerTools';
+import { getIdFromParam, handleCreationError } from '../lib/controllerTools';
 import {
   TimetableEntryDTO,
   TimetableSetDTO
@@ -50,9 +50,8 @@ export const createTEntry = async (ctx: Context): Promise<void> => {
     const tentry = await timetableService.createTEntry(tsetId, value);
     ctx.status = 201;
     ctx.body = tentry;
-  } catch (error: Error | any) {
-    ctx.status = 400;
-    ctx.body = { error: error.message };
+  } catch (error) {
+    handleCreationError(ctx, error);
   }
 };
 
@@ -73,9 +72,8 @@ export const createTSet = async (ctx: Context): Promise<void> => {
     const tset = await timetableService.createTSet(value);
     ctx.status = 201;
     ctx.body = tset;
-  } catch (error: Error | any) {
-    ctx.status = 400;
-    ctx.body = { error: error.message };
+  } catch (error) {
+    handleCreationError(ctx, error);
   }
 };
 
