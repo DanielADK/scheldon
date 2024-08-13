@@ -15,12 +15,25 @@ import {
 } from '@validators/timetableSetValidator';
 
 @Table({
-  timestamps: false
+  timestamps: false,
+  indexes: [
+    {
+      name: 'unique_timetable_set',
+      unique: true,
+      fields: ['name']
+    },
+    {
+      name: 'validity_range',
+      fields: ['validFrom', 'validTo'],
+      using: 'BTREE'
+    }
+  ]
 })
 export class TimetableSet extends Model<TimetableSet> {
   @Column({
     type: DataType.INTEGER,
-    primaryKey: true
+    primaryKey: true,
+    autoIncrement: true
   })
   declare timetableSetId: number;
 
@@ -35,13 +48,13 @@ export class TimetableSet extends Model<TimetableSet> {
     type: DataType.DATE,
     allowNull: false
   })
-  declare validFrom: Date;
+  declare validFrom: string;
 
   @Column({
     type: DataType.DATE,
     allowNull: false
   })
-  declare validTo: Date;
+  declare validTo: string;
 
   // Mapping
   @BelongsToMany(() => TimetableEntry, () => TimetableEntrySet)
