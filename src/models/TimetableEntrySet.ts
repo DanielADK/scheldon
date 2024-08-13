@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -21,6 +22,9 @@ export class TimetableEntrySet extends Model<TimetableEntrySet> {
   })
   declare timetableEntryId: number;
 
+  @BelongsTo(() => TimetableEntry)
+  declare timetableEntry: TimetableEntry;
+
   @PrimaryKey
   @ForeignKey(() => TimetableSet)
   @Column({
@@ -28,4 +32,7 @@ export class TimetableEntrySet extends Model<TimetableEntrySet> {
     allowNull: false
   })
   declare timetableSetId: number;
+
+  @BelongsTo(() => TimetableSet)
+  declare timetableSet: TimetableSet;
 }

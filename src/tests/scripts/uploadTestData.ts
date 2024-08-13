@@ -13,6 +13,11 @@ import { ClassDTO } from '@repositories/classRepository';
 import { SubClassDTO } from '@repositories/subclassRepository';
 import { StudentDTO } from '@repositories/studentRepository';
 import { StudentAssignmentDTO } from '@repositories/studentAssignmentRepository';
+import { entries, sets } from '../data/timetableData';
+import {
+  TimetableEntryDTO,
+  TimetableSetDTO
+} from '@repositories/timetableRepository';
 
 type entries =
   | SubjectDTO
@@ -21,7 +26,9 @@ type entries =
   | ClassDTO
   | SubClassDTO
   | StudentDTO
-  | StudentAssignmentDTO;
+  | StudentAssignmentDTO
+  | TimetableSetDTO
+  | TimetableEntryDTO;
 
 const uploadData = async (url: string, entity: string, data: entries[]) => {
   for (const item of data) {
@@ -41,12 +48,19 @@ const uploadData = async (url: string, entity: string, data: entries[]) => {
 };
 
 const uploadTestData = async () => {
+  // Subjects, Employees, Rooms
   await uploadData('http://localhost:3000/subjects', 'Subject', subjects);
   await uploadData('http://localhost:3000/employee', 'Employee', employees);
   await uploadData('http://localhost:3000/room', 'Room', rooms);
+
+  // Classes
   await uploadData('http://localhost:3000/classes', 'Class', classes);
   await uploadData('http://localhost:3000/subclasses', 'SubClass', subClasses);
+
+  // Students
   await uploadData('http://localhost:3000/students', 'Student', students);
+
+  // Assignments
   for (const assignment of assignments) {
     await uploadData(
       'http://localhost:3000/students/' + assignment.studentId + '/assign',
@@ -54,6 +68,18 @@ const uploadTestData = async () => {
       [assignment.data]
     );
   }
+
+  // Timetables
+  await uploadData(
+    'http://localhost:3000/timetables/set',
+    'TimetableSet',
+    sets
+  );
+  await uploadData(
+    'http://localhost:3000/timetables/set/3/entry',
+    'TimetableEntry',
+    entries
+  );
 };
 
 uploadTestData();
