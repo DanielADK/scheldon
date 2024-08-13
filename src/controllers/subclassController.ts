@@ -3,7 +3,7 @@ import Joi from 'joi';
 import { SubClassDTO } from '@repositories/subclassRepository';
 import * as subClassService from '@services/subclassService';
 import { Context } from 'koa';
-import { getIdFromParam } from '../lib/controllerTools';
+import { getIdFromParam, handleCreationError } from '../lib/controllerTools';
 
 const subClassSchema: Joi.ObjectSchema<SubClassDTO> = Joi.object({
   name: Joi.string().required().min(1).max(100),
@@ -27,9 +27,8 @@ export const createSubClass = async (ctx: Context) => {
     const subClass = await subClassService.createSubClass(value);
     ctx.status = 201;
     ctx.body = subClass;
-  } catch (error: Error | any) {
-    ctx.status = 400;
-    ctx.body = { error: error.message };
+  } catch (error) {
+    handleCreationError(ctx, error);
   }
 };
 
@@ -106,9 +105,8 @@ export const updateSubClass = async (ctx: Context) => {
 
     ctx.status = 200;
     ctx.body = { message: 'Subclass updated successfully' };
-  } catch (error: Error | any) {
-    ctx.status = 400;
-    ctx.body = { error: error.message };
+  } catch (error) {
+    handleCreationError(ctx, error);
   }
 };
 
@@ -130,8 +128,7 @@ export const deleteSubClass = async (ctx: Context) => {
 
     ctx.status = 200;
     ctx.body = { message: 'Subclass deleted successfully' };
-  } catch (error: Error | any) {
-    ctx.status = 400;
-    ctx.body = { error: error.message };
+  } catch (error) {
+    handleCreationError(ctx, error);
   }
 };

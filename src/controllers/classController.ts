@@ -2,7 +2,7 @@ import { Context } from 'koa';
 import * as classService from '@services/classService';
 import Joi from 'joi';
 import { ClassDTO } from '@repositories/classRepository';
-import { getIdFromParam } from '../lib/controllerTools';
+import { getIdFromParam, handleCreationError } from '../lib/controllerTools';
 
 // Schema for creating and updating a class
 const classSchema: Joi.ObjectSchema<ClassDTO> = Joi.object({
@@ -29,9 +29,8 @@ export const createClass = async (ctx: Context) => {
     const classObj = await classService.createClass(value);
     ctx.status = 201;
     ctx.body = classObj;
-  } catch (error: Error | any) {
-    ctx.status = 400;
-    ctx.body = { error: error.message };
+  } catch (error) {
+    handleCreationError(ctx, error);
   }
 };
 
@@ -96,9 +95,8 @@ export const getClassesAtTime = async (ctx: Context) => {
 
     ctx.status = 200;
     ctx.body = classes;
-  } catch (error: Error | any) {
-    ctx.status = 500;
-    ctx.body = { error: error.message };
+  } catch (error) {
+    handleCreationError(ctx, error);
   }
 };
 
@@ -124,9 +122,8 @@ export const updateClass = async (ctx: Context) => {
       ctx.status = 404;
       ctx.body = { error: 'Class not found' };
     }
-  } catch (error: Error | any) {
-    ctx.status = 400;
-    ctx.body = { error: error.message };
+  } catch (error) {
+    handleCreationError(ctx, error);
   }
 };
 

@@ -1,3 +1,5 @@
+import { Context } from 'koa';
+
 /**
  * Get ID from string (usually param).
  * @param id string
@@ -9,4 +11,14 @@ export const getIdFromParam = async (id: string): Promise<number> => {
     throw new Error('Invalid ID');
   }
   return idNum;
+};
+
+export const handleCreationError = (ctx: Context, error: unknown): void => {
+  if (error instanceof Error) {
+    ctx.status = 400;
+    ctx.body = { error: error.message };
+  } else {
+    ctx.status = 400;
+    ctx.body = { error: 'Unable to save data.' };
+  }
 };
