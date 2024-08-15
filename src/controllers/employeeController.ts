@@ -2,7 +2,7 @@ import * as employeeService from '@services/employeeService';
 import { Context } from 'koa';
 import Joi from 'joi';
 import { EmployeeDTO } from '@repositories/employeeRepository';
-import { getIdFromParam, handleCreationError } from '../lib/controllerTools';
+import { getIdFromParam, handleError } from '../lib/controllerTools';
 
 const employeeSchema: Joi.ObjectSchema<EmployeeDTO> = Joi.object({
   username: Joi.string().required().min(2).max(50),
@@ -35,7 +35,7 @@ export const createEmployee = async (ctx: Context): Promise<void> => {
     ctx.status = 201;
     ctx.body = employee;
   } catch (error) {
-    handleCreationError(ctx, error);
+    handleError(ctx, error);
   }
 };
 
@@ -135,7 +135,7 @@ export const updateEmployee = async (ctx: Context): Promise<void> => {
 
     ctx.status = 204;
   } catch (error) {
-    handleCreationError(ctx, error);
+    handleError(ctx, error);
   }
 };
 

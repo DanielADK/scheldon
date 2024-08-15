@@ -13,12 +13,12 @@ export const getIdFromParam = async (id: string): Promise<number> => {
   return idNum;
 };
 
-export const handleCreationError = (ctx: Context, error: unknown): void => {
+export const handleError = (ctx: Context, error: unknown): void => {
   if (error instanceof Error) {
     ctx.status = 400;
     ctx.body = { error: error.message };
   } else {
     ctx.status = 400;
-    ctx.body = { error: 'Unable to save data.' };
+    ctx.body = { error: 'Unexpected error occured.' };
   }
 };

@@ -1,6 +1,7 @@
 import { Context } from 'koa';
 import * as timetableService from '@services/timetableService';
-import { getIdFromParam, handleCreationError } from '../lib/controllerTools';
+import { TimetableExport } from '@services/timetableService';
+import { getIdFromParam, handleError } from '../lib/controllerTools';
 import {
   TimetableEntryDTO,
   TimetableSetDTO
@@ -32,6 +33,8 @@ export const timetableEntrySchema: Joi.ObjectSchema<TimetableEntryDTO> =
     roomId: Joi.number().required()
   });
 
+type getterService = (id: number) => Promise<TimetableExport | null>;
+
 /**
  * Create a new timetable set
  * @param ctx Context
@@ -51,7 +54,7 @@ export const createTEntry = async (ctx: Context): Promise<void> => {
     ctx.status = 201;
     ctx.body = tentry;
   } catch (error) {
-    handleCreationError(ctx, error);
+    handleError(ctx, error);
   }
 };
 
@@ -73,39 +76,33 @@ export const createTSet = async (ctx: Context): Promise<void> => {
     ctx.status = 201;
     ctx.body = tset;
   } catch (error) {
-    handleCreationError(ctx, error);
+    handleError(ctx, error);
   }
 };
 
 /**
  * Create a new timetable set
  * @param ctx Context
+ * @param getterService getterService function to get timetable by different ID
  */
-export const getTimetableBySetId = async (ctx: Context): Promise<void> => {
-  const setId: number = await getIdFromParam(ctx.params.id);
+export const timetableGetByIdController = async (
+  ctx: Context,
+  getterService: getterService
+) => {
+  try {
+    const id: number = await getIdFromParam(ctx.params.id);
 
-  const timetable = await timetableService.getTimetableBySetId(setId);
+    const timetable = await getterService(id);
 
-  if (!timetable) {
-    ctx.status = 404;
-    ctx.body = { error: 'Timetable not found' };
+    if (!timetable) {
+      ctx.status = 404;
+      ctx.body = { error: 'Timetable not found' };
+      return;
+    }
+
+    ctx.status = 200;
+    ctx.body = timetable;
+  } catch (error) {
+    handleError(ctx, error);
   }
-
-  ctx.status = 200;
-  ctx.body = timetable;
-};
-
-export const getTimetableByClassId = async (ctx: Context): Promise<void> => {
-  const classId: number = await getIdFromParam(ctx.params.id);
-
-  const timetable = await timetableService.getTimetableByClassId(classId);
-
-  if (!timetable) {
-    ctx.status = 404;
-    ctx.body = { error: 'Timetable not found' };
-    return;
-  }
-
-  ctx.status = 200;
-  ctx.body = timetable;
 };
