@@ -2,7 +2,7 @@ import * as subjectService from '@services/subjectService';
 import { Context } from 'koa';
 import Joi from 'joi';
 import { SubjectDTO } from '@repositories/subjectRepository';
-import { getIdFromParam, handleCreationError } from '../lib/controllerTools';
+import { getIdFromParam, handleError } from '../lib/controllerTools';
 
 // Schema for creating a subject
 const subjectSchema: Joi.ObjectSchema<SubjectDTO> = Joi.object({
@@ -29,7 +29,7 @@ export const createSubject = async (ctx: Context) => {
     ctx.status = 201;
     ctx.body = subject;
   } catch (error) {
-    handleCreationError(ctx, error);
+    handleError(ctx, error);
   }
 };
 
@@ -117,7 +117,7 @@ export const updateSubject = async (ctx: Context) => {
       ctx.body = { error: 'Subject not found' };
     }
   } catch (error) {
-    handleCreationError(ctx, error);
+    handleError(ctx, error);
   }
 };
 

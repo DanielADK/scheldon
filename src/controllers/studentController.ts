@@ -2,7 +2,7 @@ import { Context } from 'koa';
 import * as studentService from '@services/studentService';
 import Joi from 'joi';
 import { StudentDTO } from '@repositories/studentRepository';
-import { getIdFromParam, handleCreationError } from '../lib/controllerTools';
+import { getIdFromParam, handleError } from '../lib/controllerTools';
 
 // Schema for creating and updating a student
 const studentSchema: Joi.ObjectSchema<StudentDTO> = Joi.object({
@@ -29,7 +29,7 @@ export const createStudent = async (ctx: Context) => {
     ctx.status = 201;
     ctx.body = student;
   } catch (error) {
-    handleCreationError(ctx, error);
+    handleError(ctx, error);
   }
 };
 
@@ -100,7 +100,7 @@ export const updateStudent = async (ctx: Context) => {
     ctx.status = 200;
     ctx.body = { message: 'Student updated successfully' };
   } catch (error) {
-    handleCreationError(ctx, error);
+    handleError(ctx, error);
   }
 };
 
@@ -123,6 +123,6 @@ export const deleteStudent = async (ctx: Context) => {
     ctx.status = 200;
     ctx.body = { message: 'Student deleted successfully' };
   } catch (error) {
-    handleCreationError(ctx, error);
+    handleError(ctx, error);
   }
 };

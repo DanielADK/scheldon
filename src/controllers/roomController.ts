@@ -4,7 +4,7 @@ import * as roomService from '@services/roomService';
 import Joi from 'joi';
 import { RoomDTO } from '@repositories/roomRepository';
 import { RoomType } from '@models/types/RoomType';
-import { getIdFromParam, handleCreationError } from '../lib/controllerTools';
+import { getIdFromParam, handleError } from '../lib/controllerTools';
 
 // Schema for creating and updating a room
 const roomSchema: Joi.ObjectSchema<RoomDTO> = Joi.object({
@@ -38,7 +38,7 @@ export const createRoom = async (ctx: Context): Promise<Room | void> => {
     ctx.status = 201;
     ctx.body = room;
   } catch (error) {
-    handleCreationError(ctx, error);
+    handleError(ctx, error);
   }
 };
 
@@ -103,7 +103,7 @@ export const updateRoom = async (ctx: Context): Promise<void> => {
       ctx.body = { error: 'Room not found' };
     }
   } catch (error) {
-    handleCreationError(ctx, error);
+    handleError(ctx, error);
   }
 };
 
