@@ -116,12 +116,14 @@ export class Class extends Model<Class> {
   @BeforeCreate
   @BeforeUpdate
   static async validate(instance: Class) {
-    await validateClassDates(instance);
-    await validateClassName(instance);
-    await validateClassInterval(instance);
-    await validateTeacherExistence(instance);
-    await validateRoomExistence(instance);
-    await validateTeacherSchedule(instance);
-    await validateRoomSchedule(instance);
+    await Promise.all([
+      validateClassDates(instance),
+      validateClassName(instance),
+      validateClassInterval(instance),
+      validateTeacherExistence(instance),
+      validateRoomExistence(instance),
+      validateTeacherSchedule(instance),
+      validateRoomSchedule(instance)
+    ]);
   }
 }

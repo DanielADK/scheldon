@@ -98,13 +98,11 @@ export class StudentAssignment extends Model<StudentAssignment> {
   @BeforeCreate
   @BeforeUpdate
   static async validate(instance: StudentAssignment) {
-    await validateSubClassBelongsToClass(instance);
-    await validateClassDates(instance);
-    await validateExclusiveClassAssignment(instance);
-
-    // Validate only if subClassId is provided
-    if (instance.subClassId) {
-      await validateClassExistsWhenSubClass(instance);
-    }
+    await Promise.all([
+      validateSubClassBelongsToClass(instance),
+      validateClassDates(instance),
+      validateExclusiveClassAssignment(instance),
+      instance.subClassId ? validateClassExistsWhenSubClass(instance) : null
+    ]);
   }
 }

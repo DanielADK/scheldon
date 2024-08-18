@@ -63,7 +63,9 @@ export class TimetableSet extends Model<TimetableSet> {
   @BeforeCreate
   @BeforeUpdate
   static async validate(instance: TimetableSet): Promise<void> {
-    await validateDates(instance);
-    await validateUniqueInterval(instance);
+    await Promise.all([
+      validateDates(instance),
+      validateUniqueInterval(instance)
+    ]);
   }
 }
