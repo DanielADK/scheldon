@@ -106,12 +106,11 @@ export class TimetableEntry extends Model<TimetableEntry> {
   @BeforeCreate
   @BeforeUpdate
   static async validate(instance: TimetableEntry): Promise<void> {
-    await validateTeacherRole(instance);
-    await validateDayInWeekRange(instance);
-    await validateHourInDayRange(instance);
-
-    if (instance.subClassId) {
-      await validateSubClassInClass(instance);
-    }
+    await Promise.all([
+      validateTeacherRole(instance),
+      validateDayInWeekRange(instance),
+      validateHourInDayRange(instance),
+      instance.subClassId ? validateSubClassInClass(instance) : null
+    ]);
   }
 }

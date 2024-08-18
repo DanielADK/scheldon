@@ -142,10 +142,10 @@ export class LessonRecord extends Model<LessonRecord> {
   static async validate(instance: LessonRecord): Promise<void> {
     await Promise.all([
       validateXORIdentifiers(instance),
-      await validateTeacherRole(instance),
-      await validateDayInWeekRange(instance),
-      await validateHourInDayRange(instance),
-      instance.subClassId ? await validateSubClassInClass(instance) : null
+      validateTeacherRole(instance),
+      validateDayInWeekRange(instance),
+      validateHourInDayRange(instance),
+      instance.subClassId ? validateSubClassInClass(instance) : null
     ]);
   }
 }
