@@ -11,7 +11,7 @@ import {
 } from 'sequelize-typescript';
 import { Class } from '@models/Class';
 import { StudentAssignment } from '@models/StudentAssignment';
-import { Lesson } from '@models/Lesson';
+import { LessonRecord } from '@models/LessonRecord';
 import { validateSubClassNameAndClass } from '@validators/subClassValidators';
 
 @Table({
@@ -51,8 +51,8 @@ export class SubClass extends Model<SubClass> {
   @HasMany(() => StudentAssignment)
   declare studentAssignments: StudentAssignment[];
 
-  @HasMany(() => Lesson)
-  declare lessons: Lesson[];
+  @HasMany(() => LessonRecord)
+  declare lessons: LessonRecord[];
 
   @BeforeCreate
   @BeforeUpdate

@@ -8,7 +8,7 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript';
-import { Lesson } from '@models/Lesson';
+import { LessonRecord } from '@models/LessonRecord';
 import { Student } from '@models/Student';
 import { AttendanceType } from '@models/types/AttendanceType';
 
@@ -20,16 +20,20 @@ export class Attendance extends Model<Attendance> {
   @AutoIncrement
   @Column({
     type: DataType.INTEGER,
-    allowNull: false
+    allowNull: false,
+    autoIncrement: true
   })
-  attendanceId!: number;
+  declare attendanceId: number;
 
-  @ForeignKey(() => Lesson)
+  @ForeignKey(() => LessonRecord)
   @Column({
     type: DataType.INTEGER,
     allowNull: false
   })
-  lessonId!: number;
+  declare lessonRecordId: number;
+
+  @BelongsTo(() => LessonRecord)
+  declare lessonRecord: LessonRecord;
 
   @ForeignKey(() => Student)
   @Column({
@@ -38,16 +42,13 @@ export class Attendance extends Model<Attendance> {
   })
   studentId!: number;
 
+  @BelongsTo(() => Student)
+  student!: Student;
+
   @Column({
     type: DataType.ENUM(...Object.values(AttendanceType)),
     allowNull: false,
     defaultValue: AttendanceType.PRESENT
   })
   attendance!: AttendanceType;
-
-  @BelongsTo(() => Lesson)
-  lesson!: Lesson;
-
-  @BelongsTo(() => Student)
-  student!: Student;
 }
