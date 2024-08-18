@@ -26,14 +26,7 @@ import {
 } from '@validators/timetableEntryValidators';
 
 @Table({
-  timestamps: false,
-  validate: {
-    employeeIsTeacher(this: TimetableEntry) {
-      if (this.teacherId === null) {
-        throw new Error('teacherId is required');
-      }
-    }
-  }
+  timestamps: false
 })
 export class TimetableEntry extends Model<TimetableEntry> {
   @PrimaryKey
@@ -87,7 +80,7 @@ export class TimetableEntry extends Model<TimetableEntry> {
   @ForeignKey(() => Room)
   @Column({
     type: DataType.INTEGER,
-    allowNull: true
+    allowNull: false
   })
   declare roomId: number;
 

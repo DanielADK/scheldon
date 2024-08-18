@@ -11,7 +11,7 @@ import {
 } from 'sequelize-typescript';
 import { Room } from '@models/Room';
 import { Employee } from '@models/Employee';
-import { Lesson } from '@models/Lesson';
+import { LessonRecord } from '@models/LessonRecord';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { SubClass } from '@models/SubClass';
 import { StudentAssignment } from '@models/StudentAssignment';
@@ -106,8 +106,8 @@ export class Class extends Model<Class> {
   @HasMany(() => SubClass)
   declare subClasses: SubClass[];
 
-  @HasMany(() => Lesson)
-  declare lessons: Lesson[];
+  @HasMany(() => LessonRecord)
+  declare lessons: LessonRecord[];
 
   @HasMany(() => StudentAssignment)
   declare studentAssignments: StudentAssignment[];
