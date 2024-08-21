@@ -81,7 +81,7 @@ export const createTSet = async (ctx: Context): Promise<void> => {
 };
 
 /**
- * Create a new timetable set
+ * Get timetable by ID with getterService
  * @param ctx Context
  * @param getterService getterService function to get timetable by different ID
  */
