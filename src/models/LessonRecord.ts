@@ -1,5 +1,5 @@
 import {
-  AutoIncrement,
+  BeforeBulkCreate,
   BeforeCreate,
   BeforeUpdate,
   BelongsTo,
@@ -25,6 +25,7 @@ import {
   validateTeacherRole,
   validateXORIdentifiers
 } from '@validators/lessonValidators';
+import { Op } from 'sequelize';
 
 @Table({
   createdAt: true,
@@ -32,13 +33,12 @@ import {
 })
 export class LessonRecord extends Model<LessonRecord> {
   @PrimaryKey
-  @AutoIncrement
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.STRING(8),
     allowNull: false,
-    autoIncrement: true
+    unique: true
   })
-  declare lessonId: number;
+  declare lessonId: string;
 
   // timetableEntry if exists
   @ForeignKey(() => TimetableEntry)
@@ -99,7 +99,7 @@ export class LessonRecord extends Model<LessonRecord> {
   // LessonRecord-specific fields
   @Column({
     type: DataType.STRING,
-    allowNull: false
+    allowNull: true
   })
   declare topic: string | null;
 
@@ -111,7 +111,7 @@ export class LessonRecord extends Model<LessonRecord> {
 
   @Column({
     type: DataType.DATE,
-    allowNull: false
+    allowNull: true
   })
   declare fillDate: Date | null;
 
@@ -136,6 +136,63 @@ export class LessonRecord extends Model<LessonRecord> {
 
   @HasMany(() => Attendance)
   declare attendances: Attendance[];
+
+  static async generateLessonId(): Promise<string> {
+    return Math.random().toString(36).substring(2, 10);
+  }
+
+  @BeforeCreate
+  static async generateUniqueLessonId(instance: LessonRecord): Promise<void> {
+    let unique = false;
+    while (!unique) {
+      const randomId = await LessonRecord.generateLessonId();
+      const existing = await LessonRecord.findByPk(randomId);
+
+      if (!existing) {
+        instance.lessonId = randomId;
+        unique = true;
+        break;
+      }
+    }
+  }
+
+  @BeforeBulkCreate
+  static async generateBulkLessonIds(instances: LessonRecord[]): Promise<void> {
+    let remainingInstances = instances;
+
+    while (remainingInstances.length > 0) {
+      const neededIds = remainingInstances.length;
+      const generatedIds = new Set<string>();
+
+      // Generate 2x the needed amount of IDs to ensure we have enough
+      while (generatedIds.size < neededIds * 2) {
+        generatedIds.add(await LessonRecord.generateLessonId());
+      }
+
+      // Check which IDs are not already in the database
+      const existingIds = await LessonRecord.findAll({
+        where: {
+          lessonId: { [Op.in]: Array.from(generatedIds) }
+        },
+        attributes: ['lessonId']
+      });
+
+      // Assign the first N unique IDs to the instances
+      const existingIdSet = new Set(existingIds.map((id) => id.lessonId));
+      const generatedIdsArray = Array.from(generatedIds);
+
+      // Filter out existing IDs and assign unique IDs to instances
+      remainingInstances = remainingInstances.filter((instance) => {
+        const id = generatedIdsArray.find((id) => !existingIdSet.has(id));
+        if (id) {
+          existingIdSet.add(id);
+          instance.lessonId = id;
+          return false;
+        }
+        return true;
+      });
+    }
+  }
 
   @BeforeCreate
   @BeforeUpdate

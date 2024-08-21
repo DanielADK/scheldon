@@ -49,7 +49,13 @@ export const createTEntry = async (
   tsetId: number,
   tentry: TimetableEntryDTO
 ): Promise<TimetableEntry> => {
-  return await timetableRepository.createTEntry(tsetId, tentry);
+  // Verify the timetable set exists
+  const tset = await TimetableSet.findByPk(tsetId);
+  if (!tset) {
+    throw new Error('Timetable set not found');
+  }
+
+  return await timetableRepository.createTEntry(tset, tentry);
 };
 
 export const createTSet = async (

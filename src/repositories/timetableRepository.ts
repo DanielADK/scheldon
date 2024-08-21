@@ -4,10 +4,13 @@ import { Student } from '@models/Student';
 import { Employee } from '@models/Employee';
 import { Class } from '@models/Class';
 import { TimetableEntrySet } from '@models/TimetableEntrySet';
-import { Op, WhereOptions } from 'sequelize';
+import { Op, Transaction, WhereOptions } from 'sequelize';
 import { Subject } from '@models/Subject';
 import { Room } from '@models/Room';
 import { SubClass } from '@models/SubClass';
+import { sequelize } from '../index';
+import { getLessonBulkInTSetPeriod } from '@repositories/lessonRecordRepository';
+import { LessonRecord } from '@models/LessonRecord';
 
 export interface TimetableSetDTO {
   name: string;
@@ -27,21 +30,40 @@ export interface TimetableEntryDTO {
 
 /**
  * Create a new timetable set
- * @param tsetId int
+ * @param tset TimetableSet
  * @param data TimetableSetDTO
  */
 export const createTEntry = async (
-  tsetId: number,
+  tset: TimetableSet,
   data: TimetableEntryDTO
 ): Promise<TimetableEntry> => {
-  const tset = await TimetableSet.findByPk(tsetId);
-  if (!tset) {
-    throw new Error('Timetable set not found');
+  const transaction: Transaction = await sequelize.transaction();
+
+  const tentry = await TimetableEntry.create(data as TimetableEntry, {
+    transaction: transaction
+  });
+
+  try {
+    // Add TimetableEntry to TimetableSet
+    await tset.$add('TimetableEntry', tentry, { transaction: transaction });
+
+    // Create LessonsRecords in TSet validity period
+    const lessons: LessonRecord[] = await getLessonBulkInTSetPeriod(
+      tset,
+      tentry
+    );
+
+    await LessonRecord.bulkCreate(lessons, {
+      transaction: transaction,
+      validate: true
+    });
+  } catch (err) {
+    // Rollback if error
+    await transaction.rollback();
+    throw err;
   }
 
-  const tentry = await TimetableEntry.create(data as TimetableEntry);
-
-  await tset.$add('TimetableEntry', tentry);
+  await transaction.commit();
 
   return tentry;
 };
