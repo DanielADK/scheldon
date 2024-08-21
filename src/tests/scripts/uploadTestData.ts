@@ -49,9 +49,11 @@ const uploadData = async (url: string, entity: string, data: entries[]) => {
 
 const uploadTestData = async () => {
   // Subjects, Employees, Rooms
-  await uploadData('http://localhost:3000/subjects', 'Subject', subjects);
-  await uploadData('http://localhost:3000/employee', 'Employee', employees);
-  await uploadData('http://localhost:3000/room', 'Room', rooms);
+  await Promise.all([
+    uploadData('http://localhost:3000/subjects', 'Subject', subjects),
+    uploadData('http://localhost:3000/employee', 'Employee', employees),
+    uploadData('http://localhost:3000/room', 'Room', rooms)
+  ]);
 
   // Classes
   await uploadData('http://localhost:3000/classes', 'Class', classes);
