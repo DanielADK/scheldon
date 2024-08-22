@@ -2,6 +2,7 @@ import Router from 'koa-router';
 import * as timetableController from '@controllers/timetableController';
 import { timetableGetByIdController } from '@controllers/timetableController';
 import * as timetableService from '@services/timetableService';
+import { getCurrentTimetable } from '@controllers/lessonRecordController';
 
 const router = new Router();
 /**
@@ -135,6 +136,8 @@ router.post('/timetables/set', timetableController.createTSet);
 router.get('/timetables/class/:id', (ctx) =>
   timetableGetByIdController(ctx, timetableService.getTimetableByClassId)
 );
+
+router.get('/timetables/class/:id/at/:date', getCurrentTimetable);
 
 /**
  * @openapi

@@ -92,6 +92,46 @@ export const getTimetableBySetId = async (
 };
 
 /**
+ * Get timetable set at time
+ * @param time
+ */
+export const getTimetableSetAtTime = async (
+  time: Date = new Date()
+): Promise<TimetableSet | null> => {
+  return await TimetableSet.findOne({
+    attributes: ['timetableSetId'],
+    where: {
+      validFrom: { [Op.lte]: time },
+      validTo: { [Op.gte]: time }
+    }
+  });
+};
+
+export const timetableEntryInclude = [
+  {
+    model: Employee,
+    attributes: ['name', 'surname', 'abbreviation'],
+    required: false
+  },
+  {
+    model: Subject,
+    attributes: ['name', 'abbreviation']
+  },
+  {
+    model: Class,
+    attributes: ['name']
+  },
+  {
+    model: SubClass,
+    attributes: ['name']
+  },
+  {
+    model: Room,
+    attributes: ['name']
+  }
+];
+
+/**
  * Get timetable by class ID
  * @param where WhereOptions optional
  * @param time Date optional
@@ -101,18 +141,10 @@ export const getTimetableByParam = async (
   time: Date = new Date()
 ): Promise<TimetableEntrySet[] | null> => {
   // Find the timetable set that is valid at the given time
-  const tSet = await TimetableSet.findOne({
-    attributes: ['timetableSetId'],
-    where: {
-      validFrom: { [Op.lte]: time },
-      validTo: { [Op.gte]: time }
-    }
-  });
+  const tSet = await getTimetableSetAtTime(time);
   if (!tSet) {
     return null;
   }
-
-  // TODO: Add temporary lessons
 
   return await TimetableEntrySet.findAll({
     where: {
@@ -125,28 +157,7 @@ export const getTimetableByParam = async (
         as: '',
         required: true,
         where: where,
-        include: [
-          {
-            model: Employee,
-            attributes: ['name', 'surname', 'abbreviation']
-          },
-          {
-            model: Subject,
-            attributes: ['name', 'abbreviation']
-          },
-          {
-            model: Class,
-            attributes: ['name']
-          },
-          {
-            model: SubClass,
-            attributes: ['name']
-          },
-          {
-            model: Room,
-            attributes: ['name']
-          }
-        ],
+        include: timetableEntryInclude,
         attributes: ['dayInWeek', 'hourInDay']
       }
     ]

@@ -1,6 +1,13 @@
+import { Op, WhereOptions } from 'sequelize';
 import { LessonRecord } from '@models/LessonRecord';
 import { TimetableSet } from '@models/TimetableSet';
 import { TimetableEntry } from '@models/TimetableEntry';
+import { Employee } from '@models/Employee';
+import { Subject } from '@models/Subject';
+import { Class } from '@models/Class';
+import { SubClass } from '@models/SubClass';
+import { Room } from '@models/Room';
+import { timetableEntryInclude } from '@repositories/timetableRepository';
 
 export interface LessonRecordDTO {
   classId: number;
@@ -80,4 +87,80 @@ export const getLessonBulkInTSetPeriod = async (
   }
 
   return lessons;
+};
+
+/**
+ * Get date range Monday to Friday
+ * @param time
+ */
+export const getWeekRange = (time: Date): { start: Date; end: Date } => {
+  const date = new Date(time);
+  const day = date.getDay();
+  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(date.setDate(diff));
+  const friday = new Date(date.setDate(diff + 4));
+
+  return { start: monday, end: friday };
+};
+
+export const getCurrentWeekTimetableByParam = async (
+  where: WhereOptions = {},
+  time: Date = new Date()
+): Promise<LessonRecord[] | null> => {
+  const { start, end } = getWeekRange(time);
+
+  return await LessonRecord.findAll({
+    where: {
+      [Op.and]: {
+        date: {
+          [Op.between]: [start, end]
+        },
+        [Op.or]: [
+          // Temporary lesson - null TEntryID, identifiers in LessonRecord
+          { timetableEntryId: { [Op.is]: null }, ...where },
+          // Permanent lesson - TEntryID, identifiers in TimetableEntry
+          { timetableEntryId: { [Op.not]: null } }
+        ]
+      }
+    },
+    include: [
+      {
+        model: TimetableEntry,
+        include: timetableEntryInclude,
+        attributes: ['dayInWeek', 'hourInDay'],
+        // Where clause for TimetableEntry identifiers
+        ...where
+      },
+      {
+        model: Employee,
+        attributes: ['name', 'surname', 'abbreviation']
+      },
+      {
+        model: Subject,
+        attributes: ['name', 'abbreviation']
+      },
+      {
+        model: Class,
+        attributes: ['name']
+      },
+      {
+        model: SubClass,
+        attributes: ['name']
+      },
+      {
+        model: Room,
+        attributes: ['name']
+      }
+    ],
+    attributes: [
+      'dayInWeek',
+      'hourInDay',
+      'classId',
+      'subClassId',
+      'subjectId',
+      'teacherId',
+      'roomId',
+      'date'
+    ]
+  });
 };
