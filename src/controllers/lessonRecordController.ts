@@ -1,7 +1,11 @@
 import Joi from 'joi';
 import { Context } from 'koa';
 import * as lessonRecordService from '@services/lessonRecordService';
-import { handleError } from '../lib/controllerTools';
+import {
+  getDateFromParam,
+  getIdFromParam,
+  handleError
+} from '../lib/controllerTools';
 
 // Schema for administratively creating a lesson record
 const createLessonRecordSchema = Joi.object({
@@ -31,6 +35,28 @@ export const administrativeCreateLessonRecord = async (
       await lessonRecordService.administrativeCreateLessonRecord(value);
     ctx.status = 201;
     ctx.body = lessonRecord;
+  } catch (error) {
+    handleError(ctx, error);
+  }
+};
+
+export const getCurrentTimetable = async (ctx: Context): Promise<void> => {
+  try {
+    const id: number = await getIdFromParam(ctx.params.id);
+    const date: Date =
+      ctx.params.date === 'now'
+        ? new Date()
+        : await getDateFromParam(ctx.params.date);
+
+    const timetable = await lessonRecordService.getTimetableAtTime(id, date);
+
+    if (!timetable) {
+      ctx.status = 404;
+      ctx.body = { error: 'Timetable not found' };
+    }
+
+    ctx.status = 200;
+    ctx.body = timetable;
   } catch (error) {
     handleError(ctx, error);
   }

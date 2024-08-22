@@ -78,7 +78,7 @@ export const getTimetableBySetId = async (
  * Transformer of TimeTableEntry to by-class-interested format
  * @param entry TimetableEntry
  */
-const classEntryTransformer = async (
+export const classEntryTransformer = async (
   entry: TimetableEntry
 ): Promise<TimetableDetails> => {
   return {
@@ -110,7 +110,7 @@ export const getTimetableByClassId = async (
  * Transformer of TimeTableEntry to by-employee-interested format
  * @param entry TimetableEntry
  */
-const employeeEntryTransformer = async (
+export const employeeEntryTransformer = async (
   entry: TimetableEntry
 ): Promise<TimetableDetails> => {
   return {
@@ -142,7 +142,7 @@ export const getTimetableByEmployeeId = async (
  * Transformer of TimeTableEntry to by-room-interested format
  * @param entry TimetableEntry
  */
-const roomEntryTransformer = async (
+export const roomEntryTransformer = async (
   entry: TimetableEntry
 ): Promise<TimetableDetails> => {
   return {
@@ -173,8 +173,8 @@ export const getTimetableByRoomId = async (
  * @param timetable TimetableEntrySet[]
  * @param transformerFunction entryTransformer function to transform the entries into the desired format
  */
-const transformTimetable = async (
-  timetable: TimetableEntrySet[],
+export const transformTimetable = async (
+  timetable: Partial<TimetableEntrySet>[],
   transformerFunction: entryTransformer
 ): Promise<TimetableExport> => {
   // Transform the results into a 2D object
@@ -183,6 +183,7 @@ const transformTimetable = async (
   // Iterate over the timetable entries
   for (const entrySet of timetable) {
     const entry = entrySet.timetableEntry;
+    if (!entry) continue;
 
     const day = entry.dayInWeek;
     const hour = entry.hourInDay;
