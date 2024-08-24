@@ -27,10 +27,10 @@ export class Attendance extends Model<Attendance> {
 
   @ForeignKey(() => LessonRecord)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.STRING(8),
     allowNull: false
   })
-  declare lessonRecordId: number;
+  declare lessonRecordId: string;
 
   @BelongsTo(() => LessonRecord)
   declare lessonRecord: LessonRecord;
