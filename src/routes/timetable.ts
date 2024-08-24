@@ -112,7 +112,7 @@ router.post('/timetables/set/:id/entry', timetableController.createTEntry);
  *         description: Bad request
  */
 router.post('/timetables/set', timetableController.createTSet);
-// router.get('/timetables/set/:id', timetableController.getTimetableBySetId);
+
 /**
  * @openapi
  * /timetables/class/{id}:
@@ -138,6 +138,34 @@ router.get('/timetables/class/:id', (ctx) =>
   timetableGetByIdController(ctx, timetableService.getTimetableByClassId)
 );
 
+/**
+ * @openapi
+ * /timetables/class/{id}/at/{date}:
+ *   get:
+ *     tags:
+ *       - Timetable
+ *     summary: Get timetable by class ID and date
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: ID of the class
+ *       - in: path
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: now or 2024-01-01
+ *         description: date in week of the timetable
+ *     responses:
+ *       200:
+ *         description: Timetable retrieved successfully
+ *       404:
+ *         description: Timetable not found
+ */
 router.get('/timetables/class/:id/at/:date', (ctx) =>
   getCurrentTimetableByIdController(
     ctx,
@@ -172,11 +200,46 @@ router.get('/timetables/teacher/:id', (ctx) =>
 
 /**
  * @openapi
+ * /timetables/teacher/{id}/at/{date}:
+ *   get:
+ *     tags:
+ *       - Timetable
+ *     summary: Get timetable by teacher ID and date
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: ID of the teacher
+ *       - in: path
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: now or 2024-01-01
+ *         description: date in week of the timetable
+ *     responses:
+ *       200:
+ *         description: Timetable retrieved successfully
+ *       404:
+ *         description: Timetable not found
+ */
+router.get('/timetables/teacher/:id/at/:date', (ctx) =>
+  getCurrentTimetableByIdController(
+    ctx,
+    lessonRecordService.getTimetableByEmployeeId
+  )
+);
+
+/**
+ * @openapi
  * /timetables/room/{id}:
  *   get:
  *     tags:
  *       - Timetable
- *     summary: Get timetable by room ID
+ *     summary: Get timetable by room ID and date
  *     parameters:
  *       - in: path
  *         name: id
@@ -185,6 +248,13 @@ router.get('/timetables/teacher/:id', (ctx) =>
  *           type: integer
  *           example: 1
  *         description: ID of the room
+ *       - in: path
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: now or 2024-01-01
+ *         description: date in week of the timetable
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
@@ -193,6 +263,41 @@ router.get('/timetables/teacher/:id', (ctx) =>
  */
 router.get('/timetables/room/:id', (ctx) =>
   timetableGetByIdController(ctx, timetableService.getTimetableByRoomId)
+);
+
+/**
+ * @openapi
+ * /timetables/room/{id}/at/{date}:
+ *   get:
+ *     tags:
+ *       - Timetable
+ *     summary: Get current timetable by room ID and date
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: ID of the room
+ *       - in: path
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: now or 2024-01-01
+ *         description: date in week of the timetable
+ *     responses:
+ *       200:
+ *         description: Timetable retrieved successfully
+ *       404:
+ *         description: Timetable not found
+ */
+router.get('/timetables/room/:id/at/:date', (ctx) =>
+  getCurrentTimetableByIdController(
+    ctx,
+    lessonRecordService.getTimetableByRoomId
+  )
 );
 
 export default router;
