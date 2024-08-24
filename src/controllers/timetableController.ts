@@ -1,12 +1,12 @@
 import { Context } from 'koa';
 import * as timetableService from '@services/timetableService';
-import { TimetableExport } from '@services/timetableService';
 import { getIdFromParam, handleError } from '../lib/controllerTools';
 import {
   TimetableEntryDTO,
   TimetableSetDTO
 } from '@repositories/timetableRepository';
 import Joi from 'joi';
+import { TimetableExport } from '@services/transformers/timetableExport';
 
 /**
  * Schema for creating a timetable set
@@ -83,7 +83,7 @@ export const createTSet = async (ctx: Context): Promise<void> => {
 /**
  * Get timetable by ID with getterService
  * @param ctx Context
- * @param getterService getterService function to get timetable by different ID
+ * @param getterService
  */
 export const timetableGetByIdController = async (
   ctx: Context,
@@ -92,7 +92,7 @@ export const timetableGetByIdController = async (
   try {
     const id: number = await getIdFromParam(ctx.params.id);
 
-    const timetable = await getterService(id);
+    const timetable: TimetableExport | null = await getterService(id);
 
     if (!timetable) {
       ctx.status = 404;

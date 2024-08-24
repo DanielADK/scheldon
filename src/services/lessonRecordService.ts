@@ -1,21 +1,14 @@
 import * as lessonRecordRepository from '@repositories/lessonRecordRepository';
-import {
-  getCurrentWeekTimetableByParam,
-  LessonRecordDTO
-} from '@repositories/lessonRecordRepository';
+import { LessonRecordDTO } from '@repositories/lessonRecordRepository';
 import { LessonRecord } from '@models/LessonRecord';
-import { TimetableEntrySet } from '@models/TimetableEntrySet';
-import { TimetableEntry } from '@models/TimetableEntry';
-import { Class } from '@models/Class';
-import { SubClass } from '@models/SubClass';
-import { Employee } from '@models/Employee';
-import { Subject } from '@models/Subject';
-import { Room } from '@models/Room';
 import {
-  classEntryTransformer,
+  classMask,
+  employeeMask,
+  roomMask,
   TimetableExport,
-  transformTimetable
-} from '@services/timetableService';
+  transformAndMask
+} from '@services/transformers/timetableExport';
+import { LessonAdapter } from '@services/transformers/lessonAdapter';
 
 export const administrativeCreateLessonRecord = async (
   data: LessonRecordDTO
@@ -24,44 +17,49 @@ export const administrativeCreateLessonRecord = async (
 };
 
 /**
- * Convert LessonRecord to TimetableSchema, remove null values, unwrap timetableEntryes
- * @param records
+ * Get timetable by class ID
+ * @param classId int
+ * @param date
  */
-export const convertLessonRecordToTimetableSchema = async (
-  records: LessonRecord[]
-): Promise<Partial<TimetableEntrySet>[]> => {
-  const convertedTimetable: Partial<TimetableEntrySet>[] = [];
-  let timetableEntry: Partial<TimetableEntry> = {};
-  records.forEach((record) => {
-    // Remove optimization -> timetableEntry to be unwrapped
-    if (record.timetableEntry === null) {
-      timetableEntry = {
-        dayInWeek: record.dayInWeek as number,
-        hourInDay: record.hourInDay as number,
-        class: record.class as Class,
-        subClass: record.subClass as SubClass,
-        subject: record.subject as Subject,
-        teacher: record.teacher as Employee,
-        room: record.room as Room
-      };
-    } else {
-      timetableEntry = record.timetableEntry;
-    }
-    convertedTimetable.push({
-      timetableEntry: timetableEntry as TimetableEntry
-    });
-  });
-  return convertedTimetable;
+export const getTimetableByClassId = async (
+  classId: number,
+  date: Date = new Date()
+): Promise<TimetableExport | null> => {
+  const timetable = await lessonRecordRepository.getCurrentWeekTimetableByParam(
+    { classId: classId },
+    date
+  );
+  return transformAndMask(timetable, new LessonAdapter(), classMask);
 };
 
-export const getTimetableAtTime = async (
-  id: number,
-  date: Date
+/**
+ * Get timetable by employee ID
+ * @param employeeId int
+ * @param date
+ */
+export const getTimetableByEmployeeId = async (
+  employeeId: number,
+  date: Date = new Date()
 ): Promise<TimetableExport | null> => {
-  const timetable = await getCurrentWeekTimetableByParam({ classId: id }, date);
-  if (!timetable) {
-    return null;
-  }
-  const converted = await convertLessonRecordToTimetableSchema(timetable);
-  return await transformTimetable(converted, classEntryTransformer);
+  const timetable = await lessonRecordRepository.getCurrentWeekTimetableByParam(
+    { teacherId: employeeId },
+    date
+  );
+  return transformAndMask(timetable, new LessonAdapter(), employeeMask);
+};
+
+/**
+ * Get timetable by room ID
+ * @param roomId int
+ * @param date
+ */
+export const getTimetableByRoomId = async (
+  roomId: number,
+  date: Date = new Date()
+): Promise<TimetableExport | null> => {
+  const timetable = await lessonRecordRepository.getCurrentWeekTimetableByParam(
+    { roomId: roomId },
+    date
+  );
+  return transformAndMask(timetable, new LessonAdapter(), roomMask);
 };

@@ -153,6 +153,7 @@ export const getCurrentWeekTimetableByParam = async (
       }
     ],
     attributes: [
+      'lessonId',
       'dayInWeek',
       'hourInDay',
       'classId',

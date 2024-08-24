@@ -6,6 +6,7 @@ import {
   getIdFromParam,
   handleError
 } from '../lib/controllerTools';
+import { TimetableExport } from '@services/transformers/timetableExport';
 
 // Schema for administratively creating a lesson record
 const createLessonRecordSchema = Joi.object({
@@ -40,7 +41,15 @@ export const administrativeCreateLessonRecord = async (
   }
 };
 
-export const getCurrentTimetable = async (ctx: Context): Promise<void> => {
+type getterService = (
+  id: number,
+  date: Date
+) => Promise<TimetableExport | null>;
+
+export const getCurrentTimetableByIdController = async (
+  ctx: Context,
+  getterService: getterService
+): Promise<void> => {
   try {
     const id: number = await getIdFromParam(ctx.params.id);
     const date: Date =
@@ -48,7 +57,7 @@ export const getCurrentTimetable = async (ctx: Context): Promise<void> => {
         ? new Date()
         : await getDateFromParam(ctx.params.date);
 
-    const timetable = await lessonRecordService.getTimetableAtTime(id, date);
+    const timetable: TimetableExport | null = await getterService(id, date);
 
     if (!timetable) {
       ctx.status = 404;
