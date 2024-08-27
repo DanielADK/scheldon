@@ -1,4 +1,5 @@
 import { LessonRecord } from '@models/LessonRecord';
+import { LessonType } from '@models/types/LessonType';
 
 /**
  * Validate that the lesson has identifiers: (timetableEntryId)
@@ -84,5 +85,37 @@ export const validateHourInDayRange = async (
     throw new Error(
       'Hour in day is out of range. Expected value between 0 and 10'
     );
+  }
+};
+
+/**
+ * Validate the lesson type.
+ * DROPPED is only allowed with TEntry
+ * other types are not allowed with TEntry
+ * other types are allowed with custom lessons
+ * @param instance
+ * @throws Error
+ */
+export const validateType = async (instance: LessonRecord): Promise<void> => {
+  const hasTimetableEntry: boolean = !!instance.timetableEntryId;
+
+  switch (instance.type) {
+    case LessonType.DROPPED:
+      if (!hasTimetableEntry) {
+        throw new Error('DROPPED type is only allowed with timetable entries');
+      }
+      break;
+
+    case LessonType.TIME_MOVE:
+    case LessonType.OVER_WORKFLOW:
+    case LessonType.MERGED:
+      if (hasTimetableEntry) {
+        throw new Error(
+          `${instance.type} is not allowed with a timetable entry.`
+        );
+      }
+      break;
+    default:
+      throw new Error('Invalid lesson type.');
   }
 };

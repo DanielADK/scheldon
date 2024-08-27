@@ -4,33 +4,26 @@ import { AbstractTimetableAdapter } from '@services/transformers/AbstractTimetab
 
 export class LessonAdapter extends AbstractTimetableAdapter<LessonRecord> {
   transform(entry: LessonRecord): TimeLessonEntry {
-    const isTemporaryLesson = entry.timetableEntry === null;
+    const lesson = entry.timetableEntry === null ? entry : entry.timetableEntry;
+    if (lesson === null) {
+      throw new Error('Lesson record is missing timetable entry');
+    }
 
-    const teacher = isTemporaryLesson
-      ? entry.teacher
-      : entry.timetableEntry?.teacher;
-    const subject = isTemporaryLesson
-      ? entry.subject
-      : entry.timetableEntry?.subject;
-    const classData = isTemporaryLesson
-      ? entry.class
-      : entry.timetableEntry?.class;
-    const subClass = isTemporaryLesson
-      ? entry.subClass
-      : entry.timetableEntry?.subClass;
-    const room = isTemporaryLesson ? entry.room : entry.timetableEntry?.room;
+    const teacher = lesson.teacher;
+    const subject = lesson.subject;
+    const classData = lesson.class;
+    const subClass = lesson.subClass;
+    const room = lesson.room;
+    const dayInWeek = lesson.dayInWeek;
+    const hourInDay = lesson.hourInDay;
 
     if (!teacher || !subject || !classData || !room) {
       throw new Error('Lesson record is missing required fields');
     }
 
     const result: TimeLessonEntry = {
-      dayInWeek: isTemporaryLesson
-        ? (entry.dayInWeek as number)
-        : (entry.timetableEntry?.dayInWeek as number),
-      hourInDay: isTemporaryLesson
-        ? (entry.hourInDay as number)
-        : (entry.timetableEntry?.hourInDay as number),
+      dayInWeek: dayInWeek as number,
+      hourInDay: hourInDay as number,
       teacher: {
         name: teacher.name,
         surname: teacher.surname,
@@ -41,7 +34,7 @@ export class LessonAdapter extends AbstractTimetableAdapter<LessonRecord> {
         abbreviation: subject.abbreviation
       },
       class: { name: classData.name },
-      subClass: { name: subClass?.name || '' },
+      ...(subClass !== null && { subClass: { name: subClass.name } }),
       room: { name: room.name }
     };
 

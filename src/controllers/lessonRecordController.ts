@@ -7,6 +7,7 @@ import {
   handleError
 } from '../lib/controllerTools';
 import { TimetableExport } from '@services/transformers/timetableExport';
+import { LessonType } from '@models/types/LessonType';
 
 // Schema for administratively creating a lesson record
 const createLessonRecordSchema = Joi.object({
@@ -17,12 +18,18 @@ const createLessonRecordSchema = Joi.object({
   subjectId: Joi.number().optional(),
   teacherId: Joi.number().optional(),
   roomId: Joi.number().optional(),
-  date: Joi.date().required()
+  date: Joi.date().required(),
+  type: Joi.string()
+    .normalize()
+    .valid(...Object.values(LessonType))
+    .required()
 });
 
-export const administrativeCreateLessonRecord = async (
-  ctx: Context
-): Promise<void> => {
+/**
+ * Create a new lesson record/remove a lesson record to/from the standard timetable
+ * @param ctx Context
+ */
+export const createCustomLessonRecord = async (ctx: Context): Promise<void> => {
   const { error, value } = createLessonRecordSchema.validate(ctx.request.body);
 
   if (error) {
@@ -33,9 +40,18 @@ export const administrativeCreateLessonRecord = async (
 
   try {
     const lessonRecord =
-      await lessonRecordService.administrativeCreateLessonRecord(value);
+      await lessonRecordService.createCustomLessonRecord(value);
     ctx.status = 201;
     ctx.body = lessonRecord;
+  } catch (error) {
+    handleError(ctx, error);
+  }
+};
+
+export const deleteLessonRecord = async (ctx: Context): Promise<void> => {
+  try {
+    await lessonRecordService.deleteLessonRecord(ctx.params.id);
+    ctx.status = 204;
   } catch (error) {
     handleError(ctx, error);
   }
