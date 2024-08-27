@@ -10,14 +10,18 @@ export class TimetableAdapter extends AbstractTimetableAdapter<TimetableEntrySet
       teacher: {
         name: entry.timetableEntry.teacher.name,
         surname: entry.timetableEntry.teacher.surname,
-        abbreviation: entry.timetableEntry.teacher.abbreviation || ''
+        ...(entry.timetableEntry.teacher.abbreviation !== null && {
+          abbreviation: entry.timetableEntry.teacher.abbreviation
+        })
       },
       subject: {
         name: entry.timetableEntry.subject.name,
         abbreviation: entry.timetableEntry.subject.abbreviation
       },
       class: { name: entry.timetableEntry.class.name },
-      subClass: { name: entry.timetableEntry.subClass?.name || '' },
+      ...(entry.timetableEntry.subClass !== null && {
+        subClass: entry.timetableEntry.subClass.name
+      }),
       room: { name: entry.timetableEntry.room.name }
     } as TimeLessonEntry;
   }

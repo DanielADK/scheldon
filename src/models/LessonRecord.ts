@@ -23,9 +23,11 @@ import {
   validateHourInDayRange,
   validateSubClassInClass,
   validateTeacherRole,
+  validateType,
   validateXORIdentifiers
 } from '@validators/lessonValidators';
 import { Op } from 'sequelize';
+import { LessonType } from '@models/types/LessonType';
 
 @Table({
   createdAt: true,
@@ -107,13 +109,20 @@ export class LessonRecord extends Model<LessonRecord> {
     type: DataType.DATE,
     allowNull: false
   })
-  declare date: Date | null;
+  declare date: Date;
 
   @Column({
     type: DataType.DATE,
     allowNull: true
   })
   declare fillDate: Date | null;
+
+  // Type only with timetableEntry, other fields are null
+  @Column({
+    type: DataType.ENUM(...Object.values(LessonType)),
+    allowNull: true
+  })
+  declare type: LessonType | null;
 
   // Mapping
   @BelongsTo(() => Class)
@@ -202,7 +211,8 @@ export class LessonRecord extends Model<LessonRecord> {
       validateTeacherRole(instance),
       validateDayInWeekRange(instance),
       validateHourInDayRange(instance),
-      instance.subClassId ? validateSubClassInClass(instance) : null
+      instance.subClassId ? validateSubClassInClass(instance) : null,
+      instance.timetableEntry ? validateType(instance) : null
     ]);
   }
 }

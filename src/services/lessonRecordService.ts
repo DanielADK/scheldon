@@ -10,10 +10,22 @@ import {
 } from '@services/transformers/timetableExport';
 import { LessonAdapter } from '@services/transformers/lessonAdapter';
 
-export const administrativeCreateLessonRecord = async (
+/**
+ * Create a custom lesson record in the timetable
+ * @param data LessonRecordDTO
+ */
+export const createCustomLessonRecord = async (
   data: LessonRecordDTO
 ): Promise<LessonRecord> => {
   return await lessonRecordRepository.findOrCreateLessonRecord(data);
+};
+
+/**
+ * Delete a lesson record from the timetable
+ * @param id string
+ */
+export const deleteLessonRecord = async (id: string): Promise<void> => {
+  return await lessonRecordRepository.deleteLessonRecord(id);
 };
 
 /**

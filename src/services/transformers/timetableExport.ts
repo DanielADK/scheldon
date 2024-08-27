@@ -2,6 +2,7 @@ import {
   AbstractTimetableAdapter,
   TimetableModels
 } from '@services/transformers/AbstractTimetableAdapter';
+import { LessonType } from '@models/types/LessonType';
 
 /**
  * Single lesson entry format
@@ -20,6 +21,7 @@ export interface SimpleLessonEntry {
   class?: { name: string };
   subClass?: { name: string };
   room?: { name: string };
+  type?: LessonType;
 }
 
 /**
@@ -57,8 +59,9 @@ export const classMask = async (
     ...(entry.lessonId !== null && { lessonId: entry.lessonId }),
     teacher: entry.teacher,
     subject: entry.subject,
-    subClass: entry.subClass,
-    room: entry.room
+    ...(entry.subClass !== null && { subClass: entry.subClass }),
+    room: entry.room,
+    ...(entry.type !== null && { type: entry.type })
   } as SimpleLessonEntry;
 };
 
@@ -73,8 +76,9 @@ export const employeeMask = async (
     ...(entry.lessonId !== null && { lessonId: entry.lessonId }),
     subject: entry.subject,
     class: entry.class,
-    subClass: entry.subClass,
-    room: entry.room
+    ...(entry.subClass !== null && { subClass: entry.subClass }),
+    room: entry.room,
+    ...(entry.type !== null && { type: entry.type })
   } as SimpleLessonEntry;
 };
 
@@ -90,7 +94,8 @@ export const roomMask = async (
     teacher: entry.teacher,
     subject: entry.subject,
     class: entry.class,
-    subClass: entry.subClass
+    ...(entry.subClass !== null && { subClass: entry.subClass }),
+    ...(entry.type !== null && { type: entry.type })
   } as SimpleLessonEntry;
 };
 
