@@ -135,10 +135,12 @@ export const timetableEntryInclude = [
  * Get timetable by class ID
  * @param where WhereOptions optional
  * @param time Date optional
+ * @param transaction
  */
 export const getTimetableByParam = async (
   where: WhereOptions = {},
-  time: Date = new Date()
+  time: Date = new Date(),
+  transaction: Transaction | null = null
 ): Promise<TimetableEntrySet[] | null> => {
   // Find the timetable set that is valid at the given time
   const tSet = await getTimetableSetAtTime(time);
@@ -160,6 +162,7 @@ export const getTimetableByParam = async (
         include: timetableEntryInclude,
         attributes: ['dayInWeek', 'hourInDay']
       }
-    ]
+    ],
+    transaction: transaction
   });
 };

@@ -106,7 +106,7 @@ export class LessonRecord extends Model<LessonRecord> {
   declare topic: string | null;
 
   @Column({
-    type: DataType.DATE,
+    type: DataType.DATEONLY,
     allowNull: false
   })
   declare date: Date;

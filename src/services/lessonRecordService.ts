@@ -17,7 +17,7 @@ import { LessonAdapter } from '@services/transformers/lessonAdapter';
 export const createCustomLessonRecord = async (
   data: LessonRecordDTO
 ): Promise<LessonRecord> => {
-  return await lessonRecordRepository.findOrCreateLessonRecord(data);
+  return await lessonRecordRepository.createCustomLesson(data);
 };
 
 /**
