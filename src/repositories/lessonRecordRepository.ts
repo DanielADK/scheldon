@@ -81,68 +81,65 @@ export const createCustomLesson = async (
  */
 export const deleteLessonRecord = async (id: string): Promise<void> => {
   const transaction = await sequelize.transaction();
-  try {
-    const lesson = await LessonRecord.findByPk(id, {
+  const lesson = await LessonRecord.findByPk(id, {
+    transaction: transaction
+  });
+
+  if (!lesson) {
+    await transaction.rollback();
+    throw new Error('Lesson record not found');
+  }
+
+  // If the lesson has no timetableEntryId,
+  // find the default timetable entry and drop
+  if (!lesson.timetableEntryId) {
+    const tentrySet: TimetableEntrySet[] | null = await getTimetableByParam({
+      where: {
+        where: {
+          classId: lesson.classId,
+          subClassId: lesson.subClassId,
+          dayInWeek: lesson.dayInWeek,
+          hourInDay: lesson.hourInDay
+        }
+      },
+      time: lesson.date,
       transaction: transaction
     });
 
-    if (!lesson) {
-      throw new Error('Lesson record not found');
+    // If the default timetable entry is not found, throw an error
+    if (!tentrySet || tentrySet.length != 1) {
+      await transaction.rollback();
+      throw new Error('Timetable entry not found');
     }
 
-    // If the lesson has no timetableEntryId,
-    // find the default timetable entry and drop
-    if (!lesson.timetableEntryId) {
-      const tentrySet: TimetableEntrySet[] | null = await getTimetableByParam({
-        where: {
-          where: {
-            classId: lesson.classId,
-            subClassId: lesson.subClassId,
-            dayInWeek: lesson.dayInWeek,
-            hourInDay: lesson.hourInDay
-          }
-        },
-        time: lesson.date,
-        transaction: transaction
-      });
+    // Get the default timetable entry
+    const tentry: TimetableEntry = tentrySet[0].timetableEntry;
 
-      // If the default timetable entry is not found, throw an error
-      if (!tentrySet || tentrySet.length != 1) {
-        throw new Error('Timetable entry not found');
-      }
-
-      // Get the default timetable entry
-      const tentry: TimetableEntry = tentrySet[0].timetableEntry;
-
-      // Update the lesson to link it back to the original timetable entry
-      await lesson.update(
-        {
-          timetableEntryId: tentry.timetableEntryId,
-          type: LessonType.DROPPED,
-          classId: null,
-          subClassId: null,
-          dayInWeek: null,
-          hourInDay: null,
-          subjectId: null,
-          teacherId: null,
-          roomId: null,
-          fillDate: new Date()
-        },
-        { transaction: transaction }
-      );
-    } else {
-      // Otherwise, just update the lesson to mark it as DROPPED
-      await lesson.update(
-        {
-          type: LessonType.DROPPED,
-          fillDate: new Date()
-        },
-        { transaction: transaction }
-      );
-    }
-  } catch (err) {
-    await transaction.rollback();
-    throw err;
+    // Update the lesson to link it back to the original timetable entry
+    await lesson.update(
+      {
+        timetableEntryId: tentry.timetableEntryId,
+        type: LessonType.DROPPED,
+        classId: null,
+        subClassId: null,
+        dayInWeek: null,
+        hourInDay: null,
+        subjectId: null,
+        teacherId: null,
+        roomId: null,
+        fillDate: new Date()
+      },
+      { transaction: transaction }
+    );
+  } else {
+    // Otherwise, just update the lesson to mark it as DROPPED
+    await lesson.update(
+      {
+        type: LessonType.DROPPED,
+        fillDate: new Date()
+      },
+      { transaction: transaction }
+    );
   }
 
   await transaction.commit();
