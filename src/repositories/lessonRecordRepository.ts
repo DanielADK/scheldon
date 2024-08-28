@@ -35,6 +35,8 @@ export const findCurrentTimetableEntry = async(teacherId: number, currentDay: nu
 
 /**
  * Find or create a lesson record in the timetable
+ * If lesson record exists, remove standard TimetableEntry, update new lesson identifiers
+ * If lesson record does not exist, create a new lesson record with custom identifiers
  * @param data LessonRecordDTO
  */
 export const createCustomLesson = async (
@@ -50,6 +52,7 @@ export const createCustomLesson = async (
   });
 
   if (lesson) {
+    // If the lesson exists, update the lesson with custom identifiers
     return await lesson.update({
       timetableEntryId: null,
       type: data.type,
@@ -59,39 +62,11 @@ export const createCustomLesson = async (
       hourInDay: data.hourInDay,
       subjectId: data.subjectId,
       teacherId: data.teacherId,
-      roomId: data.roomId
+      roomId: data.roomId,
+      date: data.date
     });
-  }
-
-  const tentrySet: TimetableEntrySet[] | null = await getTimetableByParam({
-    where: {
-      classId: data.classId,
-      subClassId: data.subClassId,
-      dayInWeek: data.dayInWeek,
-      hourInDay: data.hourInDay
-    }
-  });
-
-  // Check if the lesson is not in standard timetable
-  const timetableEntry = await LessonRecord.findOne({
-    where: {
-      classId: data.classId,
-      subClassId: data.subClassId,
-      dayInWeek: data.dayInWeek,
-      hourInDay: data.hourInDay,
-      subjectId: data.subjectId,
-      teacherId: data.teacherId,
-      roomId: data.roomId
-    }
-  });
-
-  // If the lesson is in the standard timetable, create a new lesson record with custom identifiers
-  if (timetableEntry) {
-    return await LessonRecord.create({
-      ...data,
-      timetableEntryId: timetableEntry.timetableEntryId
-    } as LessonRecord);
   } else {
+    // If the lesson does not exist, create a new lesson with custom identifiers
     return await LessonRecord.create({
       ...data,
       timetableEntryId: null
