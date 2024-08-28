@@ -38,14 +38,22 @@ const router = new Router();
  *           type: string
  *           format: date
  *           example: "2024-09-15"
+ *         type:
+ *           type: string
+ *           enum:
+ *             - TIME_MOVE
+ *             - OVER_WORKFLOW
+ *             - DROPPED
+ *             - MERGED
+ *           example: "TIME_MOVE"
  */
 
 /**
  * @openapi
- * /lesson-records:
+ * /classregister:
  *   post:
  *     tags:
- *       - LessonRecords
+ *       - Class register
  *     summary: Create a new lesson record
  *     requestBody:
  *       required: true
@@ -79,10 +87,8 @@ const router = new Router();
  *                 error:
  *                   type: string
  */
-router.post(
-  '/classregister/',
-  lessonRecordController.administrativeCreateLessonRecord
-);
+router.post('/classregister/', lessonRecordController.createCustomLessonRecord);
+router.delete('/classregister/:id');
 
 router.get('/classregister/current');
 

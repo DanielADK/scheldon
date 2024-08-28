@@ -13,6 +13,7 @@ import {
 } from '@repositories/timetableRepository';
 import { LessonType } from '@models/types/LessonType';
 import { TimetableEntrySet } from '@models/TimetableEntrySet';
+import { sequelize } from '../index';
 
 export interface LessonRecordDTO {
   classId: number;
@@ -23,6 +24,7 @@ export interface LessonRecordDTO {
   teacherId?: number;
   roomId?: number;
   date: Date;
+  type: LessonType;
 }
 
 /*
@@ -35,9 +37,41 @@ export const findCurrentTimetableEntry = async(teacherId: number, currentDay: nu
  * Find or create a lesson record in the timetable
  * @param data LessonRecordDTO
  */
-export const findOrCreateLessonRecord = async (
+export const createCustomLesson = async (
   data: LessonRecordDTO
 ): Promise<LessonRecord> => {
+  // Check if the lesson is not exists in the timetable
+  const lesson = await LessonRecord.findOne({
+    where: {
+      dayInWeek: data.dayInWeek,
+      hourInDay: data.hourInDay,
+      date: data.date
+    }
+  });
+
+  if (lesson) {
+    return await lesson.update({
+      timetableEntryId: null,
+      type: data.type,
+      classId: data.classId,
+      subClassId: data.subClassId,
+      dayInWeek: data.dayInWeek,
+      hourInDay: data.hourInDay,
+      subjectId: data.subjectId,
+      teacherId: data.teacherId,
+      roomId: data.roomId
+    });
+  }
+
+  const tentrySet: TimetableEntrySet[] | null = await getTimetableByParam({
+    where: {
+      classId: data.classId,
+      subClassId: data.subClassId,
+      dayInWeek: data.dayInWeek,
+      hourInDay: data.hourInDay
+    }
+  });
+
   // Check if the lesson is not in standard timetable
   const timetableEntry = await LessonRecord.findOne({
     where: {
@@ -71,51 +105,72 @@ export const findOrCreateLessonRecord = async (
  * @param id string
  */
 export const deleteLessonRecord = async (id: string): Promise<void> => {
-  const lesson = await LessonRecord.findByPk(id);
-
-  if (!lesson) {
-    throw new Error('Lesson record not found');
-  }
-
-  // If the lesson has no timetableEntryId, find the default timetable entry
-  if (!lesson.timetableEntryId) {
-    const tentrySet: TimetableEntrySet[] | null = await getTimetableByParam({
-      where: {
-        classId: lesson.classId,
-        subClassId: lesson.subClassId,
-        dayInWeek: lesson.dayInWeek,
-        hourInDay: lesson.hourInDay
-      }
+  const transaction = await sequelize.transaction();
+  try {
+    const lesson = await LessonRecord.findByPk(id, {
+      transaction: transaction
     });
 
-    // If the default timetable entry is not found, throw an error
-    if (!tentrySet || tentrySet.length != 1) {
-      throw new Error('Timetable entry not found');
+    if (!lesson) {
+      throw new Error('Lesson record not found');
     }
 
-    // Get the default timetable entry
-    const tentry: TimetableEntry = tentrySet[0].timetableEntry;
+    // If the lesson has no timetableEntryId,
+    // find the default timetable entry and drop
+    if (!lesson.timetableEntryId) {
+      const tentrySet: TimetableEntrySet[] | null = await getTimetableByParam({
+        where: {
+          where: {
+            classId: lesson.classId,
+            subClassId: lesson.subClassId,
+            dayInWeek: lesson.dayInWeek,
+            hourInDay: lesson.hourInDay
+          }
+        },
+        time: lesson.date,
+        transaction: transaction
+      });
 
-    // Update the lesson to link it back to the original timetable entry
-    await lesson.update({
-      timetableEntryId: tentry.timetableEntryId,
-      type: LessonType.DROPPED,
-      classId: null,
-      subClassId: null,
-      dayInWeek: null,
-      hourInDay: null,
-      subjectId: null,
-      teacherId: null,
-      roomId: null,
-      fillDate: new Date()
-    });
-  } else {
-    // Otherwise, just update the lesson to mark it as DROPPED
-    await lesson.update({
-      type: LessonType.DROPPED,
-      fillDate: new Date()
-    });
+      // If the default timetable entry is not found, throw an error
+      if (!tentrySet || tentrySet.length != 1) {
+        throw new Error('Timetable entry not found');
+      }
+
+      // Get the default timetable entry
+      const tentry: TimetableEntry = tentrySet[0].timetableEntry;
+
+      // Update the lesson to link it back to the original timetable entry
+      await lesson.update(
+        {
+          timetableEntryId: tentry.timetableEntryId,
+          type: LessonType.DROPPED,
+          classId: null,
+          subClassId: null,
+          dayInWeek: null,
+          hourInDay: null,
+          subjectId: null,
+          teacherId: null,
+          roomId: null,
+          fillDate: new Date()
+        },
+        { transaction: transaction }
+      );
+    } else {
+      // Otherwise, just update the lesson to mark it as DROPPED
+      await lesson.update(
+        {
+          type: LessonType.DROPPED,
+          fillDate: new Date()
+        },
+        { transaction: transaction }
+      );
+    }
+  } catch (err) {
+    await transaction.rollback();
+    throw err;
   }
+
+  await transaction.commit();
 };
 
 /**
@@ -143,6 +198,7 @@ export const getLessonBulkInTSetPeriod = async (
   // Set the date to the first occurrence of the dayInWeek
   date.setDate(date.getDate() + dateDiff);
 
+  // Fill the timetable set with lessons between dates
   while (date < validTo) {
     lessons.push({
       timetableEntryId: data.timetableEntryId,
