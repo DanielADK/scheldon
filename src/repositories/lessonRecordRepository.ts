@@ -38,70 +38,79 @@ export interface LessonRecordDTO {
 export const createCustomLesson = async (
   data: LessonRecordDTO
 ): Promise<LessonRecord> => {
+  // Dropped with DELETE method
+  if (data.type === LessonType.DROPPED) {
+    throw new Error('Use DELETE method for dropping lessons');
+  }
+
   const whereClause: WhereOptions = {
     dayInWeek: data.dayInWeek,
     hourInDay: data.hourInDay,
     classId: data.classId
   };
-
   // Only include subClassId in the where clause if it's defined
   if (data.subClassId !== undefined) {
     whereClause.subClassId = data.subClassId ?? { [Op.is]: null };
   }
-  // Step 1: Check if the lesson already exists
-  const existingLesson = await LessonRecord.findOne({
-    where: {
-      date: data.date,
-      [Op.or]: [
+
+  // Start a transaction
+  const transaction = await sequelize.transaction();
+  try {
+    // Step 1: Check if the lesson already exists
+    const existingLesson = await LessonRecord.findOne({
+      where: {
+        date: data.date,
+        [Op.or]: [
+          {
+            // Case 1: timetableEntryId is null, search in LessonRecord fields
+            timetableEntryId: null,
+            date: data.date,
+            ...whereClause
+          },
+          {
+            // Case 2: timetableEntryId is not null, search in the related TimetableEntry
+            timetableEntryId: { [Op.ne]: null }
+          }
+        ]
+      },
+      include: [
         {
-          // Case 1: timetableEntryId is null, search in LessonRecord fields
-          timetableEntryId: null,
-          date: data.date,
-          ...whereClause
-        },
-        {
-          // Case 2: timetableEntryId is not null, search in the related TimetableEntry
-          timetableEntryId: { [Op.ne]: null }
+          model: TimetableEntry,
+          where: whereClause,
+          required: false // Allow null TimetableEntry for Case 1
         }
-      ]
-    },
-    include: [
-      {
-        model: TimetableEntry,
-        where: whereClause,
-        required: false // Allow null TimetableEntry for Case 1
-      }
-    ]
-  });
+      ],
+      transaction: transaction
+    });
 
-  // Define the lesson record
-  let lr = {
-    timetableEntryId: null,
-    classId: data.classId,
-    subClassId: data.subClassId,
-    dayInWeek: data.dayInWeek,
-    hourInDay: data.hourInDay,
-    subjectId: data.subjectId,
-    teacherId: data.teacherId,
-    roomId: data.roomId,
-    type: data.type as LessonType,
-    date: new Date(data.date)
-  } as LessonRecord;
+    // Define the lesson record
+    let lr = {
+      timetableEntryId: null,
+      classId: data.classId,
+      subClassId: data.subClassId,
+      subjectId: data.subjectId,
+      teacherId: data.teacherId,
+      roomId: data.roomId,
+      type: data.type as LessonType,
+      date: new Date(data.date)
+    } as LessonRecord;
 
-  if (existingLesson) {
-    // Step 2: If the lesson exists, update it with custom identifiers
-    if (data.type === LessonType.DROPPED) {
-      lr = {
-        type: data.type as LessonType,
-        fillDate: new Date(data.date)
-      } as LessonRecord;
+    if (existingLesson) {
+      // Step 2: If the lesson exists, update it with custom identifiers
+      lr = await existingLesson.update(lr);
+    } else {
+      // Step 3: If the lesson does not exist, create a new lesson record
+      await LessonRecord.generateUniqueLessonId(lr);
+
+      lr = await LessonRecord.create(lr);
     }
-    return await existingLesson.update(lr);
-  } else {
-    // Step 3: If the lesson does not exist, create a new lesson record
-    await LessonRecord.generateUniqueLessonId(lr);
 
-    return await LessonRecord.create(lr);
+    // Commit transaction
+    await transaction.commit();
+    return lr;
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
   }
 };
 
