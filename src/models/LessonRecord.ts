@@ -223,6 +223,11 @@ export class LessonRecord extends Model<LessonRecord> {
   }
 
   // Other methods
+  /**
+   * Check if the lesson record is filled
+   * @returns boolean
+   * @throws Error if the lesson record is already filled
+   */
   isFilled(): boolean {
     return this.fillDate !== null;
   }
