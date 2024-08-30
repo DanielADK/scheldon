@@ -2,7 +2,6 @@ import {
   AbstractTimetableAdapter,
   TimetableModels
 } from '@services/transformers/AbstractTimetableAdapter';
-import { LessonType } from '@models/types/LessonType';
 
 /**
  * Single lesson entry format
@@ -21,7 +20,7 @@ export interface SimpleLessonEntry {
   class?: { name: string };
   subClass?: { name: string };
   room?: { name: string };
-  type?: LessonType;
+  type?: string;
 }
 
 /**

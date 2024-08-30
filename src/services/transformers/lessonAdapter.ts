@@ -35,7 +35,8 @@ export class LessonAdapter extends AbstractTimetableAdapter<LessonRecord> {
       },
       class: { name: classData.name },
       ...(subClass !== null && { subClass: { name: subClass.name } }),
-      room: { name: room.name }
+      room: { name: room.name },
+      ...(entry.type !== null && { type: entry.type })
     };
 
     return { lessonId: entry.lessonId, ...result };

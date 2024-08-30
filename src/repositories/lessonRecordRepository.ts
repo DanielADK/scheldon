@@ -279,7 +279,8 @@ export const getCurrentWeekTimetableByParam = async (
       'subjectId',
       'teacherId',
       'roomId',
-      'date'
+      'date',
+      'type'
     ]
   });
 };
