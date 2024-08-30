@@ -22,11 +22,39 @@ import {
   validateDayInWeekRange,
   validateHourInDayRange,
   validateSubClassInClass,
-  validateTeacherRole
+  validateTeacherRole,
+  validateUniqueEntry
 } from '@validators/timetableEntryValidators';
 
 @Table({
-  timestamps: false
+  timestamps: false,
+  indexes: [
+    {
+      unique: true,
+      name: 'unique_class_entry',
+      fields: [
+        'classId',
+        'dayInWeek',
+        'hourInDay',
+        'subjectId',
+        'teacherId',
+        'roomId'
+      ]
+    },
+    {
+      unique: true,
+      name: 'unique_class_with_subclass_entry',
+      fields: [
+        'classId',
+        'subClassId',
+        'dayInWeek',
+        'hourInDay',
+        'subjectId',
+        'teacherId',
+        'roomId'
+      ]
+    }
+  ]
 })
 export class TimetableEntry extends Model<TimetableEntry> {
   @PrimaryKey
@@ -49,7 +77,7 @@ export class TimetableEntry extends Model<TimetableEntry> {
     type: DataType.INTEGER,
     allowNull: true
   })
-  declare subClassId: number;
+  declare subClassId: number | null;
 
   @Column({
     type: DataType.INTEGER,
@@ -107,6 +135,7 @@ export class TimetableEntry extends Model<TimetableEntry> {
   @BeforeUpdate
   static async validate(instance: TimetableEntry): Promise<void> {
     await Promise.all([
+      validateUniqueEntry(instance),
       validateTeacherRole(instance),
       validateDayInWeekRange(instance),
       validateHourInDayRange(instance),

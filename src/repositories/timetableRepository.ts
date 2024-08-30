@@ -39,11 +39,11 @@ export const createTEntry = async (
 ): Promise<TimetableEntry> => {
   const transaction: Transaction = await sequelize.transaction();
 
-  const tentry = await TimetableEntry.create(data as TimetableEntry, {
-    transaction: transaction
-  });
-
   try {
+    const tentry = await TimetableEntry.create(data as TimetableEntry, {
+      transaction: transaction
+    });
+
     // Add TimetableEntry to TimetableSet
     await tset.$add('TimetableEntry', tentry, { transaction: transaction });
 
@@ -57,15 +57,15 @@ export const createTEntry = async (
       transaction: transaction,
       validate: true
     });
+
+    await transaction.commit();
+
+    return tentry;
   } catch (err) {
     // Rollback if error
     await transaction.rollback();
     throw err;
   }
-
-  await transaction.commit();
-
-  return tentry;
 };
 
 export const createTSet = async (

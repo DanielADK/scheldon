@@ -18,6 +18,7 @@ import {
   TimetableEntryDTO,
   TimetableSetDTO
 } from '@repositories/timetableRepository';
+import { temporaryLessons } from '../data/lessonRecordData';
 
 type entries =
   | SubjectDTO
@@ -49,11 +50,9 @@ const uploadData = async (url: string, entity: string, data: entries[]) => {
 
 const uploadTestData = async () => {
   // Subjects, Employees, Rooms
-  await Promise.all([
-    uploadData('http://localhost:3000/subjects', 'Subject', subjects),
-    uploadData('http://localhost:3000/employee', 'Employee', employees),
-    uploadData('http://localhost:3000/room', 'Room', rooms)
-  ]);
+  await uploadData('http://localhost:3000/subjects', 'Subject', subjects);
+  await uploadData('http://localhost:3000/employee', 'Employee', employees);
+  await uploadData('http://localhost:3000/room', 'Room', rooms);
 
   // Classes
   await uploadData('http://localhost:3000/classes', 'Class', classes);
@@ -81,6 +80,13 @@ const uploadTestData = async () => {
     'http://localhost:3000/timetables/set/3/entry',
     'TimetableEntry',
     entries
+  );
+
+  // Temporary lessons
+  await uploadData(
+    'http://localhost:3000/timetables/temporary/lesson',
+    'TemporaryLesson',
+    temporaryLessons
   );
 };
 

@@ -102,13 +102,14 @@ export const validateType = async (instance: LessonRecord): Promise<void> => {
   switch (instance.type) {
     case LessonType.DROPPED:
       if (!hasTimetableEntry) {
-        throw new Error('DROPPED type is only allowed with timetable entries');
+        throw new Error('You can DROP only a lesson in standard timetable.');
       }
       break;
 
     case LessonType.TIME_MOVE:
     case LessonType.OVER_WORKFLOW:
     case LessonType.MERGED:
+    case LessonType.VOCATIONAL_REPLACE:
       if (hasTimetableEntry) {
         throw new Error(
           `${instance.type} is not allowed with a timetable entry.`

@@ -56,3 +56,26 @@ export const validateHourInDayRange = async (
     );
   }
 };
+
+/**
+ * Validate unique entry by class, subclass, day, hour, teacher, room, subject in timetable set (with nullable subclass)
+ */
+export const validateUniqueEntry = async (
+  instance: TimetableEntry
+): Promise<void> => {
+  const existing = await TimetableEntry.findOne({
+    where: {
+      classId: instance.classId,
+      subClassId: instance.subClassId ?? null,
+      dayInWeek: instance.dayInWeek,
+      hourInDay: instance.hourInDay,
+      teacherId: instance.teacherId,
+      roomId: instance.roomId,
+      subjectId: instance.subjectId
+    }
+  });
+
+  if (existing) {
+    throw new Error('Entry already exists');
+  }
+};
