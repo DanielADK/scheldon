@@ -2,6 +2,7 @@ import {
   AbstractTimetableAdapter,
   TimetableModels
 } from '@services/transformers/AbstractTimetableAdapter';
+import { LessonType } from '@models/types/LessonType';
 
 /**
  * Single lesson entry format
@@ -99,6 +100,19 @@ export const roomMask = async (
 };
 
 /**
+ * Mask the dropped lessons
+ * @param entry TimetableEntry
+ */
+export const droppedMask = async (
+  entry: SimpleLessonEntry
+): Promise<SimpleLessonEntry> => {
+  return {
+    lessonId: entry.lessonId,
+    type: entry.type
+  } as SimpleLessonEntry;
+};
+
+/**
  * Transforms timetable to common format and masks unwanted data
  * @param entrySet TimetableEntrySet[] | null - Timetable entries
  * @param adapter
@@ -142,7 +156,10 @@ export const transformTimetable = async (
     }
 
     // Add the entry to the timetable
-    timetable2D[day][hour] = await transformerFunction(entry);
+    const lesson: SimpleLessonEntry = await transformerFunction(entry);
+
+    timetable2D[day][hour] =
+      lesson.type === LessonType.DROPPED ? await droppedMask(lesson) : lesson;
   }
 
   return timetable2D;
