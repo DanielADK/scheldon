@@ -221,4 +221,9 @@ export class LessonRecord extends Model<LessonRecord> {
       }
     }
   }
+
+  // Other methods
+  isFilled(): boolean {
+    return this.fillDate !== null;
+  }
 }

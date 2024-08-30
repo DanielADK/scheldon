@@ -55,63 +55,64 @@ export const createCustomLesson = async (
 
   // Start a transaction
   const transaction = await sequelize.transaction();
-  try {
-    // Step 1: Check if the lesson already exists
-    const existingLesson = await LessonRecord.findOne({
-      where: {
-        date: data.date,
-        [Op.or]: [
-          {
-            // Case 1: timetableEntryId is null, search in LessonRecord fields
-            timetableEntryId: null,
-            date: data.date,
-            ...whereClause
-          },
-          {
-            // Case 2: timetableEntryId is not null, search in the related TimetableEntry
-            timetableEntryId: { [Op.ne]: null }
-          }
-        ]
-      },
-      include: [
+  // Step 1: Check if the lesson already exists
+  const existingLesson = await LessonRecord.findOne({
+    where: {
+      date: data.date,
+      [Op.or]: [
         {
-          model: TimetableEntry,
-          where: whereClause,
-          required: false // Allow null TimetableEntry for Case 1
+          // Case 1: timetableEntryId is null, search in LessonRecord fields
+          timetableEntryId: null,
+          date: data.date,
+          ...whereClause
+        },
+        {
+          // Case 2: timetableEntryId is not null, search in the related TimetableEntry
+          timetableEntryId: { [Op.ne]: null }
         }
-      ],
-      transaction: transaction
-    });
+      ]
+    },
+    include: [
+      {
+        model: TimetableEntry,
+        where: whereClause,
+        required: false // Allow null TimetableEntry for Case 1
+      }
+    ],
+    transaction: transaction
+  });
 
-    // Define the lesson record
-    let lr = {
-      timetableEntryId: null,
-      classId: data.classId,
-      subClassId: data.subClassId,
-      subjectId: data.subjectId,
-      teacherId: data.teacherId,
-      roomId: data.roomId,
-      type: data.type as LessonType,
-      date: new Date(data.date)
-    } as LessonRecord;
+  // Define the lesson record
+  let lr = {
+    timetableEntryId: null,
+    classId: data.classId,
+    subClassId: data.subClassId,
+    subjectId: data.subjectId,
+    teacherId: data.teacherId,
+    roomId: data.roomId,
+    type: data.type as LessonType,
+    date: new Date(data.date)
+  } as LessonRecord;
 
-    if (existingLesson) {
-      // Step 2: If the lesson exists, update it with custom identifiers
-      lr = await existingLesson.update(lr);
-    } else {
-      // Step 3: If the lesson does not exist, create a new lesson record
-      await LessonRecord.generateUniqueLessonId(lr);
-
-      lr = await LessonRecord.create(lr);
+  if (existingLesson) {
+    // Check if the lesson is already filled
+    if (existingLesson.isFilled()) {
+      await transaction.rollback();
+      throw new Error('Lesson record is already filled, cannot update.');
     }
 
-    // Commit transaction
-    await transaction.commit();
-    return lr;
-  } catch (error) {
-    await transaction.rollback();
-    throw error;
+    // Step 2: If the lesson exists, update it with custom identifiers
+    lr = await existingLesson.update(lr);
+  } else {
+    // Step 3: If the lesson does not exist, create a new lesson record
+    await LessonRecord.generateUniqueLessonId(lr);
+
+    lr = await LessonRecord.create(lr);
   }
+
+  // Commit transaction
+  await transaction.commit();
+  return lr;
 };
 
 /**
