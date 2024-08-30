@@ -3,6 +3,7 @@ import * as timetableController from '@controllers/timetableController';
 import { timetableGetByIdController } from '@controllers/timetableController';
 import * as timetableService from '@services/timetableService';
 import * as lessonRecordService from '@services/lessonRecordService';
+import * as lessonRecordController from '@controllers/lessonRecordController';
 import { getCurrentTimetableByIdController } from '@controllers/lessonRecordController';
 
 const router = new Router();
@@ -300,4 +301,9 @@ router.get('/timetables/room/:id/at/:date', (ctx) =>
   )
 );
 
+// Temporary lessons
+router.post(
+  '/timetables/temporary/lesson',
+  lessonRecordController.createCustomLessonRecord
+);
 export default router;
