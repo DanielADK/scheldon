@@ -26,8 +26,8 @@ import {
   validateType,
   validateXORIdentifiers
 } from '@validators/lessonValidators';
-import { Op } from 'sequelize';
 import { LessonType } from '@models/types/LessonType';
+import { Op } from 'sequelize';
 
 @Table({
   createdAt: true,
@@ -146,25 +146,6 @@ export class LessonRecord extends Model<LessonRecord> {
   @HasMany(() => Attendance)
   declare attendances: Attendance[];
 
-  static async generateLessonId(): Promise<string> {
-    return Math.random().toString(36).substring(2, 10);
-  }
-
-  @BeforeCreate
-  static async generateUniqueLessonId(instance: LessonRecord): Promise<void> {
-    let unique = false;
-    while (!unique) {
-      const randomId = await LessonRecord.generateLessonId();
-      const existing = await LessonRecord.findByPk(randomId);
-
-      if (!existing) {
-        instance.lessonId = randomId;
-        unique = true;
-        break;
-      }
-    }
-  }
-
   @BeforeBulkCreate
   static async generateBulkLessonIds(instances: LessonRecord[]): Promise<void> {
     let remainingInstances = instances;
@@ -203,16 +184,41 @@ export class LessonRecord extends Model<LessonRecord> {
     }
   }
 
+  @BeforeBulkCreate
+  static async validateBulk(instances: LessonRecord[]): Promise<void> {
+    await Promise.all(
+      instances.map((instance) => LessonRecord.validate(instance))
+    );
+  }
+
   @BeforeCreate
   @BeforeUpdate
   static async validate(instance: LessonRecord): Promise<void> {
     await Promise.all([
       validateXORIdentifiers(instance),
-      validateTeacherRole(instance),
+      instance.teacherId ? validateTeacherRole(instance) : null,
       validateDayInWeekRange(instance),
       validateHourInDayRange(instance),
       instance.subClassId ? validateSubClassInClass(instance) : null,
       instance.timetableEntry ? validateType(instance) : null
     ]);
+  }
+
+  static async generateLessonId(): Promise<string> {
+    return Math.random().toString(36).substring(2, 10);
+  }
+
+  static async generateUniqueLessonId(instance: LessonRecord): Promise<void> {
+    let unique = false;
+    while (!unique) {
+      const randomId = await LessonRecord.generateLessonId();
+      const existing = await LessonRecord.findByPk(randomId);
+
+      if (!existing) {
+        instance.lessonId = randomId;
+        unique = true;
+        break;
+      }
+    }
   }
 }

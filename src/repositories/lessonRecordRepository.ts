@@ -15,6 +15,8 @@ import { LessonType } from '@models/types/LessonType';
 import { TimetableEntrySet } from '@models/TimetableEntrySet';
 import { sequelize } from '../index';
 
+import { getWeekRange } from '../lib/timeLib';
+
 export interface LessonRecordDTO {
   classId: number;
   subClassId?: number;
@@ -23,15 +25,9 @@ export interface LessonRecordDTO {
   subjectId?: number;
   teacherId?: number;
   roomId?: number;
-  date: Date;
-  type: LessonType;
+  date: string;
+  type: string;
 }
-
-/*
-export const findCurrentTimetableEntry = async(teacherId: number, currentDay: number, currentHour: number): Promise<LessonRecord | null> => {
-  return await timeTableRepository.getTimetableByParam({teacherId: teacherId, dayInWeek: currentDay, hourInDay: currentHour});
-}
-*/
 
 /**
  * Find or create a lesson record in the timetable
@@ -42,35 +38,70 @@ export const findCurrentTimetableEntry = async(teacherId: number, currentDay: nu
 export const createCustomLesson = async (
   data: LessonRecordDTO
 ): Promise<LessonRecord> => {
-  // Check if the lesson is not exists in the timetable
-  const lesson = await LessonRecord.findOne({
+  const whereClause: WhereOptions = {
+    dayInWeek: data.dayInWeek,
+    hourInDay: data.hourInDay,
+    classId: data.classId
+  };
+
+  // Only include subClassId in the where clause if it's defined
+  if (data.subClassId !== undefined) {
+    whereClause.subClassId = data.subClassId ?? { [Op.is]: null };
+  }
+  // Step 1: Check if the lesson already exists
+  const existingLesson = await LessonRecord.findOne({
     where: {
-      dayInWeek: data.dayInWeek,
-      hourInDay: data.hourInDay,
-      date: data.date
-    }
+      date: data.date,
+      [Op.or]: [
+        {
+          // Case 1: timetableEntryId is null, search in LessonRecord fields
+          timetableEntryId: null,
+          date: data.date,
+          ...whereClause
+        },
+        {
+          // Case 2: timetableEntryId is not null, search in the related TimetableEntry
+          timetableEntryId: { [Op.ne]: null }
+        }
+      ]
+    },
+    include: [
+      {
+        model: TimetableEntry,
+        where: whereClause,
+        required: false // Allow null TimetableEntry for Case 1
+      }
+    ]
   });
 
-  if (lesson) {
-    // If the lesson exists, update the lesson with custom identifiers
-    return await lesson.update({
-      timetableEntryId: null,
-      type: data.type,
-      classId: data.classId,
-      subClassId: data.subClassId,
-      dayInWeek: data.dayInWeek,
-      hourInDay: data.hourInDay,
-      subjectId: data.subjectId,
-      teacherId: data.teacherId,
-      roomId: data.roomId,
-      date: data.date
-    });
+  // Define the lesson record
+  let lr = {
+    timetableEntryId: null,
+    classId: data.classId,
+    subClassId: data.subClassId,
+    dayInWeek: data.dayInWeek,
+    hourInDay: data.hourInDay,
+    subjectId: data.subjectId,
+    teacherId: data.teacherId,
+    roomId: data.roomId,
+    type: data.type as LessonType,
+    date: new Date(data.date)
+  } as LessonRecord;
+
+  if (existingLesson) {
+    // Step 2: If the lesson exists, update it with custom identifiers
+    if (data.type === LessonType.DROPPED) {
+      lr = {
+        type: data.type as LessonType,
+        fillDate: new Date(data.date)
+      } as LessonRecord;
+    }
+    return await existingLesson.update(lr);
   } else {
-    // If the lesson does not exist, create a new lesson with custom identifiers
-    return await LessonRecord.create({
-      ...data,
-      timetableEntryId: null
-    } as LessonRecord);
+    // Step 3: If the lesson does not exist, create a new lesson record
+    await LessonRecord.generateUniqueLessonId(lr);
+
+    return await LessonRecord.create(lr);
   }
 };
 
@@ -174,7 +205,8 @@ export const getLessonBulkInTSetPeriod = async (
   while (date < validTo) {
     lessons.push({
       timetableEntryId: data.timetableEntryId,
-      date: new Date(date)
+      date: new Date(date),
+      lessonId: await LessonRecord.generateLessonId()
     } as LessonRecord);
 
     // Add week to date
@@ -182,20 +214,6 @@ export const getLessonBulkInTSetPeriod = async (
   }
 
   return lessons;
-};
-
-/**
- * Get date range Monday to Friday
- * @param time
- */
-export const getWeekRange = (time: Date): { start: Date; end: Date } => {
-  const date = new Date(time);
-  const day = date.getDay();
-  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-  const monday = new Date(date.setDate(diff));
-  const friday = new Date(date.setDate(diff + 4));
-
-  return { start: monday, end: friday };
 };
 
 /**
