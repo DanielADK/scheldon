@@ -1,5 +1,5 @@
 import Router from 'koa-router';
-import * as lessonRecordController from '@controllers/lessonRecordController';
+import * as classRegisterController from '@controllers/classRegisterController';
 
 const router = new Router();
 
@@ -87,10 +87,14 @@ const router = new Router();
  *                 error:
  *                   type: string
  */
-router.post('/classregister/', lessonRecordController.createCustomLessonRecord);
-router.delete('/classregister/:id');
-
-router.get('/classregister/current');
+router.get(
+  '/classregister/current/teacher/:id',
+  classRegisterController.getCurrentLessonByTeacherId
+);
+router.get(
+  '/classregister/current/lesson/:id',
+  classRegisterController.getCurrentLessonByLessonId
+);
 
 router.post('/classregister/finish');
 

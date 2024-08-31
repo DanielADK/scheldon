@@ -306,4 +306,11 @@ router.post(
   '/timetables/temporary/lesson',
   lessonRecordController.createCustomLessonRecord
 );
+
+// Restore lesson
+router.delete(
+  '/timetables/temporary/lesson/:id',
+  lessonRecordController.deleteLessonRecord
+);
+
 export default router;
