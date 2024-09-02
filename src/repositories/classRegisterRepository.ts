@@ -1,11 +1,10 @@
 import { LessonRecord } from '@models/LessonRecord';
 import { Student } from '@models/Student';
-import { Op } from 'sequelize';
+import { Op, WhereOptions } from 'sequelize';
 import { getCurrentTimetableHour } from '../lib/timeLib';
 import { SubClass } from '@models/SubClass';
 import { StudentAssignment } from '@models/StudentAssignment';
 import { Class } from '@models/Class';
-import { TimetableEntry } from '@models/TimetableEntry';
 
 /**
  * Get the current lesson record for a specific teacher
@@ -27,58 +26,53 @@ export const getCurrentLessonRecord = async (
 
 /**
  * Get the list of students for a given lesson
- * @param lessonId number
- * @returns Promise<object[]>
+ * @param lessonId string
+ * @returns Promise<Student[]>
  */
 export const getStudentsForLesson = async (
   lessonId: string
 ): Promise<Student[]> => {
-  // Set lesson class and subClass
+  // Find the lesson and include the timetable entry
   const lesson = await LessonRecord.findByPk(lessonId, {
     include: ['timetableEntry']
   });
-  if (!lesson) {
-    throw new Error('Lesson not found');
-  }
 
-  const entry: TimetableEntry | LessonRecord | null = lesson.timetableEntry
-    ? lesson.timetableEntry
-    : lesson;
-  if (!entry) {
-    throw new Error('Timetable entry not found');
-  }
+  if (!lesson) throw new Error('Lesson not found');
 
-  // Get class and subclass
-  let lessonClass: Class | null = null;
-  let lessonSubClass: SubClass | null = null;
-  let sa: StudentAssignment[];
-  if (entry.classId) {
-    lessonClass = await Class.findByPk(entry.classId);
-    if (!lessonClass) {
-      throw new Error('Class not found');
-    }
+  // Determine the entry source (either TimetableEntry or LessonRecord itself)
+  const entry = lesson.timetableEntry ?? lesson;
+  if (!entry.classId) {
+    throw new Error('Lesson does not have a class assigned');
   }
+  const dateWhere: WhereOptions = {
+    validFrom: { [Op.lte]: new Date() },
+    validTo: { [Op.gte]: new Date() }
+  };
 
-  if (entry.subClassId) {
-    lessonSubClass = await SubClass.findByPk(entry.subClassId);
-    if (!lessonSubClass) {
-      throw new Error('SubClass not found');
-    }
-  }
+  // Find the students based on class and subclass
+  const studentAssignments = entry.subClassId
+    ? await SubClass.findByPk(entry.subClassId, {
+        include: [
+          {
+            model: StudentAssignment,
+            include: ['student'],
+            where: dateWhere
+          }
+        ]
+      })
+    : await Class.findByPk(entry.classId, {
+        include: [
+          {
+            model: StudentAssignment,
+            include: ['student'],
+            where: dateWhere
+          }
+        ]
+      });
 
-  // Get students for the lesson by subclass
-  if (lessonSubClass) {
-    sa = await lessonSubClass.$get('studentAssignments', {
-      include: ['student']
-    });
-  } else {
-    if (!lessonClass) {
-      throw new Error('No class or subclass set for the lesson');
-    }
-    // Get students by class if no subclass is set
-    sa = await lessonClass.$get('studentAssignments', { include: ['student'] });
-  }
+  if (!studentAssignments) throw new Error('No students found for the lesson');
 
-  // Get students from StudentAssignments
-  return sa.map((assignment) => assignment.student);
+  return studentAssignments.studentAssignments.map(
+    (assignment) => assignment.student
+  );
 };
