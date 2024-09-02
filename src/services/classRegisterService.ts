@@ -8,6 +8,14 @@ import { AttendanceType } from '@models/types/AttendanceType';
 import { Attendance } from '@models/Attendance';
 import { Student } from '@models/Student';
 
+interface ClassRegisterExport {
+  lesson: {
+    lessonId: string;
+    topic?: string;
+  };
+  students: StudentWithAttendance[];
+}
+
 /**
  * Get the current lesson data for a specific teacher
  * @param teacherId number
@@ -15,17 +23,13 @@ import { Student } from '@models/Student';
  */
 export const getCurrentLessonForTeacher = async (
   teacherId: number
-): Promise<object | null> => {
-  const lessonRecord = await getCurrentLessonRecord(teacherId);
-  if (!lessonRecord) {
+): Promise<ClassRegisterExport | null> => {
+  const lesson = await getCurrentLessonRecord(teacherId);
+  if (!lesson) {
     return null;
   }
 
-  const students = await getStudentsForLesson(lessonRecord.lessonId);
-  return {
-    lessonId: lessonRecord.lessonId,
-    students: students
-  };
+  return getCurrentLessonByLesson(lesson);
 };
 
 interface StudentWithAttendance {
@@ -78,28 +82,24 @@ export const groupStudentsByAttendance = (
   return studentsWithAttendance;
 };
 
-interface ClassRegisterExport {
-  lesson: {
-    lessonId: string;
-    topic?: string;
-  };
-  students: StudentWithAttendance[];
-}
+export const getCurrentLessonByLessonId = async (lessonId: string) => {
+  const lesson = await LessonRecord.findByPk(lessonId);
+  if (!lesson) {
+    throw new Error('Lesson not found');
+  }
+  return getCurrentLessonByLesson(lesson);
+};
 
 /**
  * Get the current lesson data for a specific teacher
- * @param lessonId number
- * @returns Promise<object | null>
+ * @param lesson LessonRecord
+ * @returns Promise<ClassRegisterExport | null>
  */
 export const getCurrentLessonByLesson = async (
-  lessonId: string
+  lesson: LessonRecord
 ): Promise<ClassRegisterExport | null> => {
-  const students = await getStudentsForLesson(lessonId);
-  const attendance = await getLessonAttendance(lessonId, true);
-  const lesson = await LessonRecord.findByPk(lessonId);
-  if (!lesson) {
-    return null;
-  }
+  const students = await getStudentsForLesson(lesson.lessonId);
+  const attendance = await getLessonAttendance(lesson.lessonId, true);
 
   const studentsWithAttendance = groupStudentsByAttendance(
     students,
@@ -108,7 +108,7 @@ export const getCurrentLessonByLesson = async (
 
   return {
     lesson: {
-      lessonId: lessonId,
+      lessonId: lesson.lessonId,
       ...(lesson.topic !== null && { topic: lesson.topic })
     },
     students: studentsWithAttendance

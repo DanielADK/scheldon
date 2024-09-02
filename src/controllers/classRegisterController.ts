@@ -39,7 +39,7 @@ export const getCurrentLessonByLessonId = async (
 
   try {
     const lessonData =
-      await classRegisterService.getCurrentLessonByLesson(lessonId);
+      await classRegisterService.getCurrentLessonByLessonId(lessonId);
 
     if (!lessonData) {
       ctx.status = 404;
