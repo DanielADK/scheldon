@@ -40,15 +40,14 @@ export class Attendance extends Model<Attendance> {
     type: DataType.INTEGER,
     allowNull: false
   })
-  studentId!: number;
+  declare studentId: number;
 
   @BelongsTo(() => Student)
-  student!: Student;
+  declare student: Student;
 
   @Column({
     type: DataType.ENUM(...Object.values(AttendanceType)),
-    allowNull: false,
-    defaultValue: AttendanceType.PRESENT
+    allowNull: false
   })
-  attendance!: AttendanceType;
+  declare attendance: AttendanceType;
 }
