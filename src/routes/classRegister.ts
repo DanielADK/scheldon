@@ -96,6 +96,9 @@ router.get(
   classRegisterController.getCurrentLessonByLessonId
 );
 
-router.post('/classregister/finish');
+router.post(
+  '/classregister/finish',
+  classRegisterController.finishLessonRecord
+);
 
 export default router;

@@ -5,6 +5,35 @@ import { getCurrentTimetableHour } from '../lib/timeLib';
 import { SubClass } from '@models/SubClass';
 import { StudentAssignment } from '@models/StudentAssignment';
 import { Class } from '@models/Class';
+import { attendanceRecordDTO } from '@repositories/attendanceRepository';
+import { sequelize } from '../index';
+
+export interface classRegisterRecordDTO {
+  lessonId: string;
+  topic: string;
+  studentAttendance: attendanceRecordDTO[];
+}
+
+export const finishLessonRecord = async (
+  data: classRegisterRecordDTO
+): Promise<void> => {
+  const transaction = await sequelize.transaction();
+  // Find the lesson record
+  const lessonRecord = await LessonRecord.findByPk(data.lessonId, {
+    transaction: transaction
+  });
+  if (!lessonRecord) throw new Error('Lesson record not found');
+
+  // Check if the lesson record is already finished
+  if (lessonRecord.topic)
+    throw new Error('Lesson record already locked&finished');
+
+  // Update the lesson record
+  lessonRecord.topic = data.topic;
+
+  // Save the lesson record
+  await lessonRecord.save();
+};
 
 /**
  * Get the current lesson record for a specific teacher

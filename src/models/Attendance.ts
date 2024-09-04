@@ -13,7 +13,13 @@ import { Student } from '@models/Student';
 import { AttendanceType } from '@models/types/AttendanceType';
 
 @Table({
-  timestamps: false
+  timestamps: false,
+  indexes: [
+    {
+      fields: ['lessonRecordId', 'studentId'],
+      unique: true
+    }
+  ]
 })
 export class Attendance extends Model<Attendance> {
   @PrimaryKey
@@ -21,6 +27,7 @@ export class Attendance extends Model<Attendance> {
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
+    primaryKey: true,
     autoIncrement: true
   })
   declare attendanceId: number;
