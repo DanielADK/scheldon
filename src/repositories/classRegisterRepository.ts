@@ -25,7 +25,7 @@ export const finishLessonRecord = async (
   if (!lessonRecord) throw new Error('Lesson record not found');
 
   // Check if the lesson record is already finished
-  if (lessonRecord.topic)
+  if (lessonRecord.fillDate)
     throw new Error('Lesson record already locked&finished');
 
   // Update the lesson record
