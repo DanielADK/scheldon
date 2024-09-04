@@ -1,4 +1,6 @@
 import {
+  classRegisterRecordDTO,
+  finishLessonRecord as finishLessonRecordInRepository,
   getCurrentLessonRecord,
   getStudentsForLesson
 } from '@repositories/classRegisterRepository';
@@ -15,6 +17,12 @@ interface ClassRegisterExport {
   };
   students: StudentWithAttendance[];
 }
+
+export const finishLessonRecord = async (
+  data: classRegisterRecordDTO
+): Promise<void> => {
+  return await finishLessonRecordInRepository(data);
+};
 
 /**
  * Get the current lesson data for a specific teacher
@@ -83,6 +91,9 @@ export const groupStudentsByAttendance = (
 };
 
 export const getCurrentLessonByLessonId = async (lessonId: string) => {
+  // id to lower case
+  lessonId = lessonId.toLowerCase();
+  // find lesson by id
   const lesson = await LessonRecord.findByPk(lessonId);
   if (!lesson) {
     throw new Error('Lesson not found');
