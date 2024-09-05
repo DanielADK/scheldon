@@ -31,11 +31,16 @@ type entries =
   | TimetableSetDTO
   | TimetableEntryDTO;
 
-const uploadData = async (url: string, entity: string, data: entries[]) => {
+const uploadData = async (
+  domain: string,
+  url: string,
+  entity: string,
+  data: entries[]
+) => {
   for (const item of data) {
     try {
       console.log(`Uploading ${entity} to ${url}`);
-      const response = await axios.post(url, item);
+      const response = await axios.post(domain + url, item);
       console.log(
         `Uploaded [${entity}]: ${response.data.name ?? response.data}`
       );
@@ -49,42 +54,37 @@ const uploadData = async (url: string, entity: string, data: entries[]) => {
 };
 
 const uploadTestData = async () => {
+  const url = 'https://localhost:3000';
   // Subjects, Employees, Rooms
-  await uploadData('http://localhost:3000/subjects', 'Subject', subjects);
-  await uploadData('http://localhost:3000/employee', 'Employee', employees);
-  await uploadData('http://localhost:3000/room', 'Room', rooms);
+  await uploadData(url, '/subjects', 'Subject', subjects);
+  await uploadData(url, '/employees', 'Employee', employees);
+  await uploadData(url, '/rooms', 'Room', rooms);
 
   // Classes
-  await uploadData('http://localhost:3000/classes', 'Class', classes);
-  await uploadData('http://localhost:3000/subclasses', 'SubClass', subClasses);
+  await uploadData(url, '/classes', 'Class', classes);
+  await uploadData(url, '/subclasses', 'SubClass', subClasses);
 
   // Students
-  await uploadData('http://localhost:3000/students', 'Student', students);
+  await uploadData(url, '/students', 'Student', students);
 
   // Assignments
   for (const assignment of assignments) {
     await uploadData(
-      'http://localhost:3000/students/' + assignment.studentId + '/assign',
+      url,
+      '/students/' + assignment.studentId + '/assign',
       'StudentAssignment',
       [assignment.data]
     );
   }
 
   // Timetables
-  await uploadData(
-    'http://localhost:3000/timetables/set',
-    'TimetableSet',
-    sets
-  );
-  await uploadData(
-    'http://localhost:3000/timetables/set/3/entry',
-    'TimetableEntry',
-    entries
-  );
+  await uploadData(url, '/timetables/set', 'TimetableSet', sets);
+  await uploadData(url, '/timetables/set/3/entry', 'TimetableEntry', entries);
 
   // Temporary lessons
   await uploadData(
-    'http://localhost:3000/timetables/temporary/lesson',
+    url,
+    '/timetables/temporary/lesson',
     'TemporaryLesson',
     temporaryLessons
   );
