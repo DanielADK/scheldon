@@ -1,4 +1,12 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import {
+  BeforeCreate,
+  BeforeUpdate,
+  Column,
+  DataType,
+  Model,
+  Table
+} from 'sequelize-typescript';
+import { validateTeacherWithAbbreviation } from '@validators/teacherValidator';
 
 @Table({
   timestamps: false
@@ -62,6 +70,10 @@ export class Employee extends Model<Employee> {
     defaultValue: false
   })
   declare isTeacher: boolean;
-}
 
-// TODO: validate isTeacher only with not null abbreviation
+  @BeforeCreate
+  @BeforeUpdate
+  static async validate(instance: Employee): Promise<void> {
+    await Promise.all([validateTeacherWithAbbreviation(instance)]);
+  }
+}

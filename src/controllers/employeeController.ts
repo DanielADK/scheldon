@@ -46,10 +46,7 @@ export const getAllEmployees = async (ctx: Context): Promise<void> => {
   const limit = parseInt(ctx.query.limit as string) || 10;
 
   // Get all employees
-  const employees = await employeeService.getAllEmployees(
-    limit,
-    (page - 1) * limit
-  );
+  const employees = await employeeService.getAllEmployees(page, limit);
 
   ctx.status = 200;
   ctx.body = {

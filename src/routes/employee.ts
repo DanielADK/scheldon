@@ -89,7 +89,7 @@ const router = new Router();
  *       400:
  *         description: Bad request
  */
-router.post('/employee', employeeController.createEmployee);
+router.post('/employees', employeeController.createEmployee);
 
 /**
  * Get all employees
@@ -115,7 +115,7 @@ router.post('/employee', employeeController.createEmployee);
  *       200:
  *         description: List of employees
  */
-router.get('/employee', employeeController.getAllEmployees);
+router.get('/employees', employeeController.getAllEmployees);
 
 /**
  * Get an employee by ID
@@ -142,7 +142,7 @@ router.get('/employee', employeeController.getAllEmployees);
  *       404:
  *         description: Employee not found
  */
-router.get('/employee/:id', employeeController.getEmployeeById);
+router.get('/employees/:id', employeeController.getEmployeeById);
 
 /**
  * Get an employee by username
@@ -166,7 +166,7 @@ router.get('/employee/:id', employeeController.getEmployeeById);
  *         description: Employee not found
  */
 router.get(
-  '/employee/username/:username',
+  '/employees/username/:username',
   employeeController.getEmployeeByUsername
 );
 
@@ -192,7 +192,7 @@ router.get(
  *         description: Employee not found
  */
 router.get(
-  '/employee/abbreviation/:abbreviation',
+  '/employees/abbreviation/:abbreviation',
   employeeController.getEmployeeByAbbreviation
 );
 
@@ -225,7 +225,7 @@ router.get(
  *       404:
  *         description: Employee not found
  */
-router.put('/employee/:id', employeeController.updateEmployee);
+router.put('/employees/:id', employeeController.updateEmployee);
 
 /**
  * Delete an employee
@@ -248,6 +248,6 @@ router.put('/employee/:id', employeeController.updateEmployee);
  *       404:
  *         description: Employee not found
  */
-router.delete('/employee/:id', employeeController.deleteEmployee);
+router.delete('/employees/:id', employeeController.deleteEmployee);
 
 export default router;
