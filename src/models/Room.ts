@@ -1,4 +1,6 @@
 import {
+  BeforeCreate,
+  BeforeUpdate,
   BelongsTo,
   Column,
   DataType,
@@ -8,6 +10,7 @@ import {
 } from 'sequelize-typescript';
 import { RoomType } from '@models/types/RoomType';
 import { Employee } from '@models/Employee';
+import { validateClassroom, validateOffice } from '@validators/roomValidators';
 
 @Table({
   timestamps: false
@@ -57,12 +60,17 @@ export class Room extends Model<Room> {
   @ForeignKey(() => Employee)
   @Column({
     type: DataType.INTEGER,
-    allowNull: true,
-    defaultValue: null
+    allowNull: false
   })
   declare administratorId: number;
 
   // Mapping
   @BelongsTo(() => Employee)
   declare administrator: Employee;
+
+  @BeforeCreate
+  @BeforeUpdate
+  static async validate(instance: Room): Promise<void> {
+    await Promise.all([validateOffice(instance), validateClassroom(instance)]);
+  }
 }

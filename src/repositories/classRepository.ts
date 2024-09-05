@@ -43,13 +43,14 @@ export const getClasses = async (
     offset,
     attributes: classAttributes,
     where: {
-      validFrom: { lte: new Date() },
-      validTo: { gte: new Date() }
+      validFrom: { [Op.lte]: new Date() },
+      validTo: { [Op.gte]: new Date() }
     },
     include: [
       {
         model: SubClass,
-        as: 'subClasses'
+        as: 'subClasses',
+        required: false
       }
     ]
   });

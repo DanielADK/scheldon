@@ -85,7 +85,7 @@ const router = new Router();
  *       400:
  *         description: Bad request
  */
-router.post('/room', roomController.createRoom);
+router.post('/rooms', roomController.createRoom);
 
 /**
  * @openapi
@@ -98,7 +98,7 @@ router.post('/room', roomController.createRoom);
  *       200:
  *         description: Returns all rooms
  */
-router.get('/room', roomController.getAllRooms);
+router.get('/rooms', roomController.getAllRooms);
 
 /**
  * @openapi
@@ -123,7 +123,7 @@ router.get('/room', roomController.getAllRooms);
  *       404:
  *         description: Room not found
  */
-router.get('/room/:id', roomController.getRoomById);
+router.get('/rooms/:id', roomController.getRoomById);
 
 /**
  * Update a room
@@ -154,7 +154,7 @@ router.get('/room/:id', roomController.getRoomById);
  *       404:
  *         description: Room not found
  */
-router.put('/room/:id', roomController.updateRoom);
+router.put('/rooms/:id', roomController.updateRoom);
 
 /**
  * Delete a room
@@ -177,6 +177,6 @@ router.put('/room/:id', roomController.updateRoom);
  *       404:
  *         description: Room not found
  */
-router.delete('/room/:id', roomController.deleteRoom);
+router.delete('/rooms/:id', roomController.deleteRoom);
 
 export default router;
