@@ -11,7 +11,6 @@ import {
 } from 'sequelize-typescript';
 import { Room } from '@models/Room';
 import { Employee } from '@models/Employee';
-import { LessonRecord } from '@models/LessonRecord';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { SubClass } from '@models/SubClass';
 import { StudentAssignment } from '@models/StudentAssignment';
@@ -24,6 +23,7 @@ import {
   validateTeacherExistence,
   validateTeacherSchedule
 } from '@validators/classValidators';
+import { SubstitutionEntry } from '@models/SubstitutionEntry';
 
 @Table({
   timestamps: false,
@@ -103,11 +103,11 @@ export class Class extends Model<Class> {
   @HasMany(() => TimetableEntry)
   declare timetableEntries: TimetableEntry[];
 
+  @HasMany(() => SubstitutionEntry)
+  declare substitutionEntries: SubstitutionEntry[];
+
   @HasMany(() => SubClass)
   declare subClasses: SubClass[];
-
-  @HasMany(() => LessonRecord)
-  declare lessons: LessonRecord[];
 
   @HasMany(() => StudentAssignment)
   declare studentAssignments: StudentAssignment[];

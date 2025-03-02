@@ -1,9 +1,6 @@
 import {
   AutoIncrement,
-  BeforeCreate,
-  BeforeUpdate,
   BelongsTo,
-  BelongsToMany,
   Column,
   DataType,
   ForeignKey,
@@ -11,20 +8,11 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript';
-import { TimetableSet } from '@models/TimetableSet';
 import { Class } from '@models/Class';
 import { Subject } from '@models/Subject';
 import { Employee } from '@models/Employee';
 import { Room } from '@models/Room';
-import { TimetableEntrySet } from '@models/TimetableEntrySet';
 import { SubClass } from '@models/SubClass';
-import {
-  validateDayInWeekRange,
-  validateHourInDayRange,
-  validateSubClassInClass,
-  validateTeacherRole,
-  validateUniqueEntry
-} from '@validators/timetableEntryValidators';
 
 @Table({
   timestamps: false,
@@ -56,24 +44,24 @@ import {
     }
   ]
 })
-export class TimetableEntry extends Model<TimetableEntry> {
+export class SubstitutionEntry extends Model<SubstitutionEntry> {
   @PrimaryKey
   @AutoIncrement
   @Column({
     type: DataType.INTEGER,
     allowNull: false
   })
-  declare timetableEntryId: number;
+  declare substitutionEntryId: number;
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: true
+    allowNull: false
   })
   declare dayInWeek: number;
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: true
+    allowNull: false
   })
   declare hourInDay: number;
 
@@ -113,8 +101,8 @@ export class TimetableEntry extends Model<TimetableEntry> {
   declare roomId: number;
 
   // Mappings
-  @BelongsToMany(() => TimetableSet, () => TimetableEntrySet)
-  declare timetableSets: TimetableSet[];
+  //@HasMany(() => LessonRecord)
+  //declare lessonRecords: Le;
 
   @BelongsTo(() => Class)
   declare class: Class;
@@ -131,9 +119,10 @@ export class TimetableEntry extends Model<TimetableEntry> {
   @BelongsTo(() => Room)
   declare room: Room;
 
+  /*
   @BeforeCreate
   @BeforeUpdate
-  static async validate(instance: TimetableEntry): Promise<void> {
+  static async validate(instance: SubstitutionEntry): Promise<void> {
     await Promise.all([
       validateUniqueEntry(instance),
       validateTeacherRole(instance),
@@ -142,4 +131,5 @@ export class TimetableEntry extends Model<TimetableEntry> {
       instance.subClassId ? validateSubClassInClass(instance) : null
     ]);
   }
+  */
 }

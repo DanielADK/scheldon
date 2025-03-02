@@ -1,7 +1,5 @@
 import {
-  BeforeBulkCreate,
-  BeforeCreate,
-  BeforeUpdate,
+  AutoIncrement,
   BelongsTo,
   Column,
   DataType,
@@ -11,23 +9,10 @@ import {
   PrimaryKey,
   Table
 } from 'sequelize-typescript';
-import { Class } from '@models/Class';
-import { Subject } from '@models/Subject';
-import { Employee } from '@models/Employee';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { Attendance } from '@models/Attendance';
-import { Room } from '@models/Room';
-import { SubClass } from '@models/SubClass';
-import {
-  validateDayInWeekRange,
-  validateHourInDayRange,
-  validateSubClassInClass,
-  validateTeacherRole,
-  validateType,
-  validateXORIdentifiers
-} from '@validators/lessonValidators';
 import { LessonType } from '@models/types/LessonType';
-import { Op } from 'sequelize';
+import { SubstitutionEntry } from '@models/SubstitutionEntry';
 
 @Table({
   createdAt: true,
@@ -35,12 +20,13 @@ import { Op } from 'sequelize';
 })
 export class LessonRecord extends Model<LessonRecord> {
   @PrimaryKey
+  @AutoIncrement
   @Column({
-    type: DataType.STRING(8),
+    type: DataType.BIGINT.UNSIGNED,
     allowNull: false,
     unique: true
   })
-  declare lessonId: string;
+  declare lessonId: number;
 
   // timetableEntry if exists
   @ForeignKey(() => TimetableEntry)
@@ -51,52 +37,12 @@ export class LessonRecord extends Model<LessonRecord> {
   declare timetableEntryId: number | null;
 
   // XOR fields with timetableEntry
+  @ForeignKey(() => SubstitutionEntry)
   @Column({
     type: DataType.INTEGER,
     allowNull: true
   })
-  declare dayInWeek: number | null;
-
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: true
-  })
-  declare hourInDay: number | null;
-
-  @ForeignKey(() => Class)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: true
-  })
-  declare classId: number | null;
-
-  @ForeignKey(() => SubClass)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: true
-  })
-  declare subClassId: number | null;
-
-  @ForeignKey(() => Subject)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: true
-  })
-  declare subjectId: number | null;
-
-  @ForeignKey(() => Employee)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: true
-  })
-  declare teacherId: number | null;
-
-  @ForeignKey(() => Room)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: true
-  })
-  declare roomId: number | null;
+  declare substitutionEntryId: number | null;
 
   // LessonRecord-specific fields
   @Column({
@@ -125,102 +71,36 @@ export class LessonRecord extends Model<LessonRecord> {
   declare type: LessonType | null;
 
   // Mapping
-  @BelongsTo(() => Class)
-  declare class: Class | null;
-
-  @BelongsTo(() => SubClass)
-  declare subClass: SubClass | null;
-
-  @BelongsTo(() => Subject)
-  declare subject: Subject | null;
-
-  @BelongsTo(() => Employee)
-  declare teacher: Employee | null;
-
   @BelongsTo(() => TimetableEntry)
   declare timetableEntry: TimetableEntry | null;
 
-  @BelongsTo(() => Room)
-  declare room: Room | null;
+  @BelongsTo(() => SubstitutionEntry)
+  declare substitutionEntry: SubstitutionEntry | null;
 
   @HasMany(() => Attendance)
   declare attendances: Attendance[];
 
-  @BeforeBulkCreate
-  static async generateBulkLessonIds(instances: LessonRecord[]): Promise<void> {
-    let remainingInstances = instances;
-
-    while (remainingInstances.length > 0) {
-      const neededIds = remainingInstances.length;
-      const generatedIds = new Set<string>();
-
-      // Generate 2x the needed amount of IDs to ensure we have enough
-      while (generatedIds.size < neededIds * 2) {
-        generatedIds.add(await LessonRecord.generateLessonId());
-      }
-
-      // Check which IDs are not already in the database
-      const existingIds = await LessonRecord.findAll({
-        where: {
-          lessonId: { [Op.in]: Array.from(generatedIds) }
-        },
-        attributes: ['lessonId']
-      });
-
-      // Assign the first N unique IDs to the instances
-      const existingIdSet = new Set(existingIds.map((id) => id.lessonId));
-      const generatedIdsArray = Array.from(generatedIds);
-
-      // Filter out existing IDs and assign unique IDs to instances
-      remainingInstances = remainingInstances.filter((instance) => {
-        const id = generatedIdsArray.find((id) => !existingIdSet.has(id));
-        if (id) {
-          existingIdSet.add(id);
-          instance.lessonId = id;
-          return false;
-        }
-        return true;
-      });
-    }
-  }
-
+  /*
   @BeforeBulkCreate
   static async validateBulk(instances: LessonRecord[]): Promise<void> {
     await Promise.all(
       instances.map((instance) => LessonRecord.validate(instance))
     );
-  }
+  }*/
 
+  /*
   @BeforeCreate
   @BeforeUpdate
   static async validate(instance: LessonRecord): Promise<void> {
     await Promise.all([
       validateXORIdentifiers(instance),
-      instance.teacherId ? validateTeacherRole(instance) : null,
+      //instance.teacherId ? validateTeacherRole(instance) : null,
       validateDayInWeekRange(instance),
       validateHourInDayRange(instance),
-      instance.subClassId ? validateSubClassInClass(instance) : null,
+      //instance.subClassId ? validateSubClassInClass(instance) : null,
       instance.timetableEntry ? validateType(instance) : null
     ]);
-  }
-
-  static async generateLessonId(): Promise<string> {
-    return Math.random().toString(36).substring(2, 10);
-  }
-
-  static async generateUniqueLessonId(instance: LessonRecord): Promise<void> {
-    let unique = false;
-    while (!unique) {
-      const randomId = await LessonRecord.generateLessonId();
-      const existing = await LessonRecord.findByPk(randomId);
-
-      if (!existing) {
-        instance.lessonId = randomId;
-        unique = true;
-        break;
-      }
-    }
-  }
+  }*/
 
   // Other methods
   /**
