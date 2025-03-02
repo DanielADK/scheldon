@@ -34,7 +34,7 @@ export class Attendance extends Model<Attendance> {
 
   @ForeignKey(() => LessonRecord)
   @Column({
-    type: DataType.STRING(8),
+    type: DataType.BIGINT.UNSIGNED,
     allowNull: false
   })
   declare lessonRecordId: string;

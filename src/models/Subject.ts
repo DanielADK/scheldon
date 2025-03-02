@@ -1,6 +1,6 @@
 import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
-import { LessonRecord } from '@models/LessonRecord';
 import { TimetableEntry } from '@models/TimetableEntry';
+import { SubstitutionEntry } from '@models/SubstitutionEntry';
 
 @Table({
   timestamps: false
@@ -30,6 +30,6 @@ export class Subject extends Model<Subject> {
   @HasMany(() => TimetableEntry)
   declare timetableEntries: TimetableEntry[];
 
-  @HasMany(() => LessonRecord)
-  declare lessons: LessonRecord[];
+  @HasMany(() => SubstitutionEntry)
+  declare substitutionEntries: SubstitutionEntry[];
 }
