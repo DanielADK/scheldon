@@ -1,4 +1,5 @@
 import {
+  AutoIncrement,
   BeforeCreate,
   BeforeUpdate,
   BelongsTo,
@@ -7,13 +8,14 @@ import {
   ForeignKey,
   HasMany,
   Model,
+  PrimaryKey,
   Table
 } from 'sequelize-typescript';
 import { Room } from '@models/Room';
 import { Employee } from '@models/Employee';
 import { TimetableEntry } from '@models/TimetableEntry';
-import { SubClass } from '@models/SubClass';
-import { StudentAssignment } from '@models/StudentAssignment';
+import { StudentGroup } from '@models/StudentGroup';
+import { Study } from '@models/Study';
 import {
   validateClassDates,
   validateClassInterval,
@@ -74,7 +76,7 @@ export class Class extends Model<Class> {
   // Default Room
   @ForeignKey(() => Room)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: false,
     unique: false
   })
@@ -86,7 +88,7 @@ export class Class extends Model<Class> {
   // Class Teacher
   @ForeignKey(() => Employee)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: false,
     unique: false
   })
@@ -108,11 +110,11 @@ export class Class extends Model<Class> {
   @HasMany(() => SubstitutionEntry)
   declare substitutionEntries: SubstitutionEntry[];
 
-  @HasMany(() => SubClass)
-  declare subClasses: SubClass[];
+  @HasMany(() => StudentGroup)
+  declare studentGroupes: StudentGroup[];
 
-  @HasMany(() => StudentAssignment)
-  declare studentAssignments: StudentAssignment[];
+  @HasMany(() => Study)
+  declare studentAssignments: Study[];
 
   // Hooks for validation
   @BeforeCreate

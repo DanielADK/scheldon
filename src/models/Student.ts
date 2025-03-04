@@ -1,5 +1,5 @@
 import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
-import { StudentAssignment } from '@models/StudentAssignment';
+import { Study } from '@models/Study';
 
 @Table({
   timestamps: false
@@ -31,6 +31,6 @@ export class Student extends Model<Student> {
   })
   declare surname: string;
 
-  @HasMany(() => StudentAssignment)
-  declare studentAssignments: StudentAssignment[];
+  @HasMany(() => Study)
+  declare studentAssignments: Study[];
 }

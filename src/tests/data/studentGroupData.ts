@@ -1,6 +1,6 @@
-import { SubClassDTO } from '@repositories/subclassRepository';
+import { studentGroupDTO } from '@repositories/studentGroupRepository';
 
-export const subClasses: SubClassDTO[] = [
+export const studentGroups: studentGroupDTO[] = [
   { name: '1/2', classId: 1 },
   { name: '2/2', classId: 1 },
   { name: '1/2', classId: 2 },

@@ -17,11 +17,11 @@ import { Subject } from '@models/Subject';
 import { Employee } from '@models/Employee';
 import { Room } from '@models/Room';
 import { TimetableEntrySet } from '@models/TimetableEntrySet';
-import { SubClass } from '@models/SubClass';
+import { StudentGroup } from '@models/StudentGroup';
 import {
   validateDayInWeekRange,
   validateHourInDayRange,
-  validateSubClassInClass,
+  validatestudentGroupInClass,
   validateTeacherRole,
   validateUniqueEntry
 } from '@validators/timetableEntryValidators';
@@ -43,10 +43,10 @@ import {
     },
     {
       unique: true,
-      name: 'unique_class_with_subclass_entry',
+      name: 'unique_class_with_studentGroup_entry',
       fields: [
         'classId',
-        'subClassId',
+        'studentGroupId',
         'dayInWeek',
         'hourInDay',
         'subjectId',
@@ -86,12 +86,12 @@ export class TimetableEntry extends Model<TimetableEntry> {
   })
   declare classId: number;
 
-  @ForeignKey(() => SubClass)
+  @ForeignKey(() => StudentGroup)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
     allowNull: true
   })
-  declare subClassId: number | null;
+  declare studentGroupId: number | null;
 
   @ForeignKey(() => Subject)
   @Column({
@@ -121,8 +121,8 @@ export class TimetableEntry extends Model<TimetableEntry> {
   @BelongsTo(() => Class)
   declare class: Class;
 
-  @BelongsTo(() => SubClass)
-  declare subClass: SubClass | null;
+  @BelongsTo(() => StudentGroup)
+  declare studentGroup: StudentGroup | null;
 
   @BelongsTo(() => Subject)
   declare subject: Subject;
@@ -141,7 +141,7 @@ export class TimetableEntry extends Model<TimetableEntry> {
       validateTeacherRole(instance),
       validateDayInWeekRange(instance),
       validateHourInDayRange(instance),
-      instance.subClassId ? validateSubClassInClass(instance) : null
+      instance.studentGroupId ? validatestudentGroupInClass(instance) : null
     ]);
   }
 }

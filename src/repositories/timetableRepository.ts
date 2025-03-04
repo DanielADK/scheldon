@@ -7,7 +7,7 @@ import { TimetableEntrySet } from '@models/TimetableEntrySet';
 import { Op, Transaction, WhereOptions } from 'sequelize';
 import { Subject } from '@models/Subject';
 import { Room } from '@models/Room';
-import { SubClass } from '@models/SubClass';
+import { StudentGroup } from '@models/StudentGroup';
 import { sequelize } from '../index';
 import { getLessonBulkInTSetPeriod } from '@repositories/lessonRecordRepository';
 import { LessonRecord } from '@models/LessonRecord';
@@ -20,7 +20,7 @@ export interface TimetableSetDTO {
 
 export interface TimetableEntryDTO {
   classId: number;
-  subClassId?: number;
+  studentGroupId?: number;
   dayInWeek: number;
   hourInDay: number;
   subjectId: number;
@@ -122,7 +122,7 @@ export const timetableEntryInclude = [
     attributes: ['name']
   },
   {
-    model: SubClass,
+    model: StudentGroup,
     attributes: ['name']
   },
   {

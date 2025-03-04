@@ -2,7 +2,7 @@ import {
   AbstractTimetableAdapter,
   TimetableModels
 } from '@services/transformers/AbstractTimetableAdapter';
-import { LessonType } from '@models/types/LessonType';
+import { SubstitutionType } from '@models/types/SubstitutionType';
 
 /**
  * Single lesson entry format
@@ -19,7 +19,7 @@ export interface SimpleLessonEntry {
     abbreviation: string;
   };
   class?: { name: string };
-  subClass?: { name: string };
+  studentGroup?: { name: string };
   room?: { name: string };
   type?: string;
 }
@@ -59,7 +59,7 @@ export const classMask = async (
     ...(entry.lessonId !== null && { lessonId: entry.lessonId }),
     teacher: entry.teacher,
     subject: entry.subject,
-    ...(entry.subClass !== null && { subClass: entry.subClass }),
+    ...(entry.studentGroup !== null && { studentGroup: entry.studentGroup }),
     room: entry.room,
     ...(entry.type !== null && { type: entry.type })
   } as SimpleLessonEntry;
@@ -76,7 +76,7 @@ export const employeeMask = async (
     ...(entry.lessonId !== null && { lessonId: entry.lessonId }),
     subject: entry.subject,
     class: entry.class,
-    ...(entry.subClass !== null && { subClass: entry.subClass }),
+    ...(entry.studentGroup !== null && { studentGroup: entry.studentGroup }),
     room: entry.room,
     ...(entry.type !== null && { type: entry.type })
   } as SimpleLessonEntry;
@@ -94,7 +94,7 @@ export const roomMask = async (
     teacher: entry.teacher,
     subject: entry.subject,
     class: entry.class,
-    ...(entry.subClass !== null && { subClass: entry.subClass }),
+    ...(entry.studentGroup !== null && { studentGroup: entry.studentGroup }),
     ...(entry.type !== null && { type: entry.type })
   } as SimpleLessonEntry;
 };
@@ -159,7 +159,9 @@ export const transformTimetable = async (
     const lesson: SimpleLessonEntry = await transformerFunction(entry);
 
     timetable2D[day][hour] =
-      lesson.type === LessonType.DROPPED ? await droppedMask(lesson) : lesson;
+      lesson.type === SubstitutionType.DROPPED
+        ? await droppedMask(lesson)
+        : lesson;
   }
 
   return timetable2D;

@@ -1,7 +1,7 @@
 import { Student } from '@models/Student';
-import { StudentAssignment } from '@models/StudentAssignment';
+import { Study } from '@models/Study';
 import { Class } from '@models/Class';
-import { SubClass } from '@models/SubClass';
+import { StudentGroup } from '@models/StudentGroup';
 import { Op } from 'sequelize';
 
 /**
@@ -35,7 +35,7 @@ export const getStudentById = async (id: number): Promise<Student | null> => {
   return await Student.findByPk(id, {
     include: [
       {
-        model: StudentAssignment,
+        model: Study,
         attributes: ['validFrom', 'validTo'],
         required: false,
         where: {
@@ -48,8 +48,8 @@ export const getStudentById = async (id: number): Promise<Student | null> => {
             attributes: ['classId', 'name', 'roomId', 'employeeId']
           },
           {
-            model: SubClass,
-            attributes: ['subClassId', 'name']
+            model: StudentGroup,
+            attributes: ['studentGroupId', 'name']
           }
         ]
       }
@@ -63,8 +63,8 @@ export const getStudentById = async (id: number): Promise<Student | null> => {
  */
 export const getStudentsHistory = async (
   id: number
-): Promise<StudentAssignment[] | null> => {
-  return await StudentAssignment.findAll({
+): Promise<Study[] | null> => {
+  return await Study.findAll({
     attributes: ['validFrom', 'validTo'],
     where: {
       studentId: id
@@ -75,8 +75,8 @@ export const getStudentsHistory = async (
         attributes: ['classId', 'name', 'roomId', 'employeeId']
       },
       {
-        model: SubClass,
-        attributes: ['subClassId', 'name']
+        model: StudentGroup,
+        attributes: ['studentGroupId', 'name']
       }
     ]
   });

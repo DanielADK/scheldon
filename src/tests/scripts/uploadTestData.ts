@@ -3,14 +3,14 @@ import { subjects } from '../data/subjectsData';
 import { employees } from '../data/employeeData';
 import { rooms } from '../data/roomData';
 import { classes } from '../data/classData';
-import { subClasses } from '../data/subClassData';
+import { studentGroupes } from '../data/studentGroupData';
 import { students } from '../data/studentData';
 import { assignments } from '../data/studentAssignmentData';
 import { SubjectDTO } from '@repositories/subjectRepository';
 import { EmployeeDTO } from '@repositories/employeeRepository';
 import { RoomDTO } from '@repositories/roomRepository';
 import { ClassDTO } from '@repositories/classRepository';
-import { SubClassDTO } from '@repositories/subclassRepository';
+import { studentGroupDTO } from '@repositories/studentGroupRepository';
 import { StudentDTO } from '@repositories/studentRepository';
 import { StudentAssignmentDTO } from '@repositories/studentAssignmentRepository';
 import { entries, sets } from '../data/timetableData';
@@ -25,7 +25,7 @@ type entries =
   | EmployeeDTO
   | RoomDTO
   | ClassDTO
-  | SubClassDTO
+  | studentGroupDTO
   | StudentDTO
   | StudentAssignmentDTO
   | TimetableSetDTO
@@ -62,7 +62,7 @@ const uploadTestData = async () => {
 
   // Classes
   await uploadData(url, '/classes', 'Class', classes);
-  await uploadData(url, '/subclasses', 'SubClass', subClasses);
+  await uploadData(url, '/studentGroupes', 'studentGroup', studentGroupes);
 
   // Students
   await uploadData(url, '/students', 'Student', students);

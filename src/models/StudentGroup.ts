@@ -1,4 +1,5 @@
 import {
+  AutoIncrement,
   BeforeCreate,
   BeforeUpdate,
   BelongsTo,
@@ -7,13 +8,15 @@ import {
   ForeignKey,
   HasMany,
   Model,
+  PrimaryKey,
   Table
 } from 'sequelize-typescript';
 import { Class } from '@models/Class';
-import { StudentAssignment } from '@models/StudentAssignment';
-import { validateSubClassNameAndClass } from '@validators/subClassValidators';
+import { Study } from '@models/Study';
+import { validatestudentGroupNameAndClass } from '@validators/studentGroupValidators';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
 import { TimetableEntry } from '@models/TimetableEntry';
+import { GroupCategory } from '@models/GroupCategory';
 
 @Table({
   timestamps: false,
@@ -24,13 +27,15 @@ import { TimetableEntry } from '@models/TimetableEntry';
     }
   ]
 })
-export class SubClass extends Model<SubClass> {
+export class StudentGroup extends Model<StudentGroup> {
+  @PrimaryKey
+  @AutoIncrement
   @Column({
     type: DataType.INTEGER.UNSIGNED,
     primaryKey: true,
     autoIncrement: true
   })
-  declare subClassId: number;
+  declare studentGroupId: number;
 
   @Column({
     type: DataType.STRING,
@@ -46,8 +51,19 @@ export class SubClass extends Model<SubClass> {
   })
   declare classId: number;
 
+  @ForeignKey(() => GroupCategory)
+  @Column({
+    type: DataType.INTEGER.UNSIGNED,
+    allowNull: true,
+    unique: false
+  })
+  declare groupCategoryId: number;
+
   @BelongsTo(() => Class)
   declare class: Class;
+
+  @BelongsTo(() => GroupCategory)
+  declare groupCategory: GroupCategory;
 
   @HasMany(() => TimetableEntry)
   declare timetableEntries: TimetableEntry[];
@@ -55,12 +71,12 @@ export class SubClass extends Model<SubClass> {
   @HasMany(() => SubstitutionEntry)
   declare substitutionEntries: SubstitutionEntry[];
 
-  @HasMany(() => StudentAssignment)
-  declare studentAssignments: StudentAssignment[];
+  @HasMany(() => Study)
+  declare studentAssignments: Study[];
 
   @BeforeCreate
   @BeforeUpdate
-  static async validate(instance: SubClass) {
-    await validateSubClassNameAndClass(instance);
+  static async validate(instance: StudentGroup) {
+    await validatestudentGroupNameAndClass(instance);
   }
 }

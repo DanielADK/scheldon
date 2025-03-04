@@ -1,9 +1,9 @@
-import { StudentAssignment } from '@models/StudentAssignment';
+import { Study } from '@models/Study';
 import { Op } from 'sequelize';
 
 export interface StudentAssignmentDTO {
   classId: number;
-  subClassId?: number;
+  studentGroupId?: number;
   validFrom?: Date;
   validTo?: Date;
 }
@@ -18,7 +18,7 @@ export const terminateAssignment = async (
   data: StudentAssignmentDTO
 ) => {
   // End all ongoing assignments
-  await StudentAssignment.update(
+  await Study.update(
     {
       validTo: new Date(new Date().getTime() - 1).toISOString()
     },
@@ -26,7 +26,7 @@ export const terminateAssignment = async (
       where: {
         studentId: studentId,
         classId: data.classId,
-        subClassId: data.subClassId
+        studentGroupId: data.studentGroupId
       }
     }
   );
@@ -37,7 +37,7 @@ export const terminateAllAssignments = async (
   data: StudentAssignmentDTO
 ) => {
   // End all ongoing assignments
-  await StudentAssignment.update(
+  await Study.update(
     {
       validTo: new Date(new Date().getTime() - 1).toISOString()
     },
@@ -54,13 +54,13 @@ export const createAssignment = async (
   studentId: number,
   data: StudentAssignmentDTO
 ) => {
-  return await StudentAssignment.create({
+  return await Study.create({
     studentId: studentId,
     classId: data.classId,
-    subClassId: null,
+    studentGroupId: null,
     validFrom: data.validFrom,
     validTo: data.validTo
-  } as unknown as StudentAssignment);
+  } as unknown as Study);
 };
 
 /**
@@ -82,7 +82,7 @@ export const getAssignmentsByStudentAtTime = async (
   validFrom: Date,
   validTo: Date
 ) => {
-  return await StudentAssignment.findAll({
+  return await Study.findAll({
     where: {
       studentId: studentId,
       validFrom: { [Op.lte]: validTo },

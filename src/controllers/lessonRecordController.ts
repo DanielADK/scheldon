@@ -7,12 +7,12 @@ import {
   handleError
 } from '../lib/controllerTools';
 import { TimetableExport } from '@services/transformers/timetableExport';
-import { LessonType } from '@models/types/LessonType';
+import { SubstitutionType } from '@models/types/SubstitutionType';
 
 // Schema for administratively creating a lesson record
 const createLessonRecordSchema = Joi.object({
   classId: Joi.number().required(),
-  subClassId: Joi.number().optional(),
+  studentGroupId: Joi.number().optional(),
   dayInWeek: Joi.number().required().min(0).max(4),
   hourInDay: Joi.number().required().min(0).max(10),
   subjectId: Joi.number().optional(),
@@ -21,7 +21,7 @@ const createLessonRecordSchema = Joi.object({
   date: Joi.date().required(),
   type: Joi.string()
     .normalize()
-    .valid(...Object.values(LessonType))
+    .valid(...Object.values(SubstitutionType))
     .required()
 });
 

@@ -50,8 +50,8 @@ export const terminateAssignment = async (
   // If validTo is not provided, set it to the classes default validTo
   const validTo = data.validTo ? new Date(data.validTo) : new Date();
 
-  // If subClassId is not provided, terminate all assignments for the class
-  if (!data.subClassId) {
+  // If studentGroupId is not provided, terminate all assignments for the class
+  if (!data.studentGroupId) {
     return await studentAssignmentRepository.terminateAllAssignments(
       studentId,
       {
@@ -60,10 +60,10 @@ export const terminateAssignment = async (
       }
     );
   }
-  // Else terminate only the assignment for the subClass
+  // Else terminate only the assignment for the studentGroup
   return await studentAssignmentRepository.terminateAssignment(studentId, {
     classId: data.classId,
-    subClassId: data.subClassId,
+    studentGroupId: data.studentGroupId,
     validTo: validTo
   });
 };

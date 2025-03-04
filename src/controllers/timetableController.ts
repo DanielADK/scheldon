@@ -25,7 +25,7 @@ export const timetableSetSchema: Joi.ObjectSchema<TimetableSetDTO> = Joi.object(
 export const timetableEntrySchema: Joi.ObjectSchema<TimetableEntryDTO> =
   Joi.object({
     classId: Joi.number().required(),
-    subClassId: Joi.number().optional(),
+    studentGroupId: Joi.number().optional(),
     dayInWeek: Joi.number().required().min(0).max(6),
     hourInDay: Joi.number().required().min(0).max(10),
     subjectId: Joi.number().required(),

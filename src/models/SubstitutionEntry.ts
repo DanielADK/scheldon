@@ -12,7 +12,7 @@ import { Class } from '@models/Class';
 import { Subject } from '@models/Subject';
 import { Employee } from '@models/Employee';
 import { Room } from '@models/Room';
-import { SubClass } from '@models/SubClass';
+import { StudentGroup } from '@models/StudentGroup';
 
 @Table({
   timestamps: false,
@@ -31,10 +31,10 @@ import { SubClass } from '@models/SubClass';
     },
     {
       unique: true,
-      name: 'unique_class_with_subclass_entry',
+      name: 'unique_class_with_studentGroup_entry',
       fields: [
         'classId',
-        'subClassId',
+        'studentGroupId',
         'dayInWeek',
         'hourInDay',
         'subjectId',
@@ -74,16 +74,16 @@ export class SubstitutionEntry extends Model<SubstitutionEntry> {
   })
   declare classId: number;
 
-  @ForeignKey(() => SubClass)
+  @ForeignKey(() => StudentGroup)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
     allowNull: true
   })
-  declare subClassId: number | null;
+  declare studentGroupId: number | null;
 
   @ForeignKey(() => Subject)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: false
   })
   declare subjectId: number;
@@ -109,8 +109,8 @@ export class SubstitutionEntry extends Model<SubstitutionEntry> {
   @BelongsTo(() => Class)
   declare class: Class;
 
-  @BelongsTo(() => SubClass)
-  declare subClass: SubClass | null;
+  @BelongsTo(() => StudentGroup)
+  declare studentGroup: StudentGroup | null;
 
   @BelongsTo(() => Subject)
   declare subject: Subject;
@@ -130,7 +130,7 @@ export class SubstitutionEntry extends Model<SubstitutionEntry> {
       validateTeacherRole(instance),
       validateDayInWeekRange(instance),
       validateHourInDayRange(instance),
-      instance.subClassId ? validateSubClassInClass(instance) : null
+      instance.studentGroupId ? validatestudentGroupInClass(instance) : null
     ]);
   }
   */

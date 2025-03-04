@@ -1,6 +1,6 @@
 import { FindAttributeOptions, Op } from 'sequelize';
 import { Class } from '@models/Class';
-import { SubClass } from '@models/SubClass';
+import { StudentGroup } from '@models/StudentGroup';
 
 /**
  * ClassDTO interface
@@ -48,8 +48,8 @@ export const getClasses = async (
     },
     include: [
       {
-        model: SubClass,
-        as: 'subClasses',
+        model: StudentGroup,
+        as: 'studentGroupes',
         required: false
       }
     ]
@@ -68,9 +68,9 @@ export const getClassById = async (classId: number): Promise<Class | null> => {
     attributes: classAttributes,
     include: [
       {
-        model: SubClass,
-        as: 'subClasses',
-        attributes: ['subClassId', 'name']
+        model: StudentGroup,
+        as: 'studentGroupes',
+        attributes: ['studentGroupId', 'name']
       }
     ]
   });
@@ -91,9 +91,9 @@ export const getClassesAtTime = async (
     attributes: classAttributes,
     include: [
       {
-        model: SubClass,
-        as: 'subClasses',
-        attributes: ['subClassId', 'name']
+        model: StudentGroup,
+        as: 'studentGroupes',
+        attributes: ['studentGroupId', 'name']
       }
     ]
   });

@@ -19,8 +19,8 @@ export class TimetableAdapter extends AbstractTimetableAdapter<TimetableEntrySet
         abbreviation: entry.timetableEntry.subject.abbreviation
       },
       class: { name: entry.timetableEntry.class.name },
-      ...(entry.timetableEntry.subClass !== null && {
-        subClass: entry.timetableEntry.subClass.name
+      ...(entry.timetableEntry.studentGroup !== null && {
+        studentGroup: entry.timetableEntry.studentGroup.name
       }),
       room: { name: entry.timetableEntry.room.name }
     } as TimeLessonEntry;
