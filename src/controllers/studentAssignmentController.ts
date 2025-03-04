@@ -3,17 +3,17 @@ import { Context } from 'koa';
 import * as studentAssignmentService from '@services/studentAssignmentService';
 import { getIdFromParam, handleError } from '../lib/controllerTools';
 
-// Schema for assigning a student to a class/subclass
+// Schema for assigning a student to a class/studentGroup
 const assignStudentSchema = Joi.object({
   classId: Joi.number().required(),
-  subClassId: Joi.number().optional(),
+  studentGroupId: Joi.number().optional(),
   validFrom: Joi.date().optional(),
   validTo: Joi.date().optional()
 });
 
 const unassignStudentSchema = Joi.object({
   classId: Joi.number().required(),
-  subClassId: Joi.number().optional(),
+  studentGroupId: Joi.number().optional(),
   validTo: Joi.date().optional()
 });
 

@@ -5,17 +5,17 @@ import { TimetableEntry } from '@models/TimetableEntry';
 import { Employee } from '@models/Employee';
 import { Subject } from '@models/Subject';
 import { Class } from '@models/Class';
-import { SubClass } from '@models/SubClass';
+import { StudentGroup } from '@models/StudentGroup';
 import { Room } from '@models/Room';
 import { timetableEntryInclude } from '@repositories/timetableRepository';
-import { LessonType } from '@models/types/LessonType';
+import { SubstitutionType } from '@models/types/SubstitutionType';
 import { sequelize } from '../index';
 
 import { getWeekRange } from '../lib/timeLib';
 
 export interface LessonRecordDTO {
   classId: number;
-  subClassId?: number;
+  studentGroupId?: number;
   dayInWeek: number;
   hourInDay: number;
   subjectId?: number;
@@ -35,7 +35,7 @@ export const createCustomLesson = async (
   data: LessonRecordDTO
 ): Promise<LessonRecord> => {
   // Dropped with DELETE method
-  if (data.type === LessonType.DROPPED) {
+  if (data.type === SubstitutionType.DROPPED) {
     throw new Error('Use DELETE method for dropping lessons');
   }
 
@@ -44,9 +44,9 @@ export const createCustomLesson = async (
     hourInDay: data.hourInDay,
     classId: data.classId
   };
-  // Only include subClassId in the where clause if it's defined
-  if (data.subClassId !== undefined) {
-    whereClause.subClassId = data.subClassId ?? { [Op.is]: null };
+  // Only include studentGroupId in the where clause if it's defined
+  if (data.studentGroupId !== undefined) {
+    whereClause.studentGroupId = data.studentGroupId ?? { [Op.is]: null };
   }
 
   // Start a transaction
@@ -79,14 +79,10 @@ export const createCustomLesson = async (
   });
 
   // Define the lesson record
-  let lr = {
+  let lr: LessonRecord = {
     timetableEntryId: null,
-    classId: data.classId,
-    subClassId: data.subClassId,
-    subjectId: data.subjectId,
-    teacherId: data.teacherId,
-    roomId: data.roomId,
-    type: data.type as LessonType,
+    substitutionEntryId: null,
+    type: data.type as SubstitutionType,
     date: new Date(data.date)
   } as LessonRecord;
 
@@ -101,7 +97,7 @@ export const createCustomLesson = async (
     lr = await existingLesson.update(lr);
   } else {
     // Step 3: If the lesson does not exist, create a new lesson record
-    await LessonRecord.generateUniqueLessonId(lr);
+    //await LessonRecord.generateUniqueLessonId(lr);
 
     lr = await LessonRecord.create(lr);
   }
@@ -135,9 +131,9 @@ export const deleteLessonRecord = async (id: string): Promise<void> => {
     }
 
     // Find the default timetable entry for the lesson record
-    const defaultTimetableEntry = await findDefaultTimetableEntry(
+    /*const defaultTimetableEntry = await findDefaultTimetableEntry(
       lessonRecord.classId!,
-      lessonRecord.subClassId,
+      lessonRecord.studentGroupId,
       lessonRecord.dayInWeek!,
       lessonRecord.hourInDay!,
       transaction
@@ -159,7 +155,7 @@ export const deleteLessonRecord = async (id: string): Promise<void> => {
         type: null // Reset the lesson type since it's now a standard lesson
       },
       { transaction }
-    );
+    );*/
 
     // Commit the transaction
     await transaction.commit();
@@ -173,7 +169,7 @@ export const deleteLessonRecord = async (id: string): Promise<void> => {
 /**
  * Find the default timetable entry for a lesson record
  * @param classId number - Class ID
- * @param subClassId number | null - SubClass ID
+ * @param studentGroupId number | null - StudentGroup ID
  * @param dayInWeek number - Day in week (0-6)
  * @param hourInDay number - Hour in day
  * @param transaction
@@ -181,7 +177,7 @@ export const deleteLessonRecord = async (id: string): Promise<void> => {
  */
 export const findDefaultTimetableEntry = async (
   classId: number,
-  subClassId: number | null,
+  studentGroupId: number | null,
   dayInWeek: number,
   hourInDay: number,
   transaction: Transaction | null = null
@@ -193,11 +189,11 @@ export const findDefaultTimetableEntry = async (
     hourInDay: hourInDay
   };
 
-  // Add subClassId to where clause if it's provided
-  if (subClassId !== null) {
-    whereClause.subClassId = subClassId;
+  // Add studentGroupId to where clause if it's provided
+  if (studentGroupId !== null) {
+    whereClause.studentGroupId = studentGroupId;
   } else {
-    whereClause.subClassId = { [Op.is]: null }; // Handle null subClassId
+    whereClause.studentGroupId = { [Op.is]: null }; // Handle null studentGroupId
   }
 
   // Find the default TimetableEntry based on the given parameters
@@ -236,8 +232,7 @@ export const getLessonBulkInTSetPeriod = async (
   while (date < validTo) {
     lessons.push({
       timetableEntryId: data.timetableEntryId,
-      date: new Date(date),
-      lessonId: await LessonRecord.generateLessonId()
+      date: new Date(date)
     } as LessonRecord);
 
     // Add week to date
@@ -293,7 +288,7 @@ export const getCurrentWeekTimetableByParam = async (
         attributes: ['name']
       },
       {
-        model: SubClass,
+        model: StudentGroup,
         attributes: ['name']
       },
       {
@@ -306,7 +301,7 @@ export const getCurrentWeekTimetableByParam = async (
       'dayInWeek',
       'hourInDay',
       'classId',
-      'subClassId',
+      'studentGroupId',
       'subjectId',
       'teacherId',
       'roomId',

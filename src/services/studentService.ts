@@ -1,6 +1,6 @@
 import * as studentRepository from '@repositories/studentRepository';
 import { StudentDTO } from '@repositories/studentRepository';
-import { StudentAssignment } from '@models/StudentAssignment';
+import { Study } from '@models/Study';
 
 /**
  * Create a new student
@@ -24,7 +24,7 @@ export const getStudentById = async (id: number) => {
  */
 export const getStudentsHistory = async (
   id: number
-): Promise<StudentAssignment[] | null> => {
+): Promise<Study[] | null> => {
   return await studentRepository.getStudentsHistory(id);
 };
 

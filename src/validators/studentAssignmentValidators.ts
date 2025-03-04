@@ -1,19 +1,20 @@
-import { StudentAssignment } from '@models/StudentAssignment';
+import { Study } from '@models/Study';
 import { Op } from 'sequelize';
 
 /**
- * Validate subclass belongs to class
+ * Validate studentGroup belongs to class
  * @param instance
  */
-export const validateSubClassBelongsToClass = async (
-  instance: StudentAssignment
-) => {
-  if (!instance.subClass) {
-    instance.subClass = await instance.$get('subClass');
+export const validatestudentGroupBelongsToClass = async (instance: Study) => {
+  if (!instance.studentGroup) {
+    instance.studentGroup = await instance.$get('studentGroup');
   }
 
-  if (instance.subClass && instance.subClass.classId !== instance.classId) {
-    throw new Error('Subclass must belong to the class');
+  if (
+    instance.studentGroup &&
+    instance.studentGroup.classId !== instance.classId
+  ) {
+    throw new Error('studentGroup must belong to the class');
   }
 };
 
@@ -21,7 +22,7 @@ export const validateSubClassBelongsToClass = async (
  * Validate class dates
  * @param instance
  */
-export const validateClassDates = async (instance: StudentAssignment) => {
+export const validateClassDates = async (instance: Study) => {
   const fetchedClass = await instance.$get('class');
   if (!fetchedClass) {
     throw new Error('Class not found');
@@ -40,13 +41,11 @@ export const validateClassDates = async (instance: StudentAssignment) => {
   }
 };
 
-export const validateExclusiveClassAssignment = async (
-  instance: StudentAssignment
-) => {
-  const actualAssignments = await StudentAssignment.findOne({
+export const validateExclusiveClassAssignment = async (instance: Study) => {
+  const actualAssignments = await Study.findOne({
     where: {
       studentId: instance.studentId,
-      subClassId: { [Op.is]: null },
+      studentGroupId: { [Op.is]: null },
       validTo: {
         [Op.gte]: instance.validFrom
       },
@@ -61,14 +60,12 @@ export const validateExclusiveClassAssignment = async (
   }
 };
 
-export const validateClassExistsWhenSubClass = async (
-  instance: StudentAssignment
-) => {
-  const actualAssignments = await StudentAssignment.findAll({
+export const validateClassExistsWhenstudentGroup = async (instance: Study) => {
+  const actualAssignments = await Study.findAll({
     where: {
       studentId: instance.studentId,
       classId: instance.classId,
-      subClassId: { [Op.is]: null },
+      studentGroupId: { [Op.is]: null },
       validTo: {
         [Op.gte]: instance.validFrom
       },
@@ -77,9 +74,9 @@ export const validateClassExistsWhenSubClass = async (
       }
     }
   });
-  // Find assignment where classId is number and subclassId is null
+  // Find assignment where classId is number and studentGroupId is null
   const assignment = actualAssignments.find(
-    (assignment) => assignment.classId && !assignment.subClassId
+    (assignment) => assignment.classId && !assignment.studentGroupId
   );
   if (!assignment) {
     throw new Error('Student is not assigned to the class');

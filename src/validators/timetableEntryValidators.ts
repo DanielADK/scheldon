@@ -18,16 +18,19 @@ export const validateTeacherRole = async (
 };
 
 /**
- * Validate the subclass is in the class
+ * Validate the studentGroup is in the class
  */
-export const validateSubClassInClass = async (
+export const validatestudentGroupInClass = async (
   instance: TimetableEntry
 ): Promise<void> => {
-  if (!instance.subClass) {
-    instance.subClass = await instance.$get('subClass');
+  if (!instance.studentGroup) {
+    instance.studentGroup = await instance.$get('studentGroup');
   }
-  if (instance.subClass && instance.classId !== instance.subClass.classId) {
-    throw new Error('Subclass is not in the class');
+  if (
+    instance.studentGroup &&
+    instance.classId !== instance.studentGroup.classId
+  ) {
+    throw new Error('studentGroup is not in the class');
   }
 };
 
@@ -58,7 +61,7 @@ export const validateHourInDayRange = async (
 };
 
 /**
- * Validate unique entry by class, subclass, day, hour, teacher, room, subject in timetable set (with nullable subclass)
+ * Validate unique entry by class, studentGroup, day, hour, teacher, room, subject in timetable set (with nullable studentGroup)
  */
 export const validateUniqueEntry = async (
   instance: TimetableEntry
@@ -66,7 +69,7 @@ export const validateUniqueEntry = async (
   const existing = await TimetableEntry.findOne({
     where: {
       classId: instance.classId,
-      subClassId: instance.subClassId ?? null,
+      studentGroupId: instance.studentGroupId ?? null,
       dayInWeek: instance.dayInWeek,
       hourInDay: instance.hourInDay,
       teacherId: instance.teacherId,

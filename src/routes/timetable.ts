@@ -2,9 +2,7 @@ import Router from 'koa-router';
 import * as timetableController from '@controllers/timetableController';
 import { timetableGetByIdController } from '@controllers/timetableController';
 import * as timetableService from '@services/timetableService';
-import * as lessonRecordService from '@services/lessonRecordService';
 import * as lessonRecordController from '@controllers/lessonRecordController';
-import { getCurrentTimetableByIdController } from '@controllers/lessonRecordController';
 
 const router = new Router();
 /**
@@ -17,7 +15,7 @@ const router = new Router();
  *         classId:
  *           type: integer
  *           example: 1
- *         subClassId:
+ *         studentGroupId:
  *           type: integer
  *           example: 2
  *           nullable: true
@@ -167,12 +165,12 @@ router.get('/timetables/class/:id', (ctx) =>
  *       404:
  *         description: Timetable not found
  */
-router.get('/timetables/class/:id/at/:date', (ctx) =>
+/*router.get('/timetables/class/:id/at/:date', (ctx) =>
   getCurrentTimetableByIdController(
     ctx,
     lessonRecordService.getTimetableByClassId
   )
-);
+);*/
 
 /**
  * @openapi
@@ -227,12 +225,12 @@ router.get('/timetables/teacher/:id', (ctx) =>
  *       404:
  *         description: Timetable not found
  */
-router.get('/timetables/teacher/:id/at/:date', (ctx) =>
+/*router.get('/timetables/teacher/:id/at/:date', (ctx) =>
   getCurrentTimetableByIdController(
     ctx,
     lessonRecordService.getTimetableByEmployeeId
   )
-);
+);*/
 
 /**
  * @openapi
@@ -294,12 +292,12 @@ router.get('/timetables/room/:id', (ctx) =>
  *       404:
  *         description: Timetable not found
  */
-router.get('/timetables/room/:id/at/:date', (ctx) =>
+/*router.get('/timetables/room/:id/at/:date', (ctx) =>
   getCurrentTimetableByIdController(
     ctx,
     lessonRecordService.getTimetableByRoomId
   )
-);
+);*/
 
 // Temporary lessons
 router.post(

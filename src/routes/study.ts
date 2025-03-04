@@ -3,12 +3,12 @@ import * as studentAssignmentController from '@controllers/studentAssignmentCont
 
 const router = new Router();
 
-// Create new assignment (start of study)
+// Create new study (start of study)
 /**
  * @openapi
  * components:
  *   schemas:
- *     StudentAssignment:
+ *     Study:
  *       type: object
  *       properties:
  *         studentId:
@@ -17,7 +17,7 @@ const router = new Router();
  *         classId:
  *           type: integer
  *           example: 1
- *         subClassId:
+ *         studentGroupId:
  *           type: integer
  *           example: 2
  *         validFrom:
@@ -36,9 +36,9 @@ const router = new Router();
  * /students/{studentId}/assign:
  *   post:
  *     tags:
- *       - Student Assignment
- *     summary: Assign a student to a class or subclass
- *     description: Assign a student to a specified class or subclass within a given time period.
+ *       - Study
+ *     summary: Assign a student to a class or studentGroup
+ *     description: Assign a student to a specified class or studentGroup within a given time period.
  *     parameters:
  *       - in: path
  *         name: studentId
@@ -57,9 +57,9 @@ const router = new Router();
  *                 type: integer
  *                 description: The ID of the class
  *                 example: 1
- *               subClassId:
+ *               studentGroupId:
  *                 type: integer
- *                 description: (Optional) The ID of the subclass
+ *                 description: (Optional) The ID of the student group
  *                 example: 2
  *               validFrom:
  *                 type: string
@@ -72,7 +72,7 @@ const router = new Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/StudentAssignment'
+ *               $ref: '#/components/schemas/Study'
  *       400:
  *         description: Invalid input or assignment conflict
  *         content:
@@ -95,8 +95,8 @@ router.post(
  *   delete:
  *     tags:
  *       - Student Assignment
- *     summary: Unassign a student from a class or subclass
- *     description: Terminates the assignment of a student from a class or subclass.
+ *     summary: Unassign a student from a class or studentGroup
+ *     description: Terminates the assignment of a student from a class or studentGroup.
  *     parameters:
  *       - in: path
  *         name: studentId
@@ -115,9 +115,9 @@ router.post(
  *                 type: integer
  *                 description: The ID of the class
  *                 example: 1
- *               subClassId:
+ *               studentGroupId:
  *                 type: integer
- *                 description: (Optional) The ID of the subclass
+ *                 description: (Optional) The ID of the studentGroup
  *                 example: 2
  *               validTo:
  *                 type: string

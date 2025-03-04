@@ -1,4 +1,5 @@
 import {
+  AutoIncrement,
   BeforeCreate,
   BeforeUpdate,
   BelongsTo,
@@ -6,16 +7,17 @@ import {
   DataType,
   ForeignKey,
   Model,
+  PrimaryKey,
   Table
 } from 'sequelize-typescript';
 import { Class } from '@models/Class';
-import { SubClass } from '@models/SubClass';
+import { StudentGroup } from '@models/StudentGroup';
 import { Student } from '@models/Student';
 import {
   validateClassDates,
-  validateClassExistsWhenSubClass,
+  validateClassExistsWhenstudentGroup,
   validateExclusiveClassAssignment,
-  validateSubClassBelongsToClass
+  validatestudentGroupBelongsToClass
 } from '@validators/studentAssignmentValidators';
 
 @Table({
@@ -24,7 +26,7 @@ import {
     {
       name: 'unique_assignment',
       unique: true,
-      fields: ['studentId', 'classId', 'subClassId']
+      fields: ['studentId', 'classId', 'studentGroupId']
     },
     {
       name: 'validity_range',
@@ -42,13 +44,13 @@ import {
       using: 'HASH'
     },
     {
-      name: 'subclassid',
-      fields: ['subClassId'],
+      name: 'studentGroupid',
+      fields: ['studentGroupId'],
       using: 'HASH'
     }
   ]
 })
-export class StudentAssignment extends Model<StudentAssignment> {
+export class Study extends Model<Study> {
   @PrimaryKey
   @AutoIncrement
   @Column({
@@ -57,6 +59,8 @@ export class StudentAssignment extends Model<StudentAssignment> {
     autoIncrement: true,
     allowNull: false
   })
+  declare studyId: number;
+
   @ForeignKey(() => Student)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
@@ -77,15 +81,15 @@ export class StudentAssignment extends Model<StudentAssignment> {
   @BelongsTo(() => Class)
   declare class: Class;
 
-  @ForeignKey(() => SubClass)
+  @ForeignKey(() => StudentGroup)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
     allowNull: true
   })
-  declare subClassId: number | null;
+  declare studentGroupId: number | null;
 
-  @BelongsTo(() => SubClass)
-  declare subClass: SubClass | null;
+  @BelongsTo(() => StudentGroup)
+  declare studentGroup: StudentGroup | null;
 
   // Connection validation range
   @Column({
@@ -105,12 +109,14 @@ export class StudentAssignment extends Model<StudentAssignment> {
   // Continuity validation
   @BeforeCreate
   @BeforeUpdate
-  static async validate(instance: StudentAssignment) {
+  static async validate(instance: Study) {
     await Promise.all([
-      validateSubClassBelongsToClass(instance),
+      validatestudentGroupBelongsToClass(instance),
       validateClassDates(instance),
       validateExclusiveClassAssignment(instance),
-      instance.subClassId ? validateClassExistsWhenSubClass(instance) : null
+      instance.studentGroupId
+        ? validateClassExistsWhenstudentGroup(instance)
+        : null
     ]);
   }
 }

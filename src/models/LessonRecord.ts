@@ -11,7 +11,7 @@ import {
 } from 'sequelize-typescript';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { Attendance } from '@models/Attendance';
-import { LessonType } from '@models/types/LessonType';
+import { SubstitutionType } from '@models/types/SubstitutionType';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
 
 @Table({
@@ -39,7 +39,7 @@ export class LessonRecord extends Model<LessonRecord> {
   // XOR fields with timetableEntry
   @ForeignKey(() => SubstitutionEntry)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: true
   })
   declare substitutionEntryId: number | null;
@@ -65,10 +65,16 @@ export class LessonRecord extends Model<LessonRecord> {
 
   // Type only with timetableEntry, other fields are null
   @Column({
-    type: DataType.ENUM(...Object.values(LessonType)),
+    type: DataType.ENUM(...Object.values(SubstitutionType)),
     allowNull: true
   })
-  declare type: LessonType | null;
+  declare type: SubstitutionType | null;
+
+  @Column({
+    type: DataType.STRING(2048),
+    allowNull: true
+  })
+  declare note: string | null;
 
   // Mapping
   @BelongsTo(() => TimetableEntry)
@@ -97,7 +103,7 @@ export class LessonRecord extends Model<LessonRecord> {
       //instance.teacherId ? validateTeacherRole(instance) : null,
       validateDayInWeekRange(instance),
       validateHourInDayRange(instance),
-      //instance.subClassId ? validateSubClassInClass(instance) : null,
+      //instance.studentGroupId ? validatestudentGroupInClass(instance) : null,
       instance.timetableEntry ? validateType(instance) : null
     ]);
   }*/

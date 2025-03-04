@@ -1,19 +1,19 @@
 import Router from 'koa-router';
-import * as subClassController from '@controllers/subclassController';
+import * as studentGroupController from '@controllers/studentGroupController';
 
 const router = new Router();
 
-// SubClass routes
+// StudentGroup routes
 /**
- * Create a new subclass
- * POST /subclasses
+ * Create a new studentGroup
+ * POST /studentGroupes
  * @openapi
  * components:
  *   schemas:
- *     SubClass:
+ *     StudentGroup:
  *       type: object
  *       properties:
- *         subClassId:
+ *         studentGroupId:
  *           type: integer
  *           example: 1
  *         name:
@@ -23,11 +23,11 @@ const router = new Router();
  *           type: integer
  *           example: 1
  *       required:
- *         - subClassId
+ *         - studentGroupId
  *         - name
  *         - classId
  *
- *     SubClassDTO:
+ *     studentGroupDTO:
  *       type: object
  *       properties:
  *         name:
@@ -39,34 +39,34 @@ const router = new Router();
  *       required:
  *         - name
  *         - classId
- * /subclasses:
+ * /studentGroupes:
  *   post:
  *     tags:
- *        - SubClass
- *     summary: Create a new subclass
+ *        - StudentGroup
+ *     summary: Create a new studentGroup
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/SubClassDTO'
+ *             $ref: '#/components/schemas/studentGroupDTO'
  *     responses:
  *       201:
- *         description: Subclass created successfully
+ *         description: studentGroup created successfully
  *       400:
  *         description: Invalid input
  */
-router.post('/subclasses', subClassController.createSubClass);
+router.post('/studentGroupes', studentGroupController.createstudentGroup);
 
 /**
- * Get a subclass by ID
- * GET /subclasses/{id}
+ * Get a studentGroup by ID
+ * GET /studentGroupes/{id}
  * @openapi
- * /subclasses/{id}:
+ * /studentGroupes/{id}:
  *   get:
  *     tags:
- *        - SubClass
- *     summary: Get a subclass by ID
+ *        - StudentGroup
+ *     summary: Get a studentGroup by ID
  *     parameters:
  *       - in: path
  *         name: id
@@ -75,21 +75,21 @@ router.post('/subclasses', subClassController.createSubClass);
  *           type: integer
  *     responses:
  *       200:
- *         description: Subclass data
+ *         description: studentGroup data
  *       404:
- *         description: Subclass not found
+ *         description: studentGroup not found
  */
-router.get('/subclasses/:id', subClassController.getSubClassById);
+router.get('/studentGroupes/:id', studentGroupController.getstudentGroupById);
 
 /**
- * Get all subclasses of a specific class
- * GET /subclasses/class/{classId}
+ * Get all studentGroupes of a specific class
+ * GET /studentGroupes/class/{classId}
  * @openapi
- * /subclasses/class/{classId}:
+ * /studentGroupes/class/{classId}:
  *   get:
  *     tags:
- *        - SubClass
- *     summary: Get all subclasses of a specific class
+ *        - StudentGroup
+ *     summary: Get all studentGroupes of a specific class
  *     parameters:
  *       - in: path
  *         name: classId
@@ -98,30 +98,30 @@ router.get('/subclasses/:id', subClassController.getSubClassById);
  *           type: integer
  *     responses:
  *       200:
- *         description: List of subclasses
+ *         description: List of studentGroupes
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/SubClass'
+ *                 $ref: '#/components/schemas/StudentGroup'
  *       404:
  *         description: Class not found
  */
 router.get(
-  '/subclasses/class/:classId',
-  subClassController.getSubClassesByClassId
+  '/studentGroupes/class/:classId',
+  studentGroupController.getstudentGroupesByClassId
 );
 
 /**
- * Update a subclass by ID
- * PUT /subclasses/{id}
+ * Update a studentGroup by ID
+ * PUT /studentGroupes/{id}
  * @openapi
- * /subclasses/{id}:
+ * /studentGroupes/{id}:
  *   put:
  *     tags:
- *        - SubClass
- *     summary: Update a subclass by ID
+ *        - StudentGroup
+ *     summary: Update a studentGroup by ID
  *     parameters:
  *       - in: path
  *         name: id
@@ -133,26 +133,26 @@ router.get(
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/SubClass'
+ *             $ref: '#/components/schemas/StudentGroup'
  *     responses:
  *       200:
- *         description: Subclass updated successfully
+ *         description: studentGroup updated successfully
  *       400:
  *         description: Invalid input
  *       404:
- *         description: Subclass not found
+ *         description: studentGroup not found
  */
-router.put('/subclasses/:id', subClassController.updateSubClass);
+router.put('/studentGroupes/:id', studentGroupController.updatestudentGroup);
 
 /**
- * Delete a subclass by ID
- * DELETE /subclasses/{id}
+ * Delete a studentGroup by ID
+ * DELETE /studentGroupes/{id}
  * @openapi
- * /subclasses/{id}:
+ * /studentGroupes/{id}:
  *   delete:
  *     tags:
- *        - SubClass
- *     summary: Delete a subclass by ID
+ *        - StudentGroup
+ *     summary: Delete a studentGroup by ID
  *     parameters:
  *       - in: path
  *         name: id
@@ -161,10 +161,10 @@ router.put('/subclasses/:id', subClassController.updateSubClass);
  *           type: integer
  *     responses:
  *       200:
- *         description: Subclass deleted successfully
+ *         description: studentGroup deleted successfully
  *       404:
- *         description: Subclass not found
+ *         description: studentGroup not found
  */
-router.delete('/subclasses/:id', subClassController.deleteSubClass);
+router.delete('/studentGroupes/:id', studentGroupController.deletestudentGroup);
 
 export default router;

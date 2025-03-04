@@ -1,6 +1,6 @@
 import * as classRepository from '@repositories/classRepository';
 import { ClassDTO } from '@repositories/classRepository';
-import * as subClassService from './subclassService';
+import * as studentGroupService from './studentGroupService';
 import { Class } from '@models/Class';
 import { sequelize } from '../index';
 import { Transaction } from 'sequelize';
@@ -90,8 +90,8 @@ export const updateClass = async (
         }
       );
 
-      // Copy subclasses and their assignments to the new class
-      await subClassService.transferSubClasses(
+      // Copy studentGroupes and their assignments to the new class
+      await studentGroupService.transferstudentGroupes(
         existingClass,
         newClass,
         transaction

@@ -13,7 +13,7 @@ const router = new Router();
  *         classId:
  *           type: integer
  *           example: 1
- *         subClassId:
+ *         studentGroupId:
  *           type: integer
  *           example: 2
  *         dayInWeek:

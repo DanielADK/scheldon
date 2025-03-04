@@ -109,7 +109,7 @@ router.get('/students/:id', studentController.getStudentById);
  *           type: integer
  *     responses:
  *       200:
- *         description: Student's class and subclass history
+ *         description: Student's class and studentGroup history
  *       404:
  *         description: Student not found
  */
