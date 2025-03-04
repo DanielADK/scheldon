@@ -48,33 +48,35 @@ export class SubstitutionEntry extends Model<SubstitutionEntry> {
   @PrimaryKey
   @AutoIncrement
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
+    primaryKey: true,
+    autoIncrement: true,
     allowNull: false
   })
   declare substitutionEntryId: number;
 
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.TINYINT.UNSIGNED,
     allowNull: false
   })
   declare dayInWeek: number;
 
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.TINYINT.UNSIGNED,
     allowNull: false
   })
   declare hourInDay: number;
 
   @ForeignKey(() => Class)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: false
   })
   declare classId: number;
 
   @ForeignKey(() => SubClass)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: true
   })
   declare subClassId: number | null;
@@ -88,14 +90,14 @@ export class SubstitutionEntry extends Model<SubstitutionEntry> {
 
   @ForeignKey(() => Employee)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: false
   })
   declare teacherId: number;
 
   @ForeignKey(() => Room)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: false
   })
   declare roomId: number;

@@ -1,10 +1,12 @@
 import {
+  AutoIncrement,
   BeforeCreate,
   BeforeUpdate,
   BelongsToMany,
   Column,
   DataType,
   Model,
+  PrimaryKey,
   Table
 } from 'sequelize-typescript';
 import { TimetableEntry } from '@models/TimetableEntry';
@@ -30,8 +32,10 @@ import {
   ]
 })
 export class TimetableSet extends Model<TimetableSet> {
+  @PrimaryKey
+  @AutoIncrement
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     primaryKey: true,
     autoIncrement: true
   })

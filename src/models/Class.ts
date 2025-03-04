@@ -41,8 +41,10 @@ import { SubstitutionEntry } from '@models/SubstitutionEntry';
   ]
 })
 export class Class extends Model<Class> {
+  @PrimaryKey
+  @AutoIncrement
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     primaryKey: true,
     autoIncrement: true
   })
