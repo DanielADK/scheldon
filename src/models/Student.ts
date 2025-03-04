@@ -6,7 +6,7 @@ import { StudentAssignment } from '@models/StudentAssignment';
 })
 export class Student extends Model<Student> {
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     primaryKey: true,
     autoIncrement: true
   })

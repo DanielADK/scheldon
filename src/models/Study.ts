@@ -49,9 +49,17 @@ import {
   ]
 })
 export class StudentAssignment extends Model<StudentAssignment> {
+  @PrimaryKey
+  @AutoIncrement
+  @Column({
+    type: DataType.INTEGER.UNSIGNED,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false
+  })
   @ForeignKey(() => Student)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: false
   })
   declare studentId: number;
@@ -61,7 +69,7 @@ export class StudentAssignment extends Model<StudentAssignment> {
 
   @ForeignKey(() => Class)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: false
   })
   declare classId: number;
@@ -71,7 +79,7 @@ export class StudentAssignment extends Model<StudentAssignment> {
 
   @ForeignKey(() => SubClass)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: true
   })
   declare subClassId: number | null;

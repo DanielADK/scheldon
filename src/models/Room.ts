@@ -1,4 +1,5 @@
 import {
+  AutoIncrement,
   BeforeCreate,
   BeforeUpdate,
   BelongsTo,
@@ -6,6 +7,7 @@ import {
   DataType,
   ForeignKey,
   Model,
+  PrimaryKey,
   Table
 } from 'sequelize-typescript';
 import { RoomType } from '@models/types/RoomType';
@@ -16,8 +18,10 @@ import { validateClassroom, validateOffice } from '@validators/roomValidators';
   timestamps: false
 })
 export class Room extends Model<Room> {
+  @PrimaryKey
+  @AutoIncrement
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     primaryKey: true,
     autoIncrement: true
   })
@@ -59,7 +63,7 @@ export class Room extends Model<Room> {
   // Room administrator
   @ForeignKey(() => Employee)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: false
   })
   declare administratorId: number;

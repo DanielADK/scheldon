@@ -60,54 +60,56 @@ export class TimetableEntry extends Model<TimetableEntry> {
   @PrimaryKey
   @AutoIncrement
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
+    primaryKey: true,
+    autoIncrement: true,
     allowNull: false
   })
   declare timetableEntryId: number;
 
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.TINYINT.UNSIGNED,
     allowNull: true
   })
   declare dayInWeek: number;
 
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.TINYINT.UNSIGNED,
     allowNull: true
   })
   declare hourInDay: number;
 
   @ForeignKey(() => Class)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: false
   })
   declare classId: number;
 
   @ForeignKey(() => SubClass)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: true
   })
   declare subClassId: number | null;
 
   @ForeignKey(() => Subject)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: false
   })
   declare subjectId: number;
 
   @ForeignKey(() => Employee)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: false
   })
   declare teacherId: number;
 
   @ForeignKey(() => Room)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: false
   })
   declare roomId: number;

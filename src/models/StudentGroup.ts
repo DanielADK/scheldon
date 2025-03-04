@@ -26,7 +26,7 @@ import { TimetableEntry } from '@models/TimetableEntry';
 })
 export class SubClass extends Model<SubClass> {
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     primaryKey: true,
     autoIncrement: true
   })
@@ -40,7 +40,7 @@ export class SubClass extends Model<SubClass> {
 
   @ForeignKey(() => Class)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: false,
     unique: false
   })

@@ -1,9 +1,11 @@
 import {
+  AutoIncrement,
   BeforeCreate,
   BeforeUpdate,
   Column,
   DataType,
   Model,
+  PrimaryKey,
   Table
 } from 'sequelize-typescript';
 import { validateTeacherWithAbbreviation } from '@validators/teacherValidator';
@@ -12,8 +14,10 @@ import { validateTeacherWithAbbreviation } from '@validators/teacherValidator';
   timestamps: false
 })
 export class Employee extends Model<Employee> {
+  @PrimaryKey
+  @AutoIncrement
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     primaryKey: true,
     autoIncrement: true
   })

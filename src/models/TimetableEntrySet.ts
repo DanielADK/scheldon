@@ -17,7 +17,8 @@ export class TimetableEntrySet extends Model<TimetableEntrySet> {
   @PrimaryKey
   @ForeignKey(() => TimetableEntry)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
+    primaryKey: true,
     allowNull: false
   })
   declare timetableEntryId: number;
@@ -28,7 +29,8 @@ export class TimetableEntrySet extends Model<TimetableEntrySet> {
   @PrimaryKey
   @ForeignKey(() => TimetableSet)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
+    primaryKey: true,
     allowNull: false
   })
   declare timetableSetId: number;

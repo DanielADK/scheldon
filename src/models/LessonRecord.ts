@@ -31,7 +31,7 @@ export class LessonRecord extends Model<LessonRecord> {
   // timetableEntry if exists
   @ForeignKey(() => TimetableEntry)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: true
   })
   declare timetableEntryId: number | null;

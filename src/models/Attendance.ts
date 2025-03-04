@@ -25,7 +25,7 @@ export class Attendance extends Model<Attendance> {
   @PrimaryKey
   @AutoIncrement
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: false,
     primaryKey: true,
     autoIncrement: true
@@ -44,7 +44,7 @@ export class Attendance extends Model<Attendance> {
 
   @ForeignKey(() => Student)
   @Column({
-    type: DataType.INTEGER,
+    type: DataType.INTEGER.UNSIGNED,
     allowNull: false
   })
   declare studentId: number;
