@@ -1,0 +1,90 @@
+### Create new room
+POST http://{{ip}}/rooms
+Content-Type: application/json
+
+{
+  "name": "Classroom 101",
+  "type": "CLASSROOM",
+  "floor": 1,
+  "studentCapacity": 30,
+  "administratorId": 1
+}
+
+> {%
+  client.test("Status is 201", function () {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'roomId'", function () {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("roomId"), "Response does not contain 'roomId'");
+    // Save roomId for subsequent tests
+    client.global.set("createdRoomId", json.roomId);
+  });
+%}
+
+### Get all rooms
+GET http://{{ip}}/rooms
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Content-Type is application/json", function () {
+    const ct = response.headers.valueOf("content-type");
+    client.assert(ct.includes("application/json"), "Expected Content-Type to include application/json, but got " + ct);
+  });
+%}
+
+### Get room by ID
+GET http://{{ip}}/rooms/{{createdRoomId}}
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Response contains required properties", function () {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("roomId"), "Response does not contain 'roomId'");
+    client.assert(json.hasOwnProperty("name"), "Response does not contain 'name'");
+    client.assert(json.hasOwnProperty("type"), "Response does not contain 'type'");
+    client.assert(json.hasOwnProperty("floor"), "Response does not contain 'floor'");
+    client.assert(json.hasOwnProperty("studentCapacity"), "Response does not contain 'studentCapacity'");
+    client.assert(json.hasOwnProperty("administratorId"), "Response does not contain 'administratorId'");
+  });
+%}
+
+### Update room
+PUT http://{{ip}}/rooms/{{createdRoomId}}
+Content-Type: application/json
+
+{
+  "name": "Classroom 102",
+  "type": "LAB",
+  "floor": 2,
+  "studentCapacity": 20,
+  "administratorId": 2
+}
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+%}
+
+### Delete room
+DELETE http://{{ip}}/rooms/{{createdRoomId}}
+
+> {%
+  client.test("Status is 204", function () {
+    client.assert(response.status === 204, "Expected status 204, but got " + response.status);
+  });
+%}
+
+### Verify room deletion (GET on deleted ID)
+GET http://{{ip}}/rooms/{{createdRoomId}}
+
+> {%
+  client.test("Status is 404", function () {
+    client.assert(response.status === 404, "Expected status 404 for a deleted room, but got " + response.status);
+  });
+%}
