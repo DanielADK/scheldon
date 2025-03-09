@@ -1,0 +1,105 @@
+### Create new class
+POST http://{{ip}}/classes
+Content-Type: application/json
+
+{
+  "name": "A1",
+  "validFrom": "2023-09-01",
+  "validTo": "2024-06-30",
+  "roomId": 1,
+  "employeeId": 1
+}
+
+> {%
+  client.test("Status is 201", function () {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'classId'", function () {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("classId"), "Response does not contain 'classId'");
+    // Save classId for subsequent tests
+    client.global.set("createdClassId", json.classId);
+  });
+%}
+
+### Get all classes
+GET http://{{ip}}/classes
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Content-Type is application/json", function () {
+    const ct = response.headers.valueOf("content-type");
+    client.assert(ct.includes("application/json"), "Expected Content-Type to include application/json, but got " + ct);
+  });
+%}
+
+### Get class by ID
+GET http://{{ip}}/classes/{{createdClassId}}
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Response contains requi" +
+    "conred properties", function () {
+    const json = response.body;
+    console.log(json);
+    client.assert(json.hasOwnProperty("classId"), "Response does not contain 'classId'");
+    client.assert(json.hasOwnProperty("name"), "Response does not contain 'name'");
+    client.assert(json.hasOwnProperty("validFrom"), "Response does not contain 'validFrom'");
+    client.assert(json.hasOwnProperty("validTo"), "Response does not contain 'validTo'");
+    client.assert(json.hasOwnProperty("roomId"), "Response does not contain 'roomId'");
+    client.assert(json.hasOwnProperty("employeeId"), "Response does not contain 'employeeId'");
+  });
+%}
+
+### Get classes at a specific time
+GET http://{{ip}}/classes/at-time/2023-10-01T12:00:00Z
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Response is an array", function () {
+    const json = response.body;
+    client.assert(Array.isArray(json), "Response is not an array");
+  });
+%}
+
+### Update class
+PUT http://{{ip}}/classes/{{createdClassId}}
+Content-Type: application/json
+
+{
+  "name": "A1a",
+  "validFrom": "2023-09-01",
+  "validTo": "2024-06-30",
+  "roomId": 1,
+  "employeeId": 1
+}
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+%}
+
+### Delete class
+DELETE http://{{ip}}/classes/{{createdClassId}}
+
+> {%
+  client.test("Status is 204", function () {
+    client.assert(response.status === 204, "Expected status 204, but got " + response.status);
+  });
+%}
+
+### Verify class deletion (GET on deleted ID)
+GET http://{{ip}}/classes/{{createdClassId}}
+
+> {%
+  client.test("Status is 404", function () {
+    client.assert(response.status === 404, "Expected status 404 for a deleted class, but got " + response.status);
+  });
+%}
