@@ -1,14 +1,11 @@
-import {
-  AbstractTimetableAdapter,
-  TimetableModels
-} from '@services/transformers/AbstractTimetableAdapter';
+import { AbstractTimetableAdapter, TimetableModels } from '@services/transformers/AbstractTimetableAdapter';
 import { SubstitutionType } from '@models/types/SubstitutionType';
 
 /**
  * Single lesson entry format
  */
 export interface SimpleLessonEntry {
-  lessonId?: string;
+  lessonId?: number;
   teacher?: {
     name: string;
     surname: string;
@@ -21,7 +18,8 @@ export interface SimpleLessonEntry {
   class?: { name: string };
   studentGroup?: { name: string };
   room?: { name: string };
-  type?: string;
+  // type of
+  substitutionType?: string;
 }
 
 /**
@@ -44,24 +42,20 @@ export interface TimetableExport {
 /**
  * Function type for transformation of TimetableEntries into specified format
  */
-export type maskService = (
-  entry: SimpleLessonEntry
-) => Promise<SimpleLessonEntry>;
+export type maskService = (entry: SimpleLessonEntry) => Promise<SimpleLessonEntry>;
 
 /**
  * Transformer of TimeTableEntry to by-class-interested format
  * @param entry TimetableEntry
  */
-export const classMask = async (
-  entry: SimpleLessonEntry
-): Promise<SimpleLessonEntry> => {
+export const classMask = async (entry: SimpleLessonEntry): Promise<SimpleLessonEntry> => {
   return {
     ...(entry.lessonId !== null && { lessonId: entry.lessonId }),
     teacher: entry.teacher,
     subject: entry.subject,
     ...(entry.studentGroup !== null && { studentGroup: entry.studentGroup }),
     room: entry.room,
-    ...(entry.type !== null && { type: entry.type })
+    ...(entry.substitutionType !== null && { type: entry.substitutionType })
   } as SimpleLessonEntry;
 };
 
@@ -69,16 +63,14 @@ export const classMask = async (
  * Transformer of TimeTableEntry to by-employee-interested format
  * @param entry TimetableEntry
  */
-export const employeeMask = async (
-  entry: SimpleLessonEntry
-): Promise<SimpleLessonEntry> => {
+export const employeeMask = async (entry: SimpleLessonEntry): Promise<SimpleLessonEntry> => {
   return {
     ...(entry.lessonId !== null && { lessonId: entry.lessonId }),
     subject: entry.subject,
     class: entry.class,
     ...(entry.studentGroup !== null && { studentGroup: entry.studentGroup }),
     room: entry.room,
-    ...(entry.type !== null && { type: entry.type })
+    ...(entry.substitutionType !== null && { type: entry.substitutionType })
   } as SimpleLessonEntry;
 };
 
@@ -86,16 +78,14 @@ export const employeeMask = async (
  * Transformer of TimeTableEntry to by-room-interested format
  * @param entry TimetableEntry
  */
-export const roomMask = async (
-  entry: SimpleLessonEntry
-): Promise<SimpleLessonEntry> => {
+export const roomMask = async (entry: SimpleLessonEntry): Promise<SimpleLessonEntry> => {
   return {
     ...(entry.lessonId !== null && { lessonId: entry.lessonId }),
     teacher: entry.teacher,
     subject: entry.subject,
     class: entry.class,
     ...(entry.studentGroup !== null && { studentGroup: entry.studentGroup }),
-    ...(entry.type !== null && { type: entry.type })
+    ...(entry.substitutionType !== null && { type: entry.substitutionType })
   } as SimpleLessonEntry;
 };
 
@@ -103,12 +93,10 @@ export const roomMask = async (
  * Mask the dropped lessons
  * @param entry TimetableEntry
  */
-export const droppedMask = async (
-  entry: SimpleLessonEntry
-): Promise<SimpleLessonEntry> => {
+export const droppedMask = async (entry: SimpleLessonEntry): Promise<SimpleLessonEntry> => {
   return {
     lessonId: entry.lessonId,
-    type: entry.type
+    substitutionType: entry.substitutionType
   } as SimpleLessonEntry;
 };
 
@@ -138,10 +126,7 @@ export const transformAndMask = async <T extends TimetableModels>(
  * @param timetable TimetableEntrySet[]
  * @param transformerFunction entryTransformer function to transform the entries into the desired format
  */
-export const transformTimetable = async (
-  timetable: TimeLessonEntry[],
-  transformerFunction: maskService
-): Promise<TimetableExport> => {
+export const transformTimetable = async (timetable: TimeLessonEntry[], transformerFunction: maskService): Promise<TimetableExport> => {
   // Transform the results into a 2D object
   const timetable2D: TimetableExport = {};
 
@@ -158,10 +143,7 @@ export const transformTimetable = async (
     // Add the entry to the timetable
     const lesson: SimpleLessonEntry = await transformerFunction(entry);
 
-    timetable2D[day][hour] =
-      lesson.type === SubstitutionType.DROPPED
-        ? await droppedMask(lesson)
-        : lesson;
+    timetable2D[day][hour] = lesson.substitutionType === SubstitutionType.DROPPED ? await droppedMask(lesson) : lesson;
   }
 
   return timetable2D;

@@ -61,9 +61,7 @@ export const getStudentById = async (id: number): Promise<Student | null> => {
  * Get student's history
  * @param id
  */
-export const getStudentsHistory = async (
-  id: number
-): Promise<Study[] | null> => {
+export const getStudentsHistory = async (id: number): Promise<Study[] | null> => {
   return await Study.findAll({
     attributes: ['validFrom', 'validTo'],
     where: {
@@ -87,10 +85,7 @@ export const getStudentsHistory = async (
  * @param id
  * @param data
  */
-export const updateStudent = async (
-  id: number,
-  data: StudentDTO
-): Promise<[affectedCount: number]> => {
+export const updateStudent = async (id: number, data: StudentDTO): Promise<[affectedCount: number]> => {
   return await Student.update(data, {
     where: { studentId: id }
   });

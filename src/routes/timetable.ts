@@ -2,7 +2,7 @@ import Router from 'koa-router';
 import * as timetableController from '@controllers/timetableController';
 import { timetableGetByIdController } from '@controllers/timetableController';
 import * as timetableService from '@services/timetableService';
-import * as lessonRecordController from '@controllers/lessonRecordController';
+import * as lessonRecordController from '@controllers/substitutionTimetableController';
 
 const router = new Router();
 /**
@@ -60,7 +60,7 @@ const router = new Router();
  *         - name
  *         - validFrom
  *         - validTo
- * /timetables/set/{id}/entry:
+ * /timetables/stable/set/{id}/entry:
  *   post:
  *     tags:
  *       - Timetable
@@ -88,11 +88,11 @@ const router = new Router();
  *       404:
  *         description: Timetable set not found
  */
-router.post('/timetables/set/:id/entry', timetableController.createTEntry);
+router.post('/timetables/stable/set/:id/entry', timetableController.createTEntry);
 
 /**
  * @openapi
- * /timetables/set:
+ * /timetables/stable/set:
  *   post:
  *     tags:
  *       - Timetable
@@ -110,11 +110,11 @@ router.post('/timetables/set/:id/entry', timetableController.createTEntry);
  *       400:
  *         description: Bad request
  */
-router.post('/timetables/set', timetableController.createTSet);
+router.post('/timetables/stable/set', timetableController.createTSet);
 
 /**
  * @openapi
- * /timetables/class/{id}:
+ * /timetables/stable/class/{id}:
  *   get:
  *     tags:
  *       - Timetable
@@ -133,13 +133,11 @@ router.post('/timetables/set', timetableController.createTSet);
  *       404:
  *         description: Timetable not found
  */
-router.get('/timetables/class/:id', (ctx) =>
-  timetableGetByIdController(ctx, timetableService.getTimetableByClassId)
-);
+router.get('/timetables/stable/class/:id', (ctx) => timetableGetByIdController(ctx, timetableService.getTimetableByClassId));
 
 /**
  * @openapi
- * /timetables/class/{id}/at/{date}:
+ * /timetables/stable/class/{id}/at/{date}:
  *   get:
  *     tags:
  *       - Timetable
@@ -165,7 +163,7 @@ router.get('/timetables/class/:id', (ctx) =>
  *       404:
  *         description: Timetable not found
  */
-/*router.get('/timetables/class/:id/at/:date', (ctx) =>
+/*router.get('/timetables/stable/class/:id/at/:date', (ctx) =>
   getCurrentTimetableByIdController(
     ctx,
     lessonRecordService.getTimetableByClassId
@@ -174,7 +172,7 @@ router.get('/timetables/class/:id', (ctx) =>
 
 /**
  * @openapi
- * /timetables/teacher/{id}:
+ * /timetables/stable/teacher/{id}:
  *   get:
  *     tags:
  *       - Timetable
@@ -193,13 +191,11 @@ router.get('/timetables/class/:id', (ctx) =>
  *       404:
  *         description: Timetable not found
  */
-router.get('/timetables/teacher/:id', (ctx) =>
-  timetableGetByIdController(ctx, timetableService.getTimetableByEmployeeId)
-);
+router.get('/timetables/stable/teacher/:id', (ctx) => timetableGetByIdController(ctx, timetableService.getTimetableByEmployeeId));
 
 /**
  * @openapi
- * /timetables/teacher/{id}/at/{date}:
+ * /timetables/stable/teacher/{id}/at/{date}:
  *   get:
  *     tags:
  *       - Timetable
@@ -225,7 +221,7 @@ router.get('/timetables/teacher/:id', (ctx) =>
  *       404:
  *         description: Timetable not found
  */
-/*router.get('/timetables/teacher/:id/at/:date', (ctx) =>
+/*router.get('/timetables/stable/teacher/:id/at/:date', (ctx) =>
   getCurrentTimetableByIdController(
     ctx,
     lessonRecordService.getTimetableByEmployeeId
@@ -234,7 +230,7 @@ router.get('/timetables/teacher/:id', (ctx) =>
 
 /**
  * @openapi
- * /timetables/room/{id}:
+ * /timetables/stable/room/{id}:
  *   get:
  *     tags:
  *       - Timetable
@@ -260,13 +256,11 @@ router.get('/timetables/teacher/:id', (ctx) =>
  *       404:
  *         description: Timetable not found
  */
-router.get('/timetables/room/:id', (ctx) =>
-  timetableGetByIdController(ctx, timetableService.getTimetableByRoomId)
-);
+router.get('/timetables/stable/room/:id', (ctx) => timetableGetByIdController(ctx, timetableService.getTimetableByRoomId));
 
 /**
  * @openapi
- * /timetables/room/{id}/at/{date}:
+ * /timetables/stable/room/{id}/at/{date}:
  *   get:
  *     tags:
  *       - Timetable
@@ -292,23 +286,14 @@ router.get('/timetables/room/:id', (ctx) =>
  *       404:
  *         description: Timetable not found
  */
-/*router.get('/timetables/room/:id/at/:date', (ctx) =>
-  getCurrentTimetableByIdController(
-    ctx,
-    lessonRecordService.getTimetableByRoomId
-  )
-);*/
+router.get('/timetables/stable/room/:id/at/:date', (ctx) => timetableGetByIdController(ctx, timetableService.getTimetableByRoomId));
 
 // Temporary lessons
-router.post(
-  '/timetables/temporary/lesson',
-  lessonRecordController.createCustomLessonRecord
-);
+/*router.post('/timetables/real/class/:id/at/:date', (ctx) =>
+  timetableGetByIdController(ctx, substitutionTimetableService.timetableGetByIdController)
+);*/
 
 // Restore lesson
-router.delete(
-  '/timetables/temporary/lesson/:id',
-  lessonRecordController.deleteLessonRecord
-);
+router.delete('/timetables/temporary/lesson/:id', lessonRecordController.deleteLessonRecord);
 
 export default router;

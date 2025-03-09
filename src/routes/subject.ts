@@ -136,10 +136,7 @@ router.get('/subjects/:id', subjectController.getSubjectById);
  *       404:
  *         description: Subject not found
  */
-router.get(
-  '/subjects/abbreviation/:abbreviation',
-  subjectController.getSubjectByAbbreviation
-);
+router.get('/subjects/abbreviation/:abbreviation', subjectController.getSubjectByAbbreviation);
 /**
  * Update a subject
  * PUT /subjects/{id}

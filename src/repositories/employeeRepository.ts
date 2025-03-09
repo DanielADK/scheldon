@@ -47,10 +47,7 @@ export const createEmployee = async (data: EmployeeDTO): Promise<Employee> => {
  * @param limit
  * @param offset
  */
-export const getEmployees = async (
-  limit: number,
-  offset: number
-): Promise<{ rows: Employee[]; count: number }> => {
+export const getEmployees = async (limit: number, offset: number): Promise<{ rows: Employee[]; count: number }> => {
   const { rows, count } = await Employee.findAndCountAll({
     limit,
     offset,
@@ -76,9 +73,7 @@ export const getEmployeeById = async (id: number): Promise<Employee | null> => {
  * Get employee by username
  * @param username
  */
-export const getEmployeeByUsername = async (
-  username: string
-): Promise<Employee | null> => {
+export const getEmployeeByUsername = async (username: string): Promise<Employee | null> => {
   return await Employee.findOne({
     where: { username: username },
     attributes: employeeAttributes
@@ -89,9 +84,7 @@ export const getEmployeeByUsername = async (
  * Get employee by abbreviation
  * @param abbreviation
  */
-export const getEmployeeByAbbreviation = async (
-  abbreviation: string
-): Promise<Employee | null> => {
+export const getEmployeeByAbbreviation = async (abbreviation: string): Promise<Employee | null> => {
   return await Employee.findOne({
     where: { abbreviation: abbreviation },
     attributes: employeeAttributes
@@ -103,10 +96,7 @@ export const getEmployeeByAbbreviation = async (
  * @param id
  * @param data
  */
-export const updateEmployee = async (
-  id: number,
-  data: Partial<Employee>
-): Promise<[number, Employee[]]> => {
+export const updateEmployee = async (id: number, data: Partial<Employee>): Promise<[number, Employee[]]> => {
   return await Employee.update(data, {
     where: { employeeId: id },
     returning: true

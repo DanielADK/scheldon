@@ -1,5 +1,5 @@
 import Router from 'koa-router';
-import * as studentAssignmentController from '@controllers/studentAssignmentController';
+import * as studentAssignmentController from '@controllers/studyController';
 
 const router = new Router();
 
@@ -84,17 +84,14 @@ const router = new Router();
  *                   type: string
  *                   example: "Assignment already exists in the validity period"
  */
-router.post(
-  '/students/:studentId/assign',
-  studentAssignmentController.assignStudent
-);
+router.post('/students/:studentId/assign', studentAssignmentController.assignStudent);
 
 /**
  * @openapi
  * /students/{studentId}/unassign:
  *   delete:
  *     tags:
- *       - Student Assignment
+ *       - Study
  *     summary: Unassign a student from a class or studentGroup
  *     description: Terminates the assignment of a student from a class or studentGroup.
  *     parameters:
@@ -139,9 +136,6 @@ router.post(
  *                   example: "Student is not assigned to the class"
  */
 // Terminate assignment (end of study)
-router.delete(
-  '/students/:studentId/unassign',
-  studentAssignmentController.unassignStudent
-);
+router.delete('/students/:studentId/unassign', studentAssignmentController.unassignStudent);
 
 export default router;

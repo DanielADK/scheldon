@@ -1,23 +1,11 @@
 import { TimetableSet } from '@models/TimetableSet';
 import * as timetableRepository from '@repositories/timetableRepository';
-import {
-  TimetableEntryDTO,
-  TimetableSetDTO
-} from '@repositories/timetableRepository';
+import { TimetableEntryDTO, TimetableSetDTO } from '@repositories/timetableRepository';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { TimetableAdapter } from '@services/transformers/timetableAdapter';
-import {
-  classMask,
-  employeeMask,
-  roomMask,
-  TimetableExport,
-  transformAndMask
-} from '@services/transformers/timetableExport';
+import { classMask, employeeMask, roomMask, TimetableExport, transformAndMask } from '@services/transformers/timetableExport';
 
-export const createTEntry = async (
-  tsetId: number,
-  tentry: TimetableEntryDTO
-): Promise<TimetableEntry> => {
+export const createTEntry = async (tsetId: number, tentry: TimetableEntryDTO): Promise<TimetableEntry> => {
   // Verify the timetable set exists
   const tset = await TimetableSet.findByPk(tsetId);
   if (!tset) {
@@ -27,9 +15,7 @@ export const createTEntry = async (
   return await timetableRepository.createTEntry(tset, tentry);
 };
 
-export const createTSet = async (
-  tset: TimetableSetDTO
-): Promise<TimetableSet> => {
+export const createTSet = async (tset: TimetableSetDTO): Promise<TimetableSet> => {
   return await timetableRepository.createTSet(tset);
 };
 
@@ -37,9 +23,7 @@ export const createTSet = async (
  * Get timetable by class ID
  * @param classId int
  */
-export const getTimetableByClassId = async (
-  classId: number
-): Promise<TimetableExport | null> => {
+export const getTimetableByClassId = async (classId: number): Promise<TimetableExport | null> => {
   const timetable = await timetableRepository.getTimetableByParam({
     classId: classId
   });
@@ -50,9 +34,7 @@ export const getTimetableByClassId = async (
  * Get timetable by employee ID
  * @param employeeId int
  */
-export const getTimetableByEmployeeId = async (
-  employeeId: number
-): Promise<TimetableExport | null> => {
+export const getTimetableByEmployeeId = async (employeeId: number): Promise<TimetableExport | null> => {
   const timetable = await timetableRepository.getTimetableByParam({
     teacherId: employeeId
   });
@@ -63,9 +45,7 @@ export const getTimetableByEmployeeId = async (
  * Get timetable by room ID
  * @param roomId int
  */
-export const getTimetableByRoomId = async (
-  roomId: number
-): Promise<TimetableExport | null> => {
+export const getTimetableByRoomId = async (roomId: number): Promise<TimetableExport | null> => {
   const timetable = await timetableRepository.getTimetableByParam({
     roomId: roomId
   });

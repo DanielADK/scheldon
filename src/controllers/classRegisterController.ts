@@ -12,14 +12,7 @@ const createClassRegisterSchema = Joi.object({
   studentAttendance: Joi.array().items(
     Joi.object({
       studentId: Joi.number().required(),
-      present: Joi.string()
-        .required()
-        .uppercase()
-        .valid(
-          AttendanceType.PRESENT,
-          AttendanceType.NOT_PRESENT,
-          AttendanceType.LATE_ARRIVAL
-        )
+      present: Joi.string().required().uppercase().valid(AttendanceType.PRESENT, AttendanceType.NOT_PRESENT, AttendanceType.LATE_ARRIVAL)
     })
   )
 });
@@ -51,14 +44,11 @@ export const finishLessonRecord = async (ctx: Context): Promise<void> => {
  * Get the current lesson record by teacher ID
  * @param ctx Koa context
  */
-export const getCurrentLessonByTeacherId = async (
-  ctx: Context
-): Promise<void> => {
+export const getCurrentLessonByTeacherId = async (ctx: Context): Promise<void> => {
   const teacherId: number = parseInt(ctx.params.id);
 
   try {
-    const lessonData =
-      await classRegisterService.getCurrentLessonForTeacher(teacherId);
+    const lessonData = await classRegisterService.getCurrentLessonForTeacher(teacherId);
 
     if (!lessonData) {
       ctx.status = 404;
@@ -77,7 +67,7 @@ export const getCurrentLessonByTeacherId = async (
  * Get the current lesson record by lessonID
  * @param ctx Koa context
  */
-export const getCurrentLessonByLessonId = async (
+/*export const getCurrentLessonByLessonId = async (
   ctx: Context
 ): Promise<void> => {
   const lessonId: string = ctx.params.id;
@@ -97,4 +87,4 @@ export const getCurrentLessonByLessonId = async (
   } catch (error) {
     handleError(ctx, error);
   }
-};
+};*/

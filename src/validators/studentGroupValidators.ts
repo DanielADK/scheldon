@@ -3,9 +3,7 @@ import { StudentGroup } from '@models/StudentGroup';
 /**
  * Validate unique combination of classId and name
  */
-export const validatestudentGroupNameAndClass = async (
-  instance: StudentGroup
-) => {
+export const validatestudentGroupNameAndClass = async (instance: StudentGroup) => {
   const existingstudentGroup = await StudentGroup.findOne({
     where: {
       name: instance.name,

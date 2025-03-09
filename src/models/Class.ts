@@ -111,7 +111,7 @@ export class Class extends Model<Class> {
   declare substitutionEntries: SubstitutionEntry[];
 
   @HasMany(() => StudentGroup)
-  declare studentGroupes: StudentGroup[];
+  declare studentGroups: StudentGroup[];
 
   @HasMany(() => Study)
   declare studentAssignments: Study[];

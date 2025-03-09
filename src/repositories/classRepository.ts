@@ -14,14 +14,7 @@ export interface ClassDTO {
   createdAt?: string;
 }
 
-const classAttributes: FindAttributeOptions = [
-  ['classId', 'id'],
-  'name',
-  'validFrom',
-  'validTo',
-  'roomId',
-  ['employeeId', 'classTeacherId']
-];
+const classAttributes: FindAttributeOptions = ['classId', 'name', 'validFrom', 'validTo', 'roomId', 'employeeId'];
 
 /**
  * Create a new class
@@ -34,10 +27,7 @@ export const createClass = async (data: ClassDTO): Promise<Class> => {
 /**
  * Get all classes now
  */
-export const getClasses = async (
-  limit: number,
-  offset: number
-): Promise<{ rows: Class[]; count: number }> => {
+export const getClasses = async (limit: number, offset: number): Promise<{ rows: Class[]; count: number }> => {
   const { rows, count } = await Class.findAndCountAll({
     limit,
     offset,
@@ -49,7 +39,7 @@ export const getClasses = async (
     include: [
       {
         model: StudentGroup,
-        as: 'studentGroupes',
+        as: 'studentGroups',
         required: false
       }
     ]
@@ -69,7 +59,7 @@ export const getClassById = async (classId: number): Promise<Class | null> => {
     include: [
       {
         model: StudentGroup,
-        as: 'studentGroupes',
+        as: 'studentGroups',
         attributes: ['studentGroupId', 'name']
       }
     ]
@@ -80,9 +70,7 @@ export const getClassById = async (classId: number): Promise<Class | null> => {
  * Get classes at time
  * @param time
  */
-export const getClassesAtTime = async (
-  time: string
-): Promise<Class[] | null> => {
+export const getClassesAtTime = async (time: string): Promise<Class[] | null> => {
   return await Class.findAll({
     where: {
       validFrom: { [Op.lte]: time },
@@ -92,7 +80,7 @@ export const getClassesAtTime = async (
     include: [
       {
         model: StudentGroup,
-        as: 'studentGroupes',
+        as: 'studentGroups',
         attributes: ['studentGroupId', 'name']
       }
     ]
@@ -104,10 +92,7 @@ export const getClassesAtTime = async (
  * @param classId
  * @param data
  */
-export const updateClass = async (
-  classId: number,
-  data: ClassDTO
-): Promise<[number]> => {
+export const updateClass = async (classId: number, data: ClassDTO): Promise<[number]> => {
   return await Class.update(data, {
     where: { classId: classId }
   });

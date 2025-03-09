@@ -15,10 +15,10 @@ import { StudentGroup } from '@models/StudentGroup';
 import { Student } from '@models/Student';
 import {
   validateClassDates,
-  validateClassExistsWhenstudentGroup,
+  validateClassExistsWhenStudentGroup,
   validateExclusiveClassAssignment,
   validatestudentGroupBelongsToClass
-} from '@validators/studentAssignmentValidators';
+} from '@validators/studyValidators';
 
 @Table({
   timestamps: false,
@@ -114,9 +114,7 @@ export class Study extends Model<Study> {
       validatestudentGroupBelongsToClass(instance),
       validateClassDates(instance),
       validateExclusiveClassAssignment(instance),
-      instance.studentGroupId
-        ? validateClassExistsWhenstudentGroup(instance)
-        : null
+      instance.studentGroupId ? validateClassExistsWhenStudentGroup(instance) : null
     ]);
   }
 }

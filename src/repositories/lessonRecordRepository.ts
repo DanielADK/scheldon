@@ -31,9 +31,7 @@ export interface LessonRecordDTO {
  * If lesson record does not exist, create a new lesson record with custom identifiers
  * @param data LessonRecordDTO
  */
-export const createCustomLesson = async (
-  data: LessonRecordDTO
-): Promise<LessonRecord> => {
+export const createCustomLesson = async (data: LessonRecordDTO): Promise<LessonRecord> => {
   // Dropped with DELETE method
   if (data.type === SubstitutionType.DROPPED) {
     throw new Error('Use DELETE method for dropping lessons');
@@ -45,7 +43,7 @@ export const createCustomLesson = async (
     classId: data.classId
   };
   // Only include studentGroupId in the where clause if it's defined
-  if (data.studentGroupId !== undefined) {
+  if (data.studentGroupId !== null && data.studentGroupId !== undefined) {
     whereClause.studentGroupId = data.studentGroupId ?? { [Op.is]: null };
   }
 
@@ -125,9 +123,7 @@ export const deleteLessonRecord = async (id: string): Promise<void> => {
 
     // If timetableEntryId is already null, nothing to restore
     if (!lessonRecord.timetableEntryId) {
-      throw new Error(
-        'This lesson record is already in a custom state, cannot restore.'
-      );
+      throw new Error('This lesson record is already in a custom state, cannot restore.');
     }
 
     // Find the default timetable entry for the lesson record
@@ -208,10 +204,7 @@ export const findDefaultTimetableEntry = async (
  * @param tset TimetableSet
  * @param data TimetableEntryDTO
  */
-export const getLessonBulkInTSetPeriod = async (
-  tset: TimetableSet,
-  data: TimetableEntry
-): Promise<LessonRecord[]> => {
+export const getLessonBulkInTSetPeriod = async (tset: TimetableSet, data: TimetableEntry): Promise<LessonRecord[]> => {
   const lessons: LessonRecord[] = [];
   const validTo: Date = new Date(tset.validTo);
   const date: Date = new Date(tset.validFrom);
@@ -247,10 +240,7 @@ export const getLessonBulkInTSetPeriod = async (
  * @param where WhereOptions
  * @param time Date
  */
-export const getCurrentWeekTimetableByParam = async (
-  where: WhereOptions = {},
-  time: Date = new Date()
-): Promise<LessonRecord[] | null> => {
+export const getCurrentWeekTimetableByParam = async (where: WhereOptions = {}, time: Date = new Date()): Promise<LessonRecord[] | null> => {
   const { start, end } = getWeekRange(time);
 
   return await LessonRecord.findAll({
@@ -296,17 +286,6 @@ export const getCurrentWeekTimetableByParam = async (
         attributes: ['name']
       }
     ],
-    attributes: [
-      'lessonId',
-      'dayInWeek',
-      'hourInDay',
-      'classId',
-      'studentGroupId',
-      'subjectId',
-      'teacherId',
-      'roomId',
-      'date',
-      'type'
-    ]
+    attributes: ['lessonId', 'dayInWeek', 'hourInDay', 'classId', 'studentGroupId', 'subjectId', 'teacherId', 'roomId', 'date', 'type']
   });
 };

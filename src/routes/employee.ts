@@ -165,10 +165,7 @@ router.get('/employees/:id', employeeController.getEmployeeById);
  *       404:
  *         description: Employee not found
  */
-router.get(
-  '/employees/username/:username',
-  employeeController.getEmployeeByUsername
-);
+router.get('/employees/username/:username', employeeController.getEmployeeByUsername);
 
 /**
  * Get an employee by abbreviation
@@ -191,10 +188,7 @@ router.get(
  *       404:
  *         description: Employee not found
  */
-router.get(
-  '/employees/abbreviation/:abbreviation',
-  employeeController.getEmployeeByAbbreviation
-);
+router.get('/employees/abbreviation/:abbreviation', employeeController.getEmployeeByAbbreviation);
 
 /**
  * Update an employee

@@ -37,10 +37,7 @@ export const getRoomById = async (id: number): Promise<Room | null> => {
 /**
  * Get all rooms
  */
-export const getAllRooms = async (
-  limit: number,
-  offset: number
-): Promise<{ rows: Room[]; count: number }> => {
+export const getAllRooms = async (limit: number, offset: number): Promise<{ rows: Room[]; count: number }> => {
   const { rows, count } = await Room.findAndCountAll({
     limit,
     offset
@@ -54,10 +51,7 @@ export const getAllRooms = async (
  * @param id
  * @param data
  */
-export const updateRoom = async (
-  id: number,
-  data: RoomDTO
-): Promise<[affectedCount: number]> => {
+export const updateRoom = async (id: number, data: RoomDTO): Promise<[affectedCount: number]> => {
   return await Room.update(data, { where: { roomId: id } });
 };
 

@@ -1,7 +1,4 @@
-import {
-  TimetableEntryDTO,
-  TimetableSetDTO
-} from '@repositories/timetableRepository';
+import { TimetableEntryDTO, TimetableSetDTO } from '@repositories/timetableRepository';
 
 function addDays(date: Date, days: number) {
   const copy = new Date(Number(date));

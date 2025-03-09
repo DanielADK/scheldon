@@ -10,3 +10,6 @@ export const CLASS_HOURS = [
   { hour: 8, start: '14:55', end: '15:40' },
   { hour: 9, start: '15:50', end: '16:35' }
 ];
+
+export const DAY_COUNT = 5;
+export const HOUR_COUNT = CLASS_HOURS.length;

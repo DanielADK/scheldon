@@ -7,7 +7,7 @@ const router = new Router();
  * @openapi
  * components:
  *   schemas:
- *     LessonRecord:
+ *     ClassRegister:
  *       type: object
  *       properties:
  *         classId:
@@ -33,7 +33,7 @@ const router = new Router();
  *           example: 101
  *         topic:
  *           type: string
- *           example: "Introduction to Quantum Mechanics"
+ *           example: "Introduction to Jara Cimrman's work"
  *         date:
  *           type: string
  *           format: date
@@ -41,11 +41,10 @@ const router = new Router();
  *         type:
  *           type: string
  *           enum:
- *             - TIME_MOVE
- *             - OVER_WORKFLOW
+ *             - APPEND
  *             - DROPPED
  *             - MERGED
- *           example: "TIME_MOVE"
+ *           example: "APPEND"
  */
 
 /**
@@ -60,14 +59,14 @@ const router = new Router();
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/LessonRecord'
+ *             $ref: '#/components/schemas/ClassRegister'
  *     responses:
  *       201:
  *         description: LessonRecord created successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/LessonRecord'
+ *               $ref: '#/components/schemas/ClassRegister'
  *       400:
  *         description: Bad request, validation failed
  *         content:
@@ -87,18 +86,44 @@ const router = new Router();
  *                 error:
  *                   type: string
  */
-router.get(
-  '/classregister/current/teacher/:id',
-  classRegisterController.getCurrentLessonByTeacherId
-);
-router.get(
+router.post('/classregister/finish', classRegisterController.finishLessonRecord);
+
+/**
+ * @openapi
+ * /classregister/current/teacher/{id}:
+ *   get:
+ *     tags:
+ *       - Class register
+ *     summary: Get the current lesson by teacher ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the teacher
+ *     responses:
+ *       200:
+ *         description: Current lesson data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ClassRegister'
+ *       404:
+ *         description: Lesson not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+router.get('/classregister/teacher/:id/current', classRegisterController.getCurrentLessonByTeacherId);
+//router.get('/classregister/teacher/:id/date/:date', classRegisterController.getLessonByTeacherIdAndDate);
+/*router.get(
   '/classregister/current/lesson/:id',
   classRegisterController.getCurrentLessonByLessonId
-);
-
-router.post(
-  '/classregister/finish',
-  classRegisterController.finishLessonRecord
-);
+);*/
 
 export default router;

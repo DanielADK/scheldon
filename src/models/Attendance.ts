@@ -1,13 +1,4 @@
-import {
-  AutoIncrement,
-  BelongsTo,
-  Column,
-  DataType,
-  ForeignKey,
-  Model,
-  PrimaryKey,
-  Table
-} from 'sequelize-typescript';
+import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import { LessonRecord } from '@models/LessonRecord';
 import { Student } from '@models/Student';
 import { AttendanceType } from '@models/types/AttendanceType';
