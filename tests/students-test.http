@@ -1,0 +1,80 @@
+### Create new student
+POST http://{{ip}}/students
+Content-Type: application/json
+
+{
+  "username": "jdoe",
+  "name": "John",
+  "surname": "Doe"
+}
+
+> {%
+  client.test("Status is 201", function () {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'studentId'", function () {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("studentId"), "Response does not contain 'studentId'");
+    // Save studentId for subsequent tests
+    client.global.set("createdStudentId", json.studentId);
+  });
+%}
+
+### Get student by ID
+GET http://{{ip}}/students/{{createdStudentId}}
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Response contains required properties", function () {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("studentId"), "Response does not contain 'studentId'");
+    client.assert(json.hasOwnProperty("username"), "Response does not contain 'username'");
+    client.assert(json.hasOwnProperty("name"), "Response does not contain 'name'");
+    client.assert(json.hasOwnProperty("surname"), "Response does not contain 'surname'");
+  });
+%}
+
+### Get student's history
+GET http://{{ip}}/students/{{createdStudentId}}/history
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+%}
+
+### Update student
+PUT http://{{ip}}/students/{{createdStudentId}}
+Content-Type: application/json
+
+{
+  "username": "jdoe",
+  "name": "John",
+  "surname": "Smith"
+}
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+%}
+
+### Delete student
+DELETE http://{{ip}}/students/{{createdStudentId}}
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+%}
+
+### Verify student deletion (GET on deleted student)
+GET http://{{ip}}/students/{{createdStudentId}}
+
+> {%
+  client.test("Status is 404", function () {
+    client.assert(response.status === 404, "Expected status 404 for a deleted student, but got " + response.status);
+  });
+%}
