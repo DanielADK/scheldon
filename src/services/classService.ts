@@ -42,7 +42,7 @@ export const getClassesAtTime = async (time: string): Promise<Class[] | null> =>
  * @param classId
  * @param data
  */
-export const updateClass = async (classId: number, data: ClassDTO): Promise<Class | null> => {
+export const updateClass = async (classId: number, data: ClassDTO): Promise<Class> => {
   const existingClass = await classRepository.getClassById(classId);
   if (!existingClass) {
     throw new Error('Class not found');
