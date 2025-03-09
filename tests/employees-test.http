@@ -1,0 +1,119 @@
+### Create new employee
+POST http://{{ip}}/employees
+Content-Type: application/json
+
+{
+  "username": "jdoe",
+  "name": "John",
+  "surname": "Doe",
+  "degreePre": "Dr.",
+  "degreePost": "PhD",
+  "abbreviation": "JD",
+  "isTeacher": true
+}
+
+> {%
+  client.test("Status is 201", function () {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'employeeId'", function () {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("employeeId"), "Response does not contain 'employeeId'");
+    // Save employeeId for subsequent tests
+    client.global.set("createdEmployeeId", json.employeeId);
+  });
+%}
+
+### Get all employees
+GET http://{{ip}}/employees
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Content-Type is application/json", function () {
+    const ct = response.headers.valueOf("content-type");
+    client.assert(ct.includes("application/json"), "Expected Content-Type to include application/json, but got " + ct);
+  });
+%}
+
+### Get employee by ID
+GET http://{{ip}}/employees/{{createdEmployeeId}}
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Response contains required properties", function () {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("employeeId"), "Response does not contain 'employeeId'");
+    client.assert(json.hasOwnProperty("username"), "Response does not contain 'username'");
+    client.assert(json.hasOwnProperty("name"), "Response does not contain 'name'");
+    client.assert(json.hasOwnProperty("surname"), "Response does not contain 'surname'");
+    client.assert(json.hasOwnProperty("isTeacher"), "Response does not contain 'isTeacher'");
+  });
+%}
+
+### Get employee by username
+GET http://{{ip}}/employees/username/jdoe
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Response contains 'username' equal to 'jdoe'", function () {
+    const json = response.body;
+    client.assert(json.username === "jdoe", "Expected username 'jdoe', but got " + json.username);
+  });
+%}
+
+### Get employee by abbreviation
+GET http://{{ip}}/employees/abbreviation/JD
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Response contains 'abbreviation' equal to 'JD'", function () {
+    const json = response.body;
+    client.assert(json.abbreviation === "JD", "Expected abbreviation 'JD', but got " + json.abbreviation);
+  });
+%}
+
+### Update employee
+PUT http://{{ip}}/employees/{{createdEmployeeId}}
+Content-Type: application/json
+
+{
+  "username": "jdoe",
+  "name": "John",
+  "surname": "Smithers",
+  "degreePre": "Dr.",
+  "degreePost": "PhD",
+  "abbreviation": "JD",
+  "isTeacher": true
+}
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+%}
+
+### Delete employee
+DELETE http://{{ip}}/employees/{{createdEmployeeId}}
+
+> {%
+  client.test("Status is 204", function () {
+    client.assert(response.status === 204, "Expected status 204, but got " + response.status);
+  });
+%}
+
+### Verify employee deletion (GET on deleted ID)
+GET http://{{ip}}/employees/{{createdEmployeeId}}
+
+> {%
+  client.test("Status is 404", function () {
+    client.assert(response.status === 404, "Expected status 404 for a deleted employee, but got " + response.status);
+  });
+%}

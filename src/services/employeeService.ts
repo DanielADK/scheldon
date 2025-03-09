@@ -49,8 +49,14 @@ export const getEmployeeByAbbreviation = async (abbreviation: string): Promise<E
  * @param id
  * @param data
  */
-export const updateEmployee = async (id: number, data: Partial<Employee>): Promise<[number, Employee[]]> => {
-  return await employeeRepository.updateEmployee(id, data);
+export const updateEmployee = async (id: number, data: Partial<Employee>): Promise<Employee | null> => {
+  const [count] = await employeeRepository.updateEmployee(id, data);
+
+  if (count === 0) {
+    throw new Error('Employee not found');
+  }
+
+  return await employeeRepository.getEmployeeById(id);
 };
 
 /**
