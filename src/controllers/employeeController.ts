@@ -110,6 +110,8 @@ export const getEmployeeByAbbreviation = async (ctx: Context): Promise<void> => 
 // Update an employee
 export const updateEmployee = async (ctx: Context): Promise<void> => {
   const id = await getIdFromParam(ctx.params.id as string);
+
+  // Validate request
   const { error, value } = employeeSchema.validate(ctx.request.body);
 
   if (error) {
@@ -119,15 +121,17 @@ export const updateEmployee = async (ctx: Context): Promise<void> => {
   }
 
   try {
-    const [affectedCount] = await employeeService.updateEmployee(id, value);
+    const updatedEmployee = await employeeService.updateEmployee(id, value);
 
-    if (affectedCount === 0) {
+    // If employee not found after update
+    if (!updatedEmployee) {
       ctx.status = 404;
-      ctx.body = { error: 'Employee not found' };
+      ctx.body = { error: 'Update of employee failed.' };
       return;
     }
 
-    ctx.status = 204;
+    ctx.status = 200;
+    ctx.body = updatedEmployee;
   } catch (error) {
     handleError(ctx, error);
   }

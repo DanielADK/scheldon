@@ -16,7 +16,7 @@ export interface EmployeeDTO {
 }
 
 const employeeAttributes: FindAttributeOptions = [
-  ['employeeId', 'id'],
+  'employeeId',
   'username',
   'name',
   'surname',
@@ -96,10 +96,9 @@ export const getEmployeeByAbbreviation = async (abbreviation: string): Promise<E
  * @param id
  * @param data
  */
-export const updateEmployee = async (id: number, data: Partial<Employee>): Promise<[number, Employee[]]> => {
+export const updateEmployee = async (id: number, data: Partial<Employee>): Promise<[number]> => {
   return await Employee.update(data, {
-    where: { employeeId: id },
-    returning: true
+    where: { employeeId: id }
   });
 };
 
