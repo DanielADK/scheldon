@@ -33,9 +33,7 @@ export const getClassById = async (classId: number) => {
  * Get a class at a specific time
  * @param time
  */
-export const getClassesAtTime = async (
-  time: string
-): Promise<Class[] | null> => {
+export const getClassesAtTime = async (time: string): Promise<Class[] | null> => {
   return await classRepository.getClassesAtTime(time);
 };
 
@@ -44,27 +42,23 @@ export const getClassesAtTime = async (
  * @param classId
  * @param data
  */
-export const updateClass = async (
-  classId: number,
-  data: ClassDTO
-): Promise<[number]> => {
+export const updateClass = async (classId: number, data: ClassDTO): Promise<Class | null> => {
   const existingClass = await classRepository.getClassById(classId);
   if (!existingClass) {
     throw new Error('Class not found');
   }
 
   const transaction: Transaction = await sequelize.transaction();
+  let updatedClass: Class;
 
   try {
     const { roomId, employeeId } = data;
-    const shouldCreateNewClass =
-      (roomId && roomId !== existingClass.roomId) ||
-      (employeeId && employeeId !== existingClass.employeeId);
+    const shouldCreateNewClass = (roomId && roomId !== existingClass.roomId) || (employeeId && employeeId !== existingClass.employeeId);
 
     if (shouldCreateNewClass) {
       // Check if the existing class is not already expired
       if (new Date(existingClass.validTo) < new Date()) {
-        new Error('Cannot update an expired class');
+        throw new Error('Cannot update an expired class');
       }
 
       // Create a new class with the updated data
@@ -76,28 +70,20 @@ export const updateClass = async (
           roomId: roomId ?? existingClass.roomId,
           employeeId: employeeId ?? existingClass.employeeId
         } as Class,
-        {
-          transaction: transaction
-        }
+        { transaction: transaction }
       );
 
       // End validity of the existing class
-      await existingClass.update(
-        'validTo',
-        new Date(new Date().getTime() - 1).toISOString(),
-        {
-          transaction: transaction
-        }
-      );
+      await existingClass.update('validTo', new Date(new Date().getTime() - 1).toISOString(), {
+        transaction: transaction
+      });
 
-      // Copy studentGroupes and their assignments to the new class
-      await studentGroupService.transferstudentGroupes(
-        existingClass,
-        newClass,
-        transaction
-      );
+      // Copy studentGroups and their assignments to the new class
+      await studentGroupService.transferstudentGroups(existingClass, newClass, transaction);
+      updatedClass = newClass;
     } else {
-      await existingClass.update(data, { transaction: transaction });
+      // Update the existing class object
+      updatedClass = await existingClass.update(data, { transaction });
     }
     await transaction.commit();
   } catch (error) {
@@ -105,7 +91,8 @@ export const updateClass = async (
     throw error;
   }
 
-  return await classRepository.updateClass(classId, data);
+  //
+  return updatedClass;
 };
 
 /**

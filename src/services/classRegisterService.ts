@@ -4,23 +4,21 @@ import {
   getCurrentLessonRecord,
   getStudentsForLesson
 } from '@repositories/classRegisterRepository';
-import { LessonRecord } from '@models/LessonRecord';
-import { getLessonAttendance } from '@repositories/attendanceRepository';
 import { AttendanceType } from '@models/types/AttendanceType';
 import { Attendance } from '@models/Attendance';
 import { Student } from '@models/Student';
+import { getLessonAttendance } from '@repositories/attendanceRepository';
+import { LessonRecord } from '@models/LessonRecord';
 
 interface ClassRegisterExport {
   lesson: {
-    lessonId: string;
+    lessonId: number;
     topic?: string;
   };
   students: StudentWithAttendance[];
 }
 
-export const finishLessonRecord = async (
-  data: classRegisterRecordDTO
-): Promise<void> => {
+export const finishLessonRecord = async (data: classRegisterRecordDTO): Promise<void> => {
   return await finishLessonRecordInRepository(data);
 };
 
@@ -29,9 +27,7 @@ export const finishLessonRecord = async (
  * @param teacherId number
  * @returns Promise<object | null>
  */
-export const getCurrentLessonForTeacher = async (
-  teacherId: number
-): Promise<ClassRegisterExport | null> => {
+export const getCurrentLessonForTeacher = async (teacherId: number): Promise<ClassRegisterExport | null> => {
   const lesson = await getCurrentLessonRecord(teacherId);
   if (!lesson) {
     return null;
@@ -52,10 +48,7 @@ interface StudentWithAttendance {
  * @param attendance Attendance[]
  * @returns StudentWithAttendance[]
  */
-export const groupStudentsByAttendance = (
-  students: Student[],
-  attendance: Attendance[] | null
-): StudentWithAttendance[] => {
+export const groupStudentsByAttendance = (students: Student[], attendance: Attendance[] | null): StudentWithAttendance[] => {
   // Array of StudentWithAttendance
   const studentsWithAttendance: StudentWithAttendance[] = [];
 
@@ -81,16 +74,14 @@ export const groupStudentsByAttendance = (
     const studentAttendance = attendanceMap.get(student.studentId);
     studentsWithAttendance.push({
       student: student,
-      attendance: studentAttendance
-        ? studentAttendance.attendance
-        : AttendanceType.PRESENT
+      attendance: studentAttendance ? studentAttendance.attendance : AttendanceType.PRESENT
     });
   });
 
   return studentsWithAttendance;
 };
 
-export const getCurrentLessonByLessonId = async (lessonId: string) => {
+/*export const getCurrentLessonByLessonId = async (lessonId: string) => {
   // id to lower case
   lessonId = lessonId.toLowerCase();
   // find lesson by id
@@ -99,23 +90,18 @@ export const getCurrentLessonByLessonId = async (lessonId: string) => {
     throw new Error('Lesson not found');
   }
   return getCurrentLessonByLesson(lesson);
-};
+};*/
 
 /**
  * Get the current lesson data for a specific teacher
  * @param lesson LessonRecord
  * @returns Promise<ClassRegisterExport | null>
  */
-export const getCurrentLessonByLesson = async (
-  lesson: LessonRecord
-): Promise<ClassRegisterExport | null> => {
+export const getCurrentLessonByLesson = async (lesson: LessonRecord): Promise<ClassRegisterExport | null> => {
   const students = await getStudentsForLesson(lesson.lessonId);
   const attendance = await getLessonAttendance(lesson.lessonId, true);
 
-  const studentsWithAttendance = groupStudentsByAttendance(
-    students,
-    attendance
-  );
+  const studentsWithAttendance = groupStudentsByAttendance(students, attendance);
 
   return {
     lesson: {

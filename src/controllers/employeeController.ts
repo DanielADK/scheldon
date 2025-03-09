@@ -92,13 +92,10 @@ export const getEmployeeByUsername = async (ctx: Context): Promise<void> => {
 };
 
 // Get employee by abbreviation
-export const getEmployeeByAbbreviation = async (
-  ctx: Context
-): Promise<void> => {
+export const getEmployeeByAbbreviation = async (ctx: Context): Promise<void> => {
   const abbreviation = ctx.params.abbreviation as string;
 
-  const employee =
-    await employeeService.getEmployeeByAbbreviation(abbreviation);
+  const employee = await employeeService.getEmployeeByAbbreviation(abbreviation);
 
   if (!employee) {
     ctx.status = 404;

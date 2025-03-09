@@ -20,11 +20,7 @@ export const getWeekRange = (time: Date): { start: Date; end: Date } => {
  * @param start number
  * @param end number
  */
-const binarySearchPeriod = (
-  timeString: string,
-  start: number,
-  end: number
-): number | null => {
+const binarySearchPeriod = (timeString: string, start: number, end: number): number | null => {
   if (start > end) {
     return null;
   }

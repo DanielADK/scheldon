@@ -33,13 +33,13 @@ export const createstudentGroup = async (ctx: Context) => {
 };
 
 /**
- * Get all studentGroupes
+ * Get all studentGroups
  * @param ctx
  */
-export const getstudentGroupes = async (ctx: Context) => {
-  const studentGroupes = await studentGroupService.getstudentGroupes();
+export const getstudentGroups = async (ctx: Context) => {
+  const studentGroups = await studentGroupService.getstudentGroups();
   ctx.status = 200;
-  ctx.body = studentGroupes;
+  ctx.body = studentGroups;
 };
 
 /**
@@ -49,8 +49,7 @@ export const getstudentGroupes = async (ctx: Context) => {
 export const getstudentGroupById = async (ctx: Context) => {
   const studentGroupId = await getIdFromParam(ctx.params.id as string);
 
-  const studentGroup =
-    await studentGroupService.getstudentGroupById(studentGroupId);
+  const studentGroup = await studentGroupService.getstudentGroupById(studentGroupId);
 
   if (!studentGroup) {
     ctx.status = 404;
@@ -63,23 +62,22 @@ export const getstudentGroupById = async (ctx: Context) => {
 };
 
 /**
- * Get all studentGroupes of a specific class
+ * Get all studentGroups of a specific class
  * @param ctx
  */
-export const getstudentGroupesByClassId = async (ctx: Context) => {
+export const getstudentGroupsByClassId = async (ctx: Context) => {
   const classId = await getIdFromParam(ctx.params.classId as string);
 
-  const studentGroupes =
-    await studentGroupService.getstudentGroupesByClassId(classId);
+  const studentGroups = await studentGroupService.getstudentGroupsByClassId(classId);
 
-  if (!studentGroupes.length) {
+  if (!studentGroups.length) {
     ctx.status = 404;
-    ctx.body = { error: 'No studentGroupes found for the given class' };
+    ctx.body = { error: 'No studentGroups found for the given class' };
     return;
   }
 
   ctx.status = 200;
-  ctx.body = studentGroupes;
+  ctx.body = studentGroups;
 };
 
 /**
@@ -97,10 +95,7 @@ export const updatestudentGroup = async (ctx: Context) => {
   }
 
   try {
-    const [updated] = await studentGroupService.updatestudentGroup(
-      studentGroupId,
-      value
-    );
+    const [updated] = await studentGroupService.updatestudentGroup(studentGroupId, value);
 
     if (!updated) {
       ctx.status = 404;
@@ -123,8 +118,7 @@ export const deletestudentGroup = async (ctx: Context) => {
   const studentGroupId = await getIdFromParam(ctx.params.id as string);
 
   try {
-    const deleted =
-      await studentGroupService.deletestudentGroup(studentGroupId);
+    const deleted = await studentGroupService.deletestudentGroup(studentGroupId);
 
     if (!deleted) {
       ctx.status = 404;

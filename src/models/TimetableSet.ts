@@ -1,20 +1,7 @@
-import {
-  AutoIncrement,
-  BeforeCreate,
-  BeforeUpdate,
-  BelongsToMany,
-  Column,
-  DataType,
-  Model,
-  PrimaryKey,
-  Table
-} from 'sequelize-typescript';
+import { AutoIncrement, BeforeCreate, BeforeUpdate, BelongsToMany, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { TimetableEntrySet } from '@models/TimetableEntrySet';
-import {
-  validateDates,
-  validateUniqueInterval
-} from '@validators/timetableSetValidator';
+import { validateDates, validateUniqueInterval } from '@validators/timetableSetValidator';
 
 @Table({
   timestamps: false,
@@ -67,9 +54,6 @@ export class TimetableSet extends Model<TimetableSet> {
   @BeforeCreate
   @BeforeUpdate
   static async validate(instance: TimetableSet): Promise<void> {
-    await Promise.all([
-      validateDates(instance),
-      validateUniqueInterval(instance)
-    ]);
+    await Promise.all([validateDates(instance), validateUniqueInterval(instance)]);
   }
 }

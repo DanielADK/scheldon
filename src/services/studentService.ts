@@ -22,9 +22,7 @@ export const getStudentById = async (id: number) => {
  * Get student's history
  * @param id
  */
-export const getStudentsHistory = async (
-  id: number
-): Promise<Study[] | null> => {
+export const getStudentsHistory = async (id: number): Promise<Study[] | null> => {
   return await studentRepository.getStudentsHistory(id);
 };
 

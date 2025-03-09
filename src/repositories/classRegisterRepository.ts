@@ -1,22 +1,22 @@
 import { LessonRecord } from '@models/LessonRecord';
 import { Student } from '@models/Student';
-import { Op, WhereOptions } from 'sequelize';
-import { getCurrentTimetableHour } from '../lib/timeLib';
-import { SubClass } from '@models/SubClass';
-import { StudentAssignment } from '@models/StudentAssignment';
-import { Class } from '@models/Class';
 import { attendanceRecordDTO } from '@repositories/attendanceRepository';
 import { sequelize } from '../index';
+import { Study } from '@models/Study';
+import { Class } from '@models/Class';
+import { StudentGroup } from '@models/StudentGroup';
+import { getCurrentTimetableHour } from '../lib/timeLib';
+import { col, fn, Op, where, WhereOptions } from 'sequelize';
+import { TimetableEntry } from '@models/TimetableEntry';
+import { SubstitutionEntry } from '@models/SubstitutionEntry';
 
 export interface classRegisterRecordDTO {
-  lessonId: string;
+  lessonId: number;
   topic: string;
   studentAttendance: attendanceRecordDTO[];
 }
 
-export const finishLessonRecord = async (
-  data: classRegisterRecordDTO
-): Promise<void> => {
+export const finishLessonRecord = async (data: classRegisterRecordDTO): Promise<void> => {
   const transaction = await sequelize.transaction();
   // Find the lesson record
   const lessonRecord = await LessonRecord.findByPk(data.lessonId, {
@@ -25,8 +25,7 @@ export const finishLessonRecord = async (
   if (!lessonRecord) throw new Error('Lesson record not found');
 
   // Check if the lesson record is already finished
-  if (lessonRecord.fillDate)
-    throw new Error('Lesson record already locked&finished');
+  if (lessonRecord.fillDate) throw new Error('Lesson record already locked&finished');
 
   // Update the lesson record
   lessonRecord.topic = data.topic;
@@ -40,16 +39,24 @@ export const finishLessonRecord = async (
  * @param teacherId number
  * @returns Promise<LessonRecord | null>
  */
-export const getCurrentLessonRecord = async (
-  teacherId: number
-): Promise<LessonRecord | null> => {
+export const getCurrentLessonRecord = async (teacherId: number): Promise<LessonRecord | null> => {
   const currentTime = new Date();
+  const currentHour = getCurrentTimetableHour(currentTime);
+
   return await LessonRecord.findOne({
     where: {
-      teacherId: teacherId,
       date: { [Op.lte]: currentTime },
-      hourInDay: getCurrentTimetableHour(currentTime)
-    }
+      [Op.and]: [
+        // find first lesson record where teacherId matches
+        where(fn('COALESCE', col('substitutionEntry.teacherId'), col('timetableEntry.teacherId')), teacherId),
+        // find first lesson record where hourInDay matches
+        where(fn('COALESCE', col('substitutionEntry.hourInDay'), col('timetableEntry.hourInDay')), currentHour)
+      ]
+    },
+    include: [
+      { model: TimetableEntry, as: 'timetableEntry', required: false },
+      { model: SubstitutionEntry, as: 'substitutionEntry', required: false }
+    ]
   });
 };
 
@@ -58,41 +65,41 @@ export const getCurrentLessonRecord = async (
  * @param lessonId string
  * @returns Promise<Student[]>
  */
-export const getStudentsForLesson = async (
-  lessonId: string
-): Promise<Student[]> => {
+export const getStudentsForLesson = async (lessonId: number): Promise<Student[]> => {
   // Find the lesson and include the timetable entry
   const lesson = await LessonRecord.findByPk(lessonId, {
-    include: ['timetableEntry']
+    include: ['timetableEntry', 'substitutionEntry']
   });
 
   if (!lesson) throw new Error('Lesson not found');
 
   // Determine the entry source (either TimetableEntry or LessonRecord itself)
-  const entry = lesson.timetableEntry ?? lesson;
-  if (!entry.classId) {
+  const entry = lesson.substitutionEntry ?? lesson.timetableEntry;
+  if (!entry || !entry.classId) {
     throw new Error('Lesson does not have a class assigned');
   }
+
+  const now = new Date();
   const dateWhere: WhereOptions = {
-    validFrom: { [Op.lte]: new Date() },
-    validTo: { [Op.gte]: new Date() }
+    validFrom: { [Op.lte]: now },
+    validTo: { [Op.gte]: now }
   };
 
-  // Find the students based on class and subclass
-  const studentAssignments = entry.subClassId
-    ? await SubClass.findByPk(entry.subClassId, {
+  // Find the students based on class and studentGroup
+  const studentAssignments = entry.studentGroupId
+    ? await StudentGroup.findByPk(entry.id, {
         include: [
           {
-            model: StudentAssignment,
+            model: Study,
             include: ['student'],
             where: dateWhere
           }
         ]
       })
-    : await Class.findByPk(entry.classId, {
+    : await Class.findByPk(entry.id, {
         include: [
           {
-            model: StudentAssignment,
+            model: Study,
             include: ['student'],
             where: dateWhere
           }
@@ -101,7 +108,5 @@ export const getStudentsForLesson = async (
 
   if (!studentAssignments) throw new Error('No students found for the lesson');
 
-  return studentAssignments.studentAssignments.map(
-    (assignment) => assignment.student
-  );
+  return studentAssignments.studentAssignments.map((assignment) => assignment.student);
 };

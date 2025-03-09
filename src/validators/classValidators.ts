@@ -34,9 +34,7 @@ export const validateClassName = async (instance: Class) => {
   });
 
   if (existingClass) {
-    throw new Error(
-      'Class name already exists within the validity period of another class'
-    );
+    throw new Error('Class name already exists within the validity period of another class');
   }
 };
 
@@ -102,9 +100,7 @@ export const validateTeacherSchedule = async (instance: Class) => {
   });
 
   if (existingTeacher) {
-    throw new Error(
-      'Teacher is already assigned to another class within the validity period'
-    );
+    throw new Error('Teacher is already assigned to another class within the validity period');
   }
 };
 
@@ -140,8 +136,6 @@ export const validateRoomSchedule = async (instance: Class) => {
   });
 
   if (existingRoom) {
-    throw new Error(
-      'Room is already assigned to another class within the validity period'
-    );
+    throw new Error('Room is already assigned to another class within the validity period');
   }
 };

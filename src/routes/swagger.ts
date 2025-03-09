@@ -10,7 +10,7 @@ const options = {
     info: {
       title: 'Scheldon API',
       version: '1.0.0',
-      description: 'API for school timetable management system and class books',
+      description: 'API for school timetable management system and class register',
       contact: {
         name: 'Daniel Adámek',
         email: 'adamek@spsejecna.cz'
@@ -27,9 +27,6 @@ router.get('/swagger.json', async (ctx) => {
 });
 
 //router.get('/docs', koaSwagger(specs));
-router.get(
-  '/docs',
-  koaSwagger({ routePrefix: false, swaggerOptions: { url: '/swagger.json' } })
-);
+router.get('/docs', koaSwagger({ routePrefix: false, swaggerOptions: { url: '/swagger.json' } }));
 
 export default router;

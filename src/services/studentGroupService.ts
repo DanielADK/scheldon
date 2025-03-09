@@ -6,24 +6,20 @@ import * as studentGroupRepository from '@repositories/studentGroupRepository';
 import { studentGroupDTO } from '@repositories/studentGroupRepository';
 
 /**
- * Transfer studentGroupes from existing Class to new Class
+ * Transfer studentGroups from existing Class to new Class
  * @param existingClass - The existing class
  * @param newClass - The new class
  * @param transaction - The transaction
  * @returns Promise<void>
  */
-export const transferstudentGroupes = async (
-  existingClass: Class,
-  newClass: Class,
-  transaction: Transaction
-): Promise<void> => {
-  // Copy all studentGroupes from the existing Class to the new Class
-  const studentGroupesToCopy = await StudentGroup.findAll({
+export const transferstudentGroups = async (existingClass: Class, newClass: Class, transaction: Transaction): Promise<void> => {
+  // Copy all studentGroups from the existing Class to the new Class
+  const studentGroupsToCopy = await StudentGroup.findAll({
     where: { classId: existingClass.classId },
     transaction: transaction
   });
 
-  for (const studentGroup of studentGroupesToCopy) {
+  for (const studentGroup of studentGroupsToCopy) {
     // Create new studentGroup
     const newstudentGroup = await StudentGroup.create(
       {
@@ -34,13 +30,7 @@ export const transferstudentGroupes = async (
     );
 
     // Transfer studentGroup assignments
-    await transferstudentGroupAssignments(
-      existingClass,
-      newClass,
-      studentGroup,
-      newstudentGroup,
-      transaction
-    );
+    await transferstudentGroupAssignments(existingClass, newClass, studentGroup, newstudentGroup, transaction);
   }
 };
 
@@ -69,10 +59,7 @@ export const transferstudentGroupAssignments = async (
     transaction: transaction
   });
   for (const oldstudentGroupAssignment of oldstudentGroupAssignments) {
-    await oldstudentGroupAssignment.update(
-      { validTo: new Date(new Date().getTime() - 1).toISOString() },
-      { transaction: transaction }
-    );
+    await oldstudentGroupAssignment.update({ validTo: new Date(new Date().getTime() - 1).toISOString() }, { transaction: transaction });
 
     // Create new studentGroup assignment
     await Study.create(
@@ -97,10 +84,10 @@ export const createstudentGroup = async (data: studentGroupDTO) => {
 };
 
 /**
- * Get all studentGroupes
+ * Get all studentGroups
  */
-export const getstudentGroupes = async () => {
-  return await studentGroupRepository.getstudentGroupes();
+export const getstudentGroups = async () => {
+  return await studentGroupRepository.getstudentGroups();
 };
 
 /**
@@ -112,11 +99,11 @@ export const getstudentGroupById = async (studentGroupId: number) => {
 };
 
 /**
- * Get all studentGroupes of a specific class
+ * Get all studentGroups of a specific class
  * @param classId
  */
-export const getstudentGroupesByClassId = async (classId: number) => {
-  return await studentGroupRepository.getstudentGroupesByClassId(classId);
+export const getstudentGroupsByClassId = async (classId: number) => {
+  return await studentGroupRepository.getstudentGroupsByClassId(classId);
 };
 
 /**
@@ -124,10 +111,7 @@ export const getstudentGroupesByClassId = async (classId: number) => {
  * @param studentGroupId
  * @param data
  */
-export const updatestudentGroup = async (
-  studentGroupId: number,
-  data: Partial<studentGroupDTO>
-) => {
+export const updatestudentGroup = async (studentGroupId: number, data: Partial<studentGroupDTO>) => {
   return await studentGroupRepository.updatestudentGroup(studentGroupId, data);
 };
 

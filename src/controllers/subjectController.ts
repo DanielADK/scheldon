@@ -104,10 +104,7 @@ export const updateSubject = async (ctx: Context) => {
   }
 
   try {
-    const [affectedCount] = await subjectService.updateSubject(
-      subjectId,
-      value
-    );
+    const [affectedCount] = await subjectService.updateSubject(subjectId, value);
 
     if (affectedCount > 0) {
       ctx.status = 200;

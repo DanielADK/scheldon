@@ -33,10 +33,7 @@ export interface TimetableEntryDTO {
  * @param tset TimetableSet
  * @param data TimetableSetDTO
  */
-export const createTEntry = async (
-  tset: TimetableSet,
-  data: TimetableEntryDTO
-): Promise<TimetableEntry> => {
+export const createTEntry = async (tset: TimetableSet, data: TimetableEntryDTO): Promise<TimetableEntry> => {
   const transaction: Transaction = await sequelize.transaction();
 
   try {
@@ -48,10 +45,7 @@ export const createTEntry = async (
     await tset.$add('TimetableEntry', tentry, { transaction: transaction });
 
     // Create LessonsRecords in TSet validity period
-    const lessons: LessonRecord[] = await getLessonBulkInTSetPeriod(
-      tset,
-      tentry
-    );
+    const lessons: LessonRecord[] = await getLessonBulkInTSetPeriod(tset, tentry);
 
     await LessonRecord.bulkCreate(lessons, {
       transaction: transaction,
@@ -68,9 +62,7 @@ export const createTEntry = async (
   }
 };
 
-export const createTSet = async (
-  data: TimetableSetDTO
-): Promise<TimetableSet> => {
+export const createTSet = async (data: TimetableSetDTO): Promise<TimetableSet> => {
   return await TimetableSet.create(data as TimetableSet);
 };
 
@@ -78,9 +70,7 @@ export const createTSet = async (
  * Get timetable by ID
  * @param setId
  */
-export const getTimetableBySetId = async (
-  setId: number
-): Promise<TimetableSet | null> => {
+export const getTimetableBySetId = async (setId: number): Promise<TimetableSet | null> => {
   return await TimetableSet.findByPk(setId, {
     include: [
       {
@@ -95,9 +85,7 @@ export const getTimetableBySetId = async (
  * Get timetable set at time
  * @param time
  */
-export const getTimetableSetAtTime = async (
-  time: Date = new Date()
-): Promise<TimetableSet | null> => {
+export const getTimetableSetAtTime = async (time: Date = new Date()): Promise<TimetableSet | null> => {
   return await TimetableSet.findOne({
     attributes: ['timetableSetId'],
     where: {

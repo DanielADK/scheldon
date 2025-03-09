@@ -1,6 +1,6 @@
 import Joi from 'joi';
 import { Context } from 'koa';
-import * as studentAssignmentService from '@services/studentAssignmentService';
+import * as studentAssignmentService from '@services/studyService';
 import { getIdFromParam, handleError } from '../lib/controllerTools';
 
 // Schema for assigning a student to a class/studentGroup
@@ -33,10 +33,7 @@ export const assignStudent = async (ctx: Context) => {
   }
 
   try {
-    const assignment = await studentAssignmentService.createAssignment(
-      studentId,
-      value
-    );
+    const assignment = await studentAssignmentService.createAssignment(studentId, value);
 
     ctx.status = 201;
     ctx.body = assignment;

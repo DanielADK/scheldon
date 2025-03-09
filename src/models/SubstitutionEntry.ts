@@ -1,13 +1,4 @@
-import {
-  AutoIncrement,
-  BelongsTo,
-  Column,
-  DataType,
-  ForeignKey,
-  Model,
-  PrimaryKey,
-  Table
-} from 'sequelize-typescript';
+import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import { Class } from '@models/Class';
 import { Subject } from '@models/Subject';
 import { Employee } from '@models/Employee';
@@ -20,27 +11,12 @@ import { StudentGroup } from '@models/StudentGroup';
     {
       unique: true,
       name: 'unique_class_entry',
-      fields: [
-        'classId',
-        'dayInWeek',
-        'hourInDay',
-        'subjectId',
-        'teacherId',
-        'roomId'
-      ]
+      fields: ['classId', 'dayInWeek', 'hourInDay', 'subjectId', 'teacherId', 'roomId']
     },
     {
       unique: true,
       name: 'unique_class_with_studentGroup_entry',
-      fields: [
-        'classId',
-        'studentGroupId',
-        'dayInWeek',
-        'hourInDay',
-        'subjectId',
-        'teacherId',
-        'roomId'
-      ]
+      fields: ['classId', 'studentGroupId', 'dayInWeek', 'hourInDay', 'subjectId', 'teacherId', 'roomId']
     }
   ]
 })
@@ -103,9 +79,6 @@ export class SubstitutionEntry extends Model<SubstitutionEntry> {
   declare roomId: number;
 
   // Mappings
-  //@HasMany(() => LessonRecord)
-  //declare lessonRecords: Le;
-
   @BelongsTo(() => Class)
   declare class: Class;
 
@@ -121,17 +94,14 @@ export class SubstitutionEntry extends Model<SubstitutionEntry> {
   @BelongsTo(() => Room)
   declare room: Room;
 
-  /*
-  @BeforeCreate
+  /*TODO
+   @BeforeCreate
   @BeforeUpdate
   static async validate(instance: SubstitutionEntry): Promise<void> {
     await Promise.all([
-      validateUniqueEntry(instance),
-      validateTeacherRole(instance),
       validateDayInWeekRange(instance),
       validateHourInDayRange(instance),
-      instance.studentGroupId ? validatestudentGroupInClass(instance) : null
+      instance.studentGroupId ? validateStudentGroupInClass(instance) : null
     ]);
-  }
-  */
+  }*/
 }

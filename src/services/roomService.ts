@@ -13,10 +13,7 @@ export const createRoom = async (data: RoomDTO): Promise<Room> => {
 /**
  * Get all rooms
  */
-export const getAllRooms = async (
-  page: number,
-  limit: number
-): Promise<{ rows: Room[]; count: number }> => {
+export const getAllRooms = async (page: number, limit: number): Promise<{ rows: Room[]; count: number }> => {
   const offset: number = (page - 1) * limit;
   return await roomRepository.getAllRooms(limit, offset);
 };
@@ -34,10 +31,7 @@ export const getRoomById = async (id: number): Promise<Room | null> => {
  * @param roomId
  * @param data
  */
-export const updateRoom = async (
-  roomId: number,
-  data: RoomDTO
-): Promise<[affectedCount: number]> => {
+export const updateRoom = async (roomId: number, data: RoomDTO): Promise<[affectedCount: number]> => {
   return await roomRepository.updateRoom(roomId, data);
 };
 

@@ -1,13 +1,4 @@
-import {
-  AutoIncrement,
-  BeforeCreate,
-  BeforeUpdate,
-  Column,
-  DataType,
-  Model,
-  PrimaryKey,
-  Table
-} from 'sequelize-typescript';
+import { AutoIncrement, BeforeCreate, BeforeUpdate, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import { validateTeacherWithAbbreviation } from '@validators/teacherValidator';
 
 @Table({

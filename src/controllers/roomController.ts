@@ -49,10 +49,7 @@ export const getAllRooms = async (ctx: Context): Promise<void> => {
   const page: number = parseInt(ctx.query.page as string) || 1;
   const limit: number = parseInt(ctx.query.limit as string) || 10;
 
-  const rooms: { rows: Room[]; count: number } = await roomService.getAllRooms(
-    page,
-    limit
-  );
+  const rooms: { rows: Room[]; count: number } = await roomService.getAllRooms(page, limit);
 
   ctx.status = 200;
   ctx.body = {

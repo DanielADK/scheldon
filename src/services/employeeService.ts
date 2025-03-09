@@ -32,9 +32,7 @@ export const getEmployeeById = async (id: number): Promise<Employee | null> => {
  * Get employee by username
  * @param username
  */
-export const getEmployeeByUsername = async (
-  username: string
-): Promise<Employee | null> => {
+export const getEmployeeByUsername = async (username: string): Promise<Employee | null> => {
   return await employeeRepository.getEmployeeByUsername(username);
 };
 
@@ -42,9 +40,7 @@ export const getEmployeeByUsername = async (
  * Get employee by abbreviation
  * @param abbreviation
  */
-export const getEmployeeByAbbreviation = async (
-  abbreviation: string
-): Promise<Employee | null> => {
+export const getEmployeeByAbbreviation = async (abbreviation: string): Promise<Employee | null> => {
   return await employeeRepository.getEmployeeByAbbreviation(abbreviation);
 };
 
@@ -53,10 +49,7 @@ export const getEmployeeByAbbreviation = async (
  * @param id
  * @param data
  */
-export const updateEmployee = async (
-  id: number,
-  data: Partial<Employee>
-): Promise<[number, Employee[]]> => {
+export const updateEmployee = async (id: number, data: Partial<Employee>): Promise<[number, Employee[]]> => {
   return await employeeRepository.updateEmployee(id, data);
 };
 

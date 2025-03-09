@@ -9,11 +9,7 @@ export interface SubjectDTO {
   abbreviation: string;
 }
 
-const subjectAttributes: FindAttributeOptions = [
-  ['subjectId', 'id'],
-  'name',
-  'abbreviation'
-];
+const subjectAttributes: FindAttributeOptions = [['subjectId', 'id'], 'name', 'abbreviation'];
 
 /**
  * Create a new subject
@@ -32,10 +28,7 @@ export const createSubject = async (data: SubjectDTO): Promise<Subject> => {
 /**
  * Get all subjects
  */
-export const getSubjects = async (
-  limit: number,
-  offset: number
-): Promise<{ rows: Subject[]; count: number }> => {
+export const getSubjects = async (limit: number, offset: number): Promise<{ rows: Subject[]; count: number }> => {
   const { rows, count } = await Subject.findAndCountAll({
     limit,
     offset,
@@ -49,9 +42,7 @@ export const getSubjects = async (
  * Get a subject by ID
  * @param subjectId
  */
-export const getSubjectById = async (
-  subjectId: number
-): Promise<Subject | null> => {
+export const getSubjectById = async (subjectId: number): Promise<Subject | null> => {
   return await Subject.findOne({
     where: { abbreviation: subjectId },
     attributes: subjectAttributes
@@ -62,9 +53,7 @@ export const getSubjectById = async (
  * Get a subject by abbreviation
  * @param abbreviation
  */
-export const getSubjectByAbbreviation = async (
-  abbreviation: string
-): Promise<Subject | null> => {
+export const getSubjectByAbbreviation = async (abbreviation: string): Promise<Subject | null> => {
   return await Subject.findOne({
     where: { abbreviation: abbreviation },
     attributes: subjectAttributes
@@ -76,10 +65,7 @@ export const getSubjectByAbbreviation = async (
  * @param subjectId
  * @param data
  */
-export const updateSubject = async (
-  subjectId: number,
-  data: SubjectDTO
-): Promise<[affectedRows: number]> => {
+export const updateSubject = async (subjectId: number, data: SubjectDTO): Promise<[affectedRows: number]> => {
   return await Subject.update(data, {
     where: { subjectId: subjectId }
   });

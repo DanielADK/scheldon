@@ -1,14 +1,4 @@
-import {
-  AutoIncrement,
-  BelongsTo,
-  Column,
-  DataType,
-  ForeignKey,
-  HasMany,
-  Model,
-  PrimaryKey,
-  Table
-} from 'sequelize-typescript';
+import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { Attendance } from '@models/Attendance';
 import { SubstitutionType } from '@models/types/SubstitutionType';
@@ -77,10 +67,22 @@ export class LessonRecord extends Model<LessonRecord> {
   declare note: string | null;
 
   // Mapping
-  @BelongsTo(() => TimetableEntry)
+  @BelongsTo(() => TimetableEntry, {
+    foreignKey: 'entryId',
+    constraints: false,
+    scope: {
+      entryType: 'TimetableEntry'
+    }
+  })
   declare timetableEntry: TimetableEntry | null;
 
-  @BelongsTo(() => SubstitutionEntry)
+  @BelongsTo(() => SubstitutionEntry, {
+    foreignKey: 'entryId',
+    constraints: false,
+    scope: {
+      entryType: 'SubstitutionEntry'
+    }
+  })
   declare substitutionEntry: SubstitutionEntry | null;
 
   @HasMany(() => Attendance)

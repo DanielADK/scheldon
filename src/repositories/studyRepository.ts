@@ -13,10 +13,7 @@ export interface StudentAssignmentDTO {
  * @param studentId
  * @param data
  */
-export const terminateAssignment = async (
-  studentId: number,
-  data: StudentAssignmentDTO
-) => {
+export const terminateAssignment = async (studentId: number, data: StudentAssignmentDTO) => {
   // End all ongoing assignments
   await Study.update(
     {
@@ -32,10 +29,7 @@ export const terminateAssignment = async (
   );
 };
 
-export const terminateAllAssignments = async (
-  studentId: number,
-  data: StudentAssignmentDTO
-) => {
+export const terminateAllAssignments = async (studentId: number, data: StudentAssignmentDTO) => {
   // End all ongoing assignments
   await Study.update(
     {
@@ -50,10 +44,7 @@ export const terminateAllAssignments = async (
   );
 };
 
-export const createAssignment = async (
-  studentId: number,
-  data: StudentAssignmentDTO
-) => {
+export const createAssignment = async (studentId: number, data: StudentAssignmentDTO) => {
   return await Study.create({
     studentId: studentId,
     classId: data.classId,
@@ -77,11 +68,7 @@ export const getActualAssignmentsByStudent = async (studentId: number) => {
  * @param validFrom
  * @param validTo
  */
-export const getAssignmentsByStudentAtTime = async (
-  studentId: number,
-  validFrom: Date,
-  validTo: Date
-) => {
+export const getAssignmentsByStudentAtTime = async (studentId: number, validFrom: Date, validTo: Date) => {
   return await Study.findAll({
     where: {
       studentId: studentId,

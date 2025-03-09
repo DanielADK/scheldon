@@ -1,37 +1,31 @@
 import { Context } from 'koa';
 import * as timetableService from '@services/timetableService';
 import { getIdFromParam, handleError } from '../lib/controllerTools';
-import {
-  TimetableEntryDTO,
-  TimetableSetDTO
-} from '@repositories/timetableRepository';
+import { TimetableEntryDTO, TimetableSetDTO } from '@repositories/timetableRepository';
 import Joi from 'joi';
 import { TimetableExport } from '@services/transformers/timetableExport';
 
 /**
  * Schema for creating a timetable set
  */
-export const timetableSetSchema: Joi.ObjectSchema<TimetableSetDTO> = Joi.object(
-  {
-    name: Joi.string().required().min(3).max(50),
-    validFrom: Joi.date().required(),
-    validTo: Joi.date().required()
-  }
-);
+export const timetableSetSchema: Joi.ObjectSchema<TimetableSetDTO> = Joi.object({
+  name: Joi.string().required().min(3).max(50),
+  validFrom: Joi.date().required(),
+  validTo: Joi.date().required()
+});
 
 /**
  * Schema for creating a timetable entry
  */
-export const timetableEntrySchema: Joi.ObjectSchema<TimetableEntryDTO> =
-  Joi.object({
-    classId: Joi.number().required(),
-    studentGroupId: Joi.number().optional(),
-    dayInWeek: Joi.number().required().min(0).max(6),
-    hourInDay: Joi.number().required().min(0).max(10),
-    subjectId: Joi.number().required(),
-    teacherId: Joi.number().required(),
-    roomId: Joi.number().required()
-  });
+export const timetableEntrySchema: Joi.ObjectSchema<TimetableEntryDTO> = Joi.object({
+  classId: Joi.number().required(),
+  studentGroupId: Joi.number().optional(),
+  dayInWeek: Joi.number().required().min(0).max(6),
+  hourInDay: Joi.number().required().min(0).max(10),
+  subjectId: Joi.number().required(),
+  teacherId: Joi.number().required(),
+  roomId: Joi.number().required()
+});
 
 type getterService = (id: number) => Promise<TimetableExport | null>;
 
@@ -85,10 +79,7 @@ export const createTSet = async (ctx: Context): Promise<void> => {
  * @param ctx Context
  * @param getterService
  */
-export const timetableGetByIdController = async (
-  ctx: Context,
-  getterService: getterService
-) => {
+export const timetableGetByIdController = async (ctx: Context, getterService: getterService) => {
   try {
     const id: number = await getIdFromParam(ctx.params.id);
 

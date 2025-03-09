@@ -21,8 +21,7 @@ import { StudentGroup } from '@models/StudentGroup';
 import {
   validateDayInWeekRange,
   validateHourInDayRange,
-  validatestudentGroupInClass,
-  validateTeacherRole,
+  validateStudentGroupInClass,
   validateUniqueEntry
 } from '@validators/timetableEntryValidators';
 
@@ -32,27 +31,12 @@ import {
     {
       unique: true,
       name: 'unique_class_entry',
-      fields: [
-        'classId',
-        'dayInWeek',
-        'hourInDay',
-        'subjectId',
-        'teacherId',
-        'roomId'
-      ]
+      fields: ['classId', 'dayInWeek', 'hourInDay', 'subjectId', 'teacherId', 'roomId']
     },
     {
       unique: true,
       name: 'unique_class_with_studentGroup_entry',
-      fields: [
-        'classId',
-        'studentGroupId',
-        'dayInWeek',
-        'hourInDay',
-        'subjectId',
-        'teacherId',
-        'roomId'
-      ]
+      fields: ['classId', 'studentGroupId', 'dayInWeek', 'hourInDay', 'subjectId', 'teacherId', 'roomId']
     }
   ]
 })
@@ -138,10 +122,9 @@ export class TimetableEntry extends Model<TimetableEntry> {
   static async validate(instance: TimetableEntry): Promise<void> {
     await Promise.all([
       validateUniqueEntry(instance),
-      validateTeacherRole(instance),
       validateDayInWeekRange(instance),
       validateHourInDayRange(instance),
-      instance.studentGroupId ? validatestudentGroupInClass(instance) : null
+      instance.studentGroupId ? validateStudentGroupInClass(instance) : null
     ]);
   }
 }

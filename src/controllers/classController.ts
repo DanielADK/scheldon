@@ -113,15 +113,9 @@ export const updateClass = async (ctx: Context) => {
   }
 
   try {
-    const [affectedCount] = await classService.updateClass(classId, value);
-
-    if (affectedCount > 0) {
-      ctx.status = 200;
-      ctx.body = { message: 'Class updated' };
-    } else {
-      ctx.status = 404;
-      ctx.body = { error: 'Class not found' };
-    }
+    const updatedClass = await classService.updateClass(classId, value);
+    ctx.status = 200;
+    ctx.body = updatedClass;
   } catch (error) {
     handleError(ctx, error);
   }

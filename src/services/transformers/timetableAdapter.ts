@@ -2,7 +2,17 @@ import { TimetableEntrySet } from '@models/TimetableEntrySet';
 import { TimeLessonEntry } from '@services/transformers/timetableExport';
 import { AbstractTimetableAdapter } from '@services/transformers/AbstractTimetableAdapter';
 
+/**
+ * Adapter class to transform `TimetableEntrySet` objects into `TimeLessonEntry` objects.
+ * Extends the `AbstractTimetableAdapter` class.
+ */
 export class TimetableAdapter extends AbstractTimetableAdapter<TimetableEntrySet> {
+  /**
+   * Transforms a `TimetableEntrySet` object into a `TimeLessonEntry` object.
+   *
+   * @param {TimetableEntrySet} entry - The timetable entry set to transform.
+   * @returns {TimeLessonEntry} The transformed timetable entry.
+   */
   transform(entry: TimetableEntrySet): TimeLessonEntry {
     return {
       dayInWeek: entry.timetableEntry.dayInWeek,

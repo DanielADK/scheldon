@@ -10,10 +10,7 @@ export const validatestudentGroupBelongsToClass = async (instance: Study) => {
     instance.studentGroup = await instance.$get('studentGroup');
   }
 
-  if (
-    instance.studentGroup &&
-    instance.studentGroup.classId !== instance.classId
-  ) {
+  if (instance.studentGroup && instance.studentGroup.classId !== instance.classId) {
     throw new Error('studentGroup must belong to the class');
   }
 };
@@ -60,7 +57,7 @@ export const validateExclusiveClassAssignment = async (instance: Study) => {
   }
 };
 
-export const validateClassExistsWhenstudentGroup = async (instance: Study) => {
+export const validateClassExistsWhenStudentGroup = async (instance: Study) => {
   const actualAssignments = await Study.findAll({
     where: {
       studentId: instance.studentId,
@@ -75,9 +72,7 @@ export const validateClassExistsWhenstudentGroup = async (instance: Study) => {
     }
   });
   // Find assignment where classId is number and studentGroupId is null
-  const assignment = actualAssignments.find(
-    (assignment) => assignment.classId && !assignment.studentGroupId
-  );
+  const assignment = actualAssignments.find((assignment) => assignment.classId && !assignment.studentGroupId);
   if (!assignment) {
     throw new Error('Student is not assigned to the class');
   }
