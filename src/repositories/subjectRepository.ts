@@ -9,7 +9,7 @@ export interface SubjectDTO {
   abbreviation: string;
 }
 
-const subjectAttributes: FindAttributeOptions = [['subjectId', 'id'], 'name', 'abbreviation'];
+const subjectAttributes: FindAttributeOptions = ['subjectId', 'name', 'abbreviation'];
 
 /**
  * Create a new subject
@@ -44,7 +44,7 @@ export const getSubjects = async (limit: number, offset: number): Promise<{ rows
  */
 export const getSubjectById = async (subjectId: number): Promise<Subject | null> => {
   return await Subject.findOne({
-    where: { abbreviation: subjectId },
+    where: { subjectId: subjectId },
     attributes: subjectAttributes
   });
 };

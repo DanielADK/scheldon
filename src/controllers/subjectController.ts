@@ -42,7 +42,7 @@ export const getAllSubjects = async (ctx: Context) => {
   // Get all subjects
   const subjects = await subjectService.getAllSubjects(page, limit);
 
-  ctx.status = 201;
+  ctx.status = 200;
   ctx.body = {
     data: subjects.rows,
     meta: {
