@@ -1,0 +1,100 @@
+### Create new subject
+POST http://{{ip}}/subjects
+Content-Type: application/json
+
+{
+  "name": "Mathematics II",
+  "abbreviation": "M2"
+}
+
+> {%
+  client.test("Status is 201", function () {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'subjectId'", function () {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("subjectId"), "Response does not contain 'subjectId'");
+    // Save subjectId for subsequent tests
+    client.global.set("createdSubjectId", json.subjectId);
+    client.global.set("createdSubjectAbbreviation", json.abbreviation);
+  });
+%}
+
+
+### Get all subjects
+GET http://{{ip}}/subjects
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Content-Type is application/json", function () {
+    const ct = response.headers.valueOf("content-type");
+    client.assert(ct.includes("application/json"), "Expected Content-Type to include application/json, but got " + ct);
+  });
+%}
+
+### Get subject by ID
+GET http://{{ip}}/subjects/{{createdSubjectId}}
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Response contains required properties", function () {
+    const subject = response.body;
+    client.assert(subject.hasOwnProperty("subjectId"), "Subject does not contain 'subjectId'");
+    client.assert(subject.hasOwnProperty("name"), "Subject does not contain 'name'");
+    client.assert(subject.hasOwnProperty("abbreviation"), "Subject does not contain 'abbreviation'");
+  });
+%}
+
+### Get subject by abbreviation
+GET http://{{ip}}/subjects/abbreviation/{{createdSubjectAbbreviation}}
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Response contains required properties", function () {
+    const subject = response.body;
+    client.assert(subject.hasOwnProperty("subjectId"), "Response does not contain 'subjectId'");
+    client.assert(subject.hasOwnProperty("abbreviation"), "Response does not contain 'abbreviation'");
+
+    client.assert(subject.subjectId === client.global.get("createdSubjectId"))
+    client.assert(subject.abbreviation === client.global.get("createdSubjectAbbreviation"))
+  });
+%}
+
+### Update subject
+PUT http://{{ip}}/subjects/{{createdSubjectId}}
+Content-Type: application/json
+
+{
+  "name": "Advanced Mathematics II",
+  "abbreviation": "AM2"
+}
+
+> {%
+  client.test("Status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+%}
+
+### Delete subject
+DELETE http://{{ip}}/subjects/{{createdSubjectId}}
+
+> {%
+  client.test("Status is 204", function () {
+    client.assert(response.status === 204, "Expected status 204, but got " + response.status);
+  });
+%}
+
+### Verify subject deletion (GET on deleted subject)
+GET http://{{ip}}/subjects/{{createdSubjectId}}
+
+> {%
+  client.test("Status is 404", function () {
+    client.assert(response.status === 404, "Expected status 404 for a deleted subject, but got " + response.status);
+  });
+%}
