@@ -65,7 +65,7 @@ export const getSubjectByAbbreviation = async (abbreviation: string): Promise<Su
  * @param subjectId
  * @param data
  */
-export const updateSubject = async (subjectId: number, data: SubjectDTO): Promise<[affectedRows: number]> => {
+export const updateSubject = async (subjectId: number, data: Partial<SubjectDTO>): Promise<[affectedRows: number]> => {
   return await Subject.update(data, {
     where: { subjectId: subjectId }
   });
