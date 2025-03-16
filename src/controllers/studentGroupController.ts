@@ -86,6 +86,8 @@ export const getstudentGroupsByClassId = async (ctx: Context) => {
  */
 export const updatestudentGroup = async (ctx: Context) => {
   const studentGroupId = await getIdFromParam(ctx.params.id as string);
+
+  // Validate request
   const { error, value } = studentGroupSchema.validate(ctx.request.body);
 
   if (error) {
@@ -95,16 +97,15 @@ export const updatestudentGroup = async (ctx: Context) => {
   }
 
   try {
-    const [updated] = await studentGroupService.updatestudentGroup(studentGroupId, value);
+    const [affectedCount] = await studentGroupService.updatestudentGroup(studentGroupId, value);
 
-    if (!updated) {
+    if (affectedCount > 0) {
+      ctx.status = 200;
+      ctx.body = { message: 'studentGroup updated' };
+    } else {
       ctx.status = 404;
       ctx.body = { error: 'studentGroup not found' };
-      return;
     }
-
-    ctx.status = 200;
-    ctx.body = { message: 'studentGroup updated successfully' };
   } catch (error) {
     handleError(ctx, error);
   }

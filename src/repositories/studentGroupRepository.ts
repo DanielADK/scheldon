@@ -46,10 +46,9 @@ export const getstudentGroupsByClassId = async (classId: number): Promise<Studen
  * @param studentGroupId
  * @param data
  */
-export const updatestudentGroup = async (studentGroupId: number, data: Partial<studentGroupDTO>): Promise<[number, StudentGroup[]]> => {
+export const updatestudentGroup = async (studentGroupId: number, data: Partial<studentGroupDTO>): Promise<[affectedRows: number]> => {
   return await StudentGroup.update(data, {
-    where: { studentGroupId },
-    returning: true
+    where: { studentGroupId }
   });
 };
 
