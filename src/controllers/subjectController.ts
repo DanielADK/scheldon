@@ -88,11 +88,6 @@ export const getSubjectByAbbreviation = async (ctx: Context) => {
 // Schema for deleting a subject
 export const updateSubject = async (ctx: Context) => {
   const subjectId = await getIdFromParam(ctx.params.id as string);
-  if (isNaN(subjectId)) {
-    ctx.status = 400;
-    ctx.body = { error: 'Invalid subject ID' };
-    return;
-  }
 
   // Validate request
   const { error, value } = subjectSchema.validate(ctx.request.body);
