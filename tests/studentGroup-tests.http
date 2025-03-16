@@ -1,0 +1,170 @@
+
+#####################################
+### Precondition: Create a new class
+#####################################
+
+### Create new class
+POST http://{{ip}}/classes
+Content-Type: application/json
+
+{
+  "name": "Test Class",
+  "validFrom": "2023-09-01",
+  "validTo": "2024-06-30",
+  "roomId": 1,
+  "employeeId": 1
+}
+
+> {%
+  client.test("Class creation status is 201", function () {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'classId'", function () {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("classId"), "Response does not contain 'classId'");
+    // Save classId for subsequent tests
+    client.global.set("createdClassId", json.classId);
+  });
+%}
+
+#####################################
+### Student Group Tests
+#####################################
+
+### Create new student group
+POST http://{{ip}}/studentGroups
+Content-Type: application/json
+
+{
+  "name": "Group A",
+  "classId": {{createdClassId}}
+}
+
+> {%
+  client.test("StudentGroup creation status is 201", function () {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'studentGroupId'", function () {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("studentGroupId"), "Response does not contain 'studentGroupId'");
+    // Save studentGroupId for subsequent tests
+    client.global.set("createdStudentGroupId", json.studentGroupId);
+  });
+%}
+
+### Create new student group with invalid input (missing 'name')
+POST http://{{ip}}/studentGroups
+Content-Type: application/json
+
+{
+  "classId": {{createdClassId}}
+}
+
+> {%
+  client.test("Invalid input returns 400", function () {
+    client.assert(response.status === 400, "Expected status 400 for invalid input, but got " + response.status);
+  });
+%}
+
+### Get student group by ID
+GET http://{{ip}}/studentGroups/{{createdStudentGroupId}}
+
+> {%
+  client.test("Get student group status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Response contains required properties", function () {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("studentGroupId"), "Response does not contain 'studentGroupId'");
+    client.assert(json.hasOwnProperty("name"), "Response does not contain 'name'");
+    client.assert(json.hasOwnProperty("classId"), "Response does not contain 'classId'");
+    client.assert(json.classId === client.global.get("createdClassId"), "classId does not match the created class");
+  });
+%}
+
+### Get all student groups for the class
+GET http://{{ip}}/studentGroups/class/{{createdClassId}}
+
+> {%
+  client.test("Get all groups status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Response is an array with at least one group", function () {
+    const json = response.body;
+    client.assert(Array.isArray(json), "Expected response to be an array");
+    client.assert(json.length > 0, "Expected at least one student group in the array");
+    // Optional: verify that the created group is in the list
+    const found = json.some(group => group.studentGroupId === client.global.get("createdStudentGroupId"));
+    client.assert(found, "Created student group not found in the array");
+  });
+%}
+
+### Update student group
+PUT http://{{ip}}/studentGroups/{{createdStudentGroupId}}
+Content-Type: application/json
+
+{
+  "name": "Group A Updated",
+  "classId": {{createdClassId}}
+}
+
+> {%
+  client.test("Update student group status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+%}
+
+### Update student group with invalid input (missing 'name')
+PUT http://{{ip}}/studentGroups/{{createdStudentGroupId}}
+Content-Type: application/json
+
+{
+  "studentGroupId": {{createdStudentGroupId}},
+  "classId": {{createdClassId}}
+}
+
+> {%
+  client.test("Invalid update returns 400", function () {
+    client.assert(response.status === 400, "Expected status 400 for invalid update input, but got " + response.status);
+  });
+%}
+
+### Delete student group
+DELETE http://{{ip}}/studentGroups/{{createdStudentGroupId}}
+
+> {%
+  client.test("Student group deletion status is 200", function () {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+%}
+
+### Verify student group deletion (GET on deleted group)
+GET http://{{ip}}/studentGroups/{{createdStudentGroupId}}
+
+> {%
+  client.test("Expected status 404 for deleted student group", function () {
+    client.assert(response.status === 404, "Expected status 404 for a deleted student group, but got " + response.status);
+  });
+%}
+
+#####################################
+### Cleanup: Delete the created class
+#####################################
+
+### Delete class
+DELETE http://{{ip}}/classes/{{createdClassId}}
+
+> {%
+  client.test("Class deletion status is 204", function () {
+    client.assert(response.status === 204, "Expected status 204 for class deletion, but got " + response.status);
+  });
+%}
+
+### Verify class deletion (GET on deleted class)
+GET http://{{ip}}/classes/{{createdClassId}}
+
+> {%
+  client.test("Expected status 404 for deleted class", function () {
+    client.assert(response.status === 404, "Expected status 404 for a deleted class, but got " + response.status);
+  });
+%}
