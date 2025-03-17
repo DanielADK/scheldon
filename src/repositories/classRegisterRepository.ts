@@ -1,4 +1,4 @@
-import { LessonRecord } from '@models/LessonRecord';
+import { ClassRegister } from '@models/ClassRegister';
 import { Student } from '@models/Student';
 import { attendanceRecordDTO } from '@repositories/attendanceRepository';
 import { sequelize } from '../index';
@@ -19,7 +19,7 @@ export interface classRegisterRecordDTO {
 export const finishLessonRecord = async (data: classRegisterRecordDTO): Promise<void> => {
   const transaction = await sequelize.transaction();
   // Find the lesson record
-  const lessonRecord = await LessonRecord.findByPk(data.lessonId, {
+  const lessonRecord = await ClassRegister.findByPk(data.lessonId, {
     transaction: transaction
   });
   if (!lessonRecord) throw new Error('Lesson record not found');
@@ -37,13 +37,13 @@ export const finishLessonRecord = async (data: classRegisterRecordDTO): Promise<
 /**
  * Get the current lesson record for a specific teacher
  * @param teacherId number
- * @returns Promise<LessonRecord | null>
+ * @returns Promise<ClassRegister | null>
  */
-export const getCurrentLessonRecord = async (teacherId: number): Promise<LessonRecord | null> => {
+export const getCurrentLessonRecord = async (teacherId: number): Promise<ClassRegister | null> => {
   const currentTime = new Date();
   const currentHour = getCurrentTimetableHour(currentTime);
 
-  return await LessonRecord.findOne({
+  return await ClassRegister.findOne({
     where: {
       date: { [Op.lte]: currentTime },
       [Op.and]: [
@@ -67,13 +67,13 @@ export const getCurrentLessonRecord = async (teacherId: number): Promise<LessonR
  */
 export const getStudentsForLesson = async (lessonId: number): Promise<Student[]> => {
   // Find the lesson and include the timetable entry
-  const lesson = await LessonRecord.findByPk(lessonId, {
+  const lesson = await ClassRegister.findByPk(lessonId, {
     include: ['timetableEntry', 'substitutionEntry']
   });
 
   if (!lesson) throw new Error('Lesson not found');
 
-  // Determine the entry source (either TimetableEntry or LessonRecord itself)
+  // Determine the entry source (either TimetableEntry or ClassRegister itself)
   const entry = lesson.substitutionEntry ?? lesson.timetableEntry;
   if (!entry || !entry.classId) {
     throw new Error('Lesson does not have a class assigned');

@@ -1,5 +1,5 @@
 import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
-import { LessonRecord } from '@models/LessonRecord';
+import { ClassRegister } from '@models/ClassRegister';
 import { Student } from '@models/Student';
 import { AttendanceType } from '@models/types/AttendanceType';
 
@@ -23,15 +23,15 @@ export class Attendance extends Model<Attendance> {
   })
   declare attendanceId: number;
 
-  @ForeignKey(() => LessonRecord)
+  @ForeignKey(() => ClassRegister)
   @Column({
     type: DataType.BIGINT.UNSIGNED,
     allowNull: false
   })
   declare lessonRecordId: string;
 
-  @BelongsTo(() => LessonRecord)
-  declare lessonRecord: LessonRecord;
+  @BelongsTo(() => ClassRegister)
+  declare lessonRecord: ClassRegister;
 
   @ForeignKey(() => Student)
   @Column({

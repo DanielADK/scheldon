@@ -8,7 +8,7 @@ import { SubstitutionEntry } from '@models/SubstitutionEntry';
   createdAt: true,
   updatedAt: false
 })
-export class LessonRecord extends Model<LessonRecord> {
+export class ClassRegister extends Model<ClassRegister> {
   @PrimaryKey
   @AutoIncrement
   @Column({
@@ -34,7 +34,7 @@ export class LessonRecord extends Model<LessonRecord> {
   })
   declare substitutionEntryId: number | null;
 
-  // LessonRecord-specific fields
+  // ClassRegister-specific fields
   @Column({
     type: DataType.STRING,
     allowNull: true
@@ -90,16 +90,16 @@ export class LessonRecord extends Model<LessonRecord> {
 
   /*
   @BeforeBulkCreate
-  static async validateBulk(instances: LessonRecord[]): Promise<void> {
+  static async validateBulk(instances: ClassRegister[]): Promise<void> {
     await Promise.all(
-      instances.map((instance) => LessonRecord.validate(instance))
+      instances.map((instance) => ClassRegister.validate(instance))
     );
   }*/
 
   /*
   @BeforeCreate
   @BeforeUpdate
-  static async validate(instance: LessonRecord): Promise<void> {
+  static async validate(instance: ClassRegister): Promise<void> {
     await Promise.all([
       validateXORIdentifiers(instance),
       //instance.teacherId ? validateTeacherRole(instance) : null,

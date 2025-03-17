@@ -62,7 +62,7 @@ const router = new Router();
  *             $ref: '#/components/schemas/ClassRegister'
  *     responses:
  *       201:
- *         description: LessonRecord created successfully
+ *         description: ClassRegister created successfully
  *         content:
  *           application/json:
  *             schema:
