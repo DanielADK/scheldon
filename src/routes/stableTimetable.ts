@@ -2,7 +2,6 @@ import Router from 'koa-router';
 import * as timetableController from '@controllers/timetableController';
 import { timetableGetByIdController } from '@controllers/timetableController';
 import * as timetableService from '@services/timetableService';
-import * as lessonRecordController from '@controllers/substitutionTimetableController';
 
 const router = new Router();
 /**
@@ -60,6 +59,7 @@ const router = new Router();
  *         - name
  *         - validFrom
  *         - validTo
+ *
  * /timetables/stable/set/{id}/entry:
  *   post:
  *     tags:
@@ -287,13 +287,5 @@ router.get('/timetables/stable/room/:id', (ctx) => timetableGetByIdController(ct
  *         description: Timetable not found
  */
 router.get('/timetables/stable/room/:id/at/:date', (ctx) => timetableGetByIdController(ctx, timetableService.getTimetableByRoomId));
-
-// Temporary lessons
-/*router.post('/timetables/real/class/:id/at/:date', (ctx) =>
-  timetableGetByIdController(ctx, substitutionTimetableService.timetableGetByIdController)
-);*/
-
-// Restore lesson
-router.delete('/timetables/temporary/lesson/:id', lessonRecordController.deleteLessonRecord);
 
 export default router;

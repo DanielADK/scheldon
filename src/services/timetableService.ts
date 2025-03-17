@@ -1,9 +1,11 @@
 import { TimetableSet } from '@models/TimetableSet';
+// Service for creating substitution entries
 import * as timetableRepository from '@repositories/timetableRepository';
-import { TimetableEntryDTO, TimetableSetDTO } from '@repositories/timetableRepository';
+import { SubstitutionEntryDTO, TimetableEntryDTO, TimetableSetDTO } from '@repositories/timetableRepository';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { TimetableAdapter } from '@services/transformers/timetableAdapter';
 import { classMask, employeeMask, roomMask, TimetableExport, transformAndMask } from '@services/transformers/timetableExport';
+import { SubstitutionEntry } from '@models/SubstitutionEntry';
 
 export const createTEntry = async (tsetId: number, tentry: TimetableEntryDTO): Promise<TimetableEntry> => {
   // Verify the timetable set exists
@@ -15,6 +17,19 @@ export const createTEntry = async (tsetId: number, tentry: TimetableEntryDTO): P
   return await timetableRepository.createTEntry(tset, tentry);
 };
 
+/**
+ * Create a new substitution entry
+ * @param sentry
+ */
+
+export const createSubstitutionEntry = async (sentry: SubstitutionEntryDTO): Promise<SubstitutionEntry> => {
+  return await timetableRepository.createSEntry(sentry);
+};
+
+/**
+ * Create a new timetable set
+ * @param tset TimetableSetDTO
+ */
 export const createTSet = async (tset: TimetableSetDTO): Promise<TimetableSet> => {
   return await timetableRepository.createTSet(tset);
 };
