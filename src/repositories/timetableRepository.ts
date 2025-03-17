@@ -10,7 +10,8 @@ import { Room } from '@models/Room';
 import { StudentGroup } from '@models/StudentGroup';
 import { sequelize } from '../index';
 import { getLessonBulkInTSetPeriod } from '@repositories/lessonRecordRepository';
-import { LessonRecord } from '@models/LessonRecord';
+import { ClassRegister } from '@models/ClassRegister';
+import { SubstitutionEntry } from '@models/SubstitutionEntry';
 
 export interface TimetableSetDTO {
   name: string;
@@ -18,7 +19,7 @@ export interface TimetableSetDTO {
   validTo: string;
 }
 
-export interface TimetableEntryDTO {
+export interface EntryDTO {
   classId: number;
   studentGroupId?: number;
   dayInWeek: number;
@@ -26,6 +27,13 @@ export interface TimetableEntryDTO {
   subjectId: number;
   teacherId: number;
   roomId: number;
+}
+
+export type TimetableEntryDTO = EntryDTO;
+
+export interface SubstitutionEntryDTO extends EntryDTO {
+  date: Date;
+  type: string;
 }
 
 /**
@@ -45,9 +53,9 @@ export const createTEntry = async (tset: TimetableSet, data: TimetableEntryDTO):
     await tset.$add('TimetableEntry', tentry, { transaction: transaction });
 
     // Create LessonsRecords in TSet validity period
-    const lessons: LessonRecord[] = await getLessonBulkInTSetPeriod(tset, tentry);
+    const lessons: ClassRegister[] = await getLessonBulkInTSetPeriod(tset, tentry);
 
-    await LessonRecord.bulkCreate(lessons, {
+    await ClassRegister.bulkCreate(lessons, {
       transaction: transaction,
       validate: true
     });
@@ -59,6 +67,153 @@ export const createTEntry = async (tset: TimetableSet, data: TimetableEntryDTO):
     // Rollback if error
     await transaction.rollback();
     throw err;
+  }
+};
+
+export const createSEntry = async (data: SubstitutionEntryDTO): Promise<void> => {
+  const transaction: Transaction = await sequelize.transaction();
+
+  try {
+    // Find or create the substitution entry based on provided data
+    const sentry = await findOrCreateSubstitutionEntry(data, transaction);
+
+    // Find if a class register already exists for the provided date and substitution entry
+    let classregister = await findClassRegister(data, sentry, transaction);
+
+    if (!classregister) {
+      // If no class register exists, create a new one associated with the substitution entry
+      classregister = await createClassRegisterWithSubstitution(sentry, data, transaction);
+    } else {
+      if (classregister.timetableEntry) {
+        // If there's a linked timetable entry, handle conflicts with the substitution entry
+        await handleTimetableEntryConflict(classregister, data, transaction);
+      } else if (classregister.substitutionEntry) {
+        // If there's a linked substitution entry, handle conflicts between the old and new substitution entries
+        await handleSubstitutionEntryConflict(classregister, data, transaction);
+      }
+    }
+
+    // If all operations succeed, commit the transaction
+    await transaction.commit();
+  } catch (err) {
+    // Rollback transaction in case of an error
+    await transaction.rollback();
+    throw err;
+  }
+};
+
+const findOrCreateSubstitutionEntry = async (data: SubstitutionEntryDTO, transaction: Transaction) => {
+  // Try to find an existing substitution entry matching the data
+  let sentry = await SubstitutionEntry.findOne({
+    where: {
+      hourInDay: data.hourInDay,
+      dayInWeek: data.dayInWeek,
+      classId: data.classId,
+      studentGroupId: data.studentGroupId,
+      subjectId: data.subjectId,
+      teacherId: data.teacherId,
+      roomId: data.roomId
+    },
+    transaction: transaction
+  });
+
+  // If no entry is found, create a new substitution entry
+  if (!sentry) {
+    sentry = await SubstitutionEntry.create(data as unknown as SubstitutionEntry, { transaction: transaction });
+  }
+
+  return sentry;
+};
+
+const findClassRegister = async (data: SubstitutionEntryDTO, sentry: SubstitutionEntry, transaction: Transaction) => {
+  // Find if there's already a class register for the given date, linked to a timetable entry or substitution entry
+  return await ClassRegister.findOne({
+    where: { date: data.date },
+    include: [
+      {
+        model: TimetableEntry,
+        required: false,
+        where: {
+          hourInDay: sentry.hourInDay,
+          classId: sentry.classId,
+          studentGroupId: sentry.studentGroupId
+        }
+      },
+      {
+        model: SubstitutionEntry,
+        required: false,
+        where: {
+          hourInDay: sentry.hourInDay,
+          classId: sentry.classId,
+          studentGroupId: sentry.studentGroupId
+        }
+      }
+    ],
+    having: sequelize.where(
+      sequelize.literal(
+        '(TimetableEntry IS NOT NULL AND SubstitutionEntry IS NULL) OR (TimetableEntry IS NULL AND SubstitutionEntry IS NOT NULL)'
+      ),
+      true
+    ),
+    transaction: transaction
+  });
+};
+
+const createClassRegisterWithSubstitution = async (sentry: SubstitutionEntry, data: SubstitutionEntryDTO, transaction: Transaction) => {
+  // Create a new class register and associate it with the substitution entry
+  return await ClassRegister.create(
+    {
+      date: data.date,
+      timetableEntryId: null,
+      substitutionEntryId: sentry.substitutionEntryId
+    } as ClassRegister,
+    { transaction: transaction }
+  );
+};
+
+const handleTimetableEntryConflict = async (classregister: ClassRegister, data: SubstitutionEntryDTO, transaction: Transaction) => {
+  // Find or create a substitution entry for the provided data
+  const substitutionEntry = await findOrCreateSubstitutionEntry(data, transaction);
+
+  if (substitutionEntry && classregister) {
+    // Nullify the timetable entry ID in the class register
+    classregister.timetableEntryId = null;
+
+    // Assign the substitution entry ID to the class register
+    classregister.substitutionEntryId = substitutionEntry.substitutionEntryId;
+
+    // Save the updated class register
+    await classregister.save({ transaction: transaction });
+  }
+};
+
+const handleSubstitutionEntryConflict = async (classregister: ClassRegister, data: SubstitutionEntryDTO, transaction: Transaction) => {
+  const oldSubstitutionEntry = classregister.substitutionEntry;
+
+  // Create a new substitution entry for the updated data
+  const newSubstitutionEntry = await SubstitutionEntry.create(data as unknown as SubstitutionEntry, {
+    transaction: transaction
+  });
+
+  if (newSubstitutionEntry && classregister) {
+    // Assign the new substitution entry ID to the class register
+    classregister.substitutionEntryId = newSubstitutionEntry.substitutionEntryId;
+
+    // Save the updated class register with the new substitution entry ID
+    await classregister.save({ transaction: transaction });
+
+    // Check if the old substitution entry is still being referenced by any class registers
+    if (oldSubstitutionEntry) {
+      const isOldEntryUsed = await ClassRegister.count({
+        where: { substitutionEntryId: oldSubstitutionEntry.substitutionEntryId },
+        transaction: transaction
+      });
+
+      // If the old substitution entry is unused, delete it
+      if (isOldEntryUsed === 0) {
+        await oldSubstitutionEntry.destroy({ transaction: transaction });
+      }
+    }
   }
 };
 
