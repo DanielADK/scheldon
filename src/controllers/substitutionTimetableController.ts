@@ -1,20 +1,23 @@
 import Joi from 'joi';
 import { Context } from 'koa';
-import * as lessonRecordService from '@services/lessonRecordService';
-import {
-  getDateFromParam,
-  getIdFromParam,
-  handleError
-} from '../lib/controllerTools';
-import { TimetableExport } from '@services/transformers/timetableExport';
+import * as lessonRecordService from '@services/substitutionTimetableService';
+import { handleError } from '../lib/controllerTools';
 import { SubstitutionType } from '@models/types/SubstitutionType';
+import { DAY_COUNT, HOUR_COUNT } from '../config/timetableConfig';
+import { TimetableExport } from '@services/transformers/timetableExport';
 
 // Schema for administratively creating a lesson record
 const createLessonRecordSchema = Joi.object({
   classId: Joi.number().required(),
   studentGroupId: Joi.number().optional(),
-  dayInWeek: Joi.number().required().min(0).max(4),
-  hourInDay: Joi.number().required().min(0).max(10),
+  dayInWeek: Joi.number()
+    .required()
+    .min(0)
+    .max(DAY_COUNT - 1),
+  hourInDay: Joi.number()
+    .required()
+    .min(0)
+    .max(HOUR_COUNT - 1),
   subjectId: Joi.number().optional(),
   teacherId: Joi.number().optional(),
   roomId: Joi.number().optional(),
@@ -24,6 +27,8 @@ const createLessonRecordSchema = Joi.object({
     .valid(...Object.values(SubstitutionType))
     .required()
 });
+
+type getterService = (id: number) => Promise<TimetableExport | null>;
 
 /**
  * Create a new lesson record/remove a lesson record to/from the standard timetable
@@ -39,8 +44,7 @@ export const createCustomLessonRecord = async (ctx: Context): Promise<void> => {
   }
 
   try {
-    const lessonRecord =
-      await lessonRecordService.createCustomLessonRecord(value);
+    const lessonRecord = await lessonRecordService.createCustomLessonRecord(value);
     ctx.status = 201;
     ctx.body = lessonRecord;
   } catch (error) {
@@ -52,36 +56,6 @@ export const deleteLessonRecord = async (ctx: Context): Promise<void> => {
   try {
     await lessonRecordService.deleteLessonRecord(ctx.params.id);
     ctx.status = 204;
-  } catch (error) {
-    handleError(ctx, error);
-  }
-};
-
-type getterService = (
-  id: number,
-  date: Date
-) => Promise<TimetableExport | null>;
-
-export const getCurrentTimetableByIdController = async (
-  ctx: Context,
-  getterService: getterService
-): Promise<void> => {
-  try {
-    const id: number = await getIdFromParam(ctx.params.id);
-    const date: Date =
-      ctx.params.date === 'now'
-        ? new Date()
-        : await getDateFromParam(ctx.params.date);
-
-    const timetable: TimetableExport | null = await getterService(id, date);
-
-    if (!timetable) {
-      ctx.status = 404;
-      ctx.body = { error: 'Timetable not found' };
-    }
-
-    ctx.status = 200;
-    ctx.body = timetable;
   } catch (error) {
     handleError(ctx, error);
   }

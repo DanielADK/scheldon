@@ -4,6 +4,7 @@ import { Subject } from '@models/Subject';
 import { Employee } from '@models/Employee';
 import { Room } from '@models/Room';
 import { StudentGroup } from '@models/StudentGroup';
+import { SubstitutionType } from '@models/types/SubstitutionType';
 
 @Table({
   timestamps: false,
@@ -77,6 +78,12 @@ export class SubstitutionEntry extends Model<SubstitutionEntry> {
     allowNull: false
   })
   declare roomId: number;
+
+  @Column({
+    type: DataType.ENUM(...Object.values(SubstitutionType)),
+    allowNull: false
+  })
+  declare type: SubstitutionType;
 
   // Mappings
   @BelongsTo(() => Class)
