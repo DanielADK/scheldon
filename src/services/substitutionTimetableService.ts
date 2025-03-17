@@ -1,14 +1,12 @@
 import * as lessonRecordRepository from '@repositories/lessonRecordRepository';
 import { LessonRecordDTO } from '@repositories/lessonRecordRepository';
-import { LessonRecord } from '@models/LessonRecord';
+import { ClassRegister } from '@models/ClassRegister';
 
 /**
  * Create a custom lesson record in the timetable
  * @param data LessonRecordDTO
  */
-export const createCustomLessonRecord = async (
-  data: LessonRecordDTO
-): Promise<LessonRecord> => {
+export const createCustomLessonRecord = async (data: LessonRecordDTO): Promise<ClassRegister> => {
   return await lessonRecordRepository.createCustomLesson(data);
 };
 
@@ -25,14 +23,8 @@ export const deleteLessonRecord = async (id: string): Promise<void> => {
  * @param classId int
  * @param date
  */
-/*export const getTimetableByClassId = async (
-  classId: number,
-  date: Date = new Date()
-): Promise<TimetableExport | null> => {
-  const timetable = await lessonRecordRepository.getCurrentWeekTimetableByParam(
-    { classId: classId },
-    date
-  );
+/*export const getTimetableByClassId = async (classId: number, date: Date = new Date()): Promise<TimetableExport | null> => {
+  const timetable = await lessonRecordRepository.getCurrentWeekTimetableByParam({ classId: classId }, date);
   return transformAndMask(timetable, new LessonAdapter(), classMask);
 };*/
 

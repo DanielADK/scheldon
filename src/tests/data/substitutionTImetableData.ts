@@ -10,14 +10,14 @@ export const temporaryLessons: LessonRecordDTO[] = [
     teacherId: 2,
     roomId: 2,
     date: addDays(startOfWeek(new Date()), 0).toISOString(),
-    type: 'VR'
+    type: 'A'
   },
   {
     classId: 1,
     dayInWeek: 0,
     hourInDay: 1,
     date: addDays(startOfWeek(new Date()), 0).toISOString(),
-    type: 'D'
+    type: 'M'
   },
   {
     classId: 1,
@@ -27,6 +27,6 @@ export const temporaryLessons: LessonRecordDTO[] = [
     teacherId: 2,
     roomId: 2,
     date: addDays(startOfWeek(new Date()), 1).toISOString(),
-    type: 'TM'
+    type: 'A'
   }
 ];
