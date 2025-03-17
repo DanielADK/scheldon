@@ -94,11 +94,11 @@ export const createSEntry = async (data: SubstitutionEntryDTO): Promise<void> =>
     const sentry = await findOrCreateSubstitutionEntry(data, transaction);
 
     // Find if a class register already exists for the provided date and substitution entry
-    let classregister = await findClassRegister(data, sentry, transaction);
+    const classregister = await findClassRegister(data, sentry, transaction);
 
     if (!classregister) {
       // If no class register exists, create a new one associated with the substitution entry
-      classregister = await createClassRegisterWithSubstitution(sentry, data, transaction);
+      await createClassRegisterWithSubstitution(sentry, data, transaction);
     } else {
       if (classregister.timetableEntry) {
         // If there's a linked timetable entry, handle conflicts with the substitution entry
