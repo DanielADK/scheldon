@@ -33,12 +33,12 @@ export const getLessonAttendance = async (lessonId: number, withStudents: boolea
 
 /**
  * Update the attendance record for a specific lesson with upsert
- * @param lesson LessonRecord - The lesson record
+ * @param lesson ClassRegister - The lesson record
  * @param attendance attendanceRecordDTO[] - The attendance records to upsert
  * @param transaction Transaction - The transaction to use
  */
 /*export const updateAttendance = async (
-  lesson: LessonRecord,
+  lesson: ClassRegister,
   attendance: attendanceRecordDTO[],
   transaction: Transaction
 ) => {

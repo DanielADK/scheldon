@@ -8,7 +8,7 @@ import { AttendanceType } from '@models/types/AttendanceType';
 import { Attendance } from '@models/Attendance';
 import { Student } from '@models/Student';
 import { getLessonAttendance } from '@repositories/attendanceRepository';
-import { LessonRecord } from '@models/LessonRecord';
+import { ClassRegister } from '@models/ClassRegister';
 
 interface ClassRegisterExport {
   lesson: {
@@ -85,7 +85,7 @@ export const groupStudentsByAttendance = (students: Student[], attendance: Atten
   // id to lower case
   lessonId = lessonId.toLowerCase();
   // find lesson by id
-  const lesson = await LessonRecord.findByPk(lessonId);
+  const lesson = await ClassRegister.findByPk(lessonId);
   if (!lesson) {
     throw new Error('Lesson not found');
   }
@@ -94,10 +94,10 @@ export const groupStudentsByAttendance = (students: Student[], attendance: Atten
 
 /**
  * Get the current lesson data for a specific teacher
- * @param lesson LessonRecord
+ * @param lesson ClassRegister
  * @returns Promise<ClassRegisterExport | null>
  */
-export const getCurrentLessonByLesson = async (lesson: LessonRecord): Promise<ClassRegisterExport | null> => {
+export const getCurrentLessonByLesson = async (lesson: ClassRegister): Promise<ClassRegisterExport | null> => {
   const students = await getStudentsForLesson(lesson.lessonId);
   const attendance = await getLessonAttendance(lesson.lessonId, true);
 

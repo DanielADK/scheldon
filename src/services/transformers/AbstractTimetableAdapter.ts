@@ -1,8 +1,8 @@
 import { TimetableEntrySet } from '@models/TimetableEntrySet';
-import { LessonRecord } from '@models/LessonRecord';
+import { ClassRegister } from '@models/ClassRegister';
 import { TimeLessonEntry } from '@services/transformers/timetableExport';
 
-export type TimetableModels = TimetableEntrySet | LessonRecord;
+export type TimetableModels = TimetableEntrySet | ClassRegister;
 /**
  * Abstract class for transforming timetable entries
  */
