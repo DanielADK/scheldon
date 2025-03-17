@@ -9,9 +9,10 @@ import { Subject } from '@models/Subject';
 import { Room } from '@models/Room';
 import { StudentGroup } from '@models/StudentGroup';
 import { sequelize } from '../index';
-import { getLessonBulkInTSetPeriod } from '@repositories/lessonRecordRepository';
+import { getLessonBulkInTSetPeriod } from '@repositories/DEPRlessonRecordRepository';
 import { ClassRegister } from '@models/ClassRegister';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
+import { getDayInWeek } from '../lib/timeLib';
 
 export interface TimetableSetDTO {
   name: string;
@@ -22,14 +23,15 @@ export interface TimetableSetDTO {
 export interface EntryDTO {
   classId: number;
   studentGroupId?: number;
-  dayInWeek: number;
   hourInDay: number;
   subjectId: number;
   teacherId: number;
   roomId: number;
 }
 
-export type TimetableEntryDTO = EntryDTO;
+export interface TimetableEntryDTO extends EntryDTO {
+  dayInWeek: number;
+}
 
 export interface SubstitutionEntryDTO extends EntryDTO {
   date: Date;
@@ -70,6 +72,20 @@ export const createTEntry = async (tset: TimetableSet, data: TimetableEntryDTO):
   }
 };
 
+/**
+ * Asynchronously creates or updates a substitution entry and its associated class register.
+ * This function performs several operations to ensure the proper handling of substitution
+ * entries and their integration with existing timetable or substitution data. It operates
+ * within a database transaction to ensure atomicity.
+ *
+ * @param {SubstitutionEntryDTO} data - The data required for creating or updating the substitution entry,
+ * including information about the substitution, the class it pertains to, and any associated metadata.
+ *
+ * @returns {Promise<void>} A promise that resolves when the substitution entry and related operations
+ * are successfully completed. If any error occurs, the transaction is rolled back and the error is thrown.
+ *
+ * @throws Will throw an error if any operation within the transaction fails, causing the transaction to be rolled back.
+ */
 export const createSEntry = async (data: SubstitutionEntryDTO): Promise<void> => {
   const transaction: Transaction = await sequelize.transaction();
 
@@ -107,7 +123,7 @@ const findOrCreateSubstitutionEntry = async (data: SubstitutionEntryDTO, transac
   let sentry = await SubstitutionEntry.findOne({
     where: {
       hourInDay: data.hourInDay,
-      dayInWeek: data.dayInWeek,
+      dayInWeek: getDayInWeek(data.date),
       classId: data.classId,
       studentGroupId: data.studentGroupId,
       subjectId: data.subjectId,

@@ -15,6 +15,17 @@ export const getWeekRange = (time: Date): { start: Date; end: Date } => {
 };
 
 /**
+ * Get dayInWeek from date
+ * Starting from Monday = 0, Sunday = 6
+ * @param date
+ * @returns {number}
+ */
+export const getDayInWeek = (date: Date): number => {
+  let day = date.getDay();
+  return ++day % 7; // Convert Sunday (0) to 6
+};
+
+/**
  * Binary search for the current hour in the timetable
  * @param timeString string
  * @param start number
