@@ -81,12 +81,12 @@ export const createTEntry = async (tset: TimetableSet, data: TimetableEntryDTO):
  * @param {SubstitutionEntryDTO} data - The data required for creating or updating the substitution entry,
  * including information about the substitution, the class it pertains to, and any associated metadata.
  *
- * @returns {Promise<void>} A promise that resolves when the substitution entry and related operations
- * are successfully completed. If any error occurs, the transaction is rolled back and the error is thrown.
+ * @returns {Promise<SubstitutionEntry>} A promise that resolves with the substitution entry used or created.
+ * If any error occurs, the transaction is rolled back and the error is thrown.
  *
  * @throws Will throw an error if any operation within the transaction fails, causing the transaction to be rolled back.
  */
-export const createSEntry = async (data: SubstitutionEntryDTO): Promise<void> => {
+export const createSEntry = async (data: SubstitutionEntryDTO): Promise<SubstitutionEntry> => {
   const transaction: Transaction = await sequelize.transaction();
 
   try {
@@ -102,15 +102,17 @@ export const createSEntry = async (data: SubstitutionEntryDTO): Promise<void> =>
     } else {
       if (classregister.timetableEntry) {
         // If there's a linked timetable entry, handle conflicts with the substitution entry
-        await handleTimetableEntryConflict(classregister, data, transaction);
+        await handleTimetableEntryConflict(classregister, sentry, transaction);
       } else if (classregister.substitutionEntry) {
         // If there's a linked substitution entry, handle conflicts between the old and new substitution entries
-        await handleSubstitutionEntryConflict(classregister, data, transaction);
+        await handleSubstitutionEntryConflict(classregister, sentry, transaction);
       }
     }
 
     // If all operations succeed, commit the transaction
     await transaction.commit();
+
+    return sentry;
   } catch (err) {
     // Rollback transaction in case of an error
     await transaction.rollback();
@@ -118,7 +120,14 @@ export const createSEntry = async (data: SubstitutionEntryDTO): Promise<void> =>
   }
 };
 
-const findOrCreateSubstitutionEntry = async (data: SubstitutionEntryDTO, transaction: Transaction) => {
+/**
+ * Finds an existing substitution entry matching the provided data, or creates a new one if none exists.
+ *
+ * @param {SubstitutionEntryDTO} data - The substitution entry data to find or create.
+ * @param {Transaction} transaction - The database transaction used for the operation.
+ * @returns {Promise<SubstitutionEntry>} Returns the found or newly created substitution entry.
+ */
+const findOrCreateSubstitutionEntry = async (data: SubstitutionEntryDTO, transaction: Transaction): Promise<SubstitutionEntry> => {
   // Try to find an existing substitution entry matching the data
   let sentry = await SubstitutionEntry.findOne({
     where: {
@@ -141,7 +150,22 @@ const findOrCreateSubstitutionEntry = async (data: SubstitutionEntryDTO, transac
   return sentry;
 };
 
-const findClassRegister = async (data: SubstitutionEntryDTO, sentry: SubstitutionEntry, transaction: Transaction) => {
+/**
+ * Asynchronously finds a class register for a specific date that is associated with either
+ * a timetable entry or a substitution entry based on the provided data.
+ *
+ * @param {SubstitutionEntryDTO} data - Object containing date information relevant to the class register search.
+ * @param {SubstitutionEntry} sentry - Substitution entry information, which includes details like hour in day, class ID, and student group ID.
+ * @param {Transaction} transaction - The database transaction within which the query is executed.
+ *
+ * @returns {Promise<ClassRegister | null>} A promise that resolves to the found class register or null
+ * if no matching record is found based on the specified criteria.
+ */
+const findClassRegister = async (
+  data: SubstitutionEntryDTO,
+  sentry: SubstitutionEntry,
+  transaction: Transaction
+): Promise<ClassRegister | null> => {
   // Find if there's already a class register for the given date, linked to a timetable entry or substitution entry
   return await ClassRegister.findOne({
     where: { date: data.date },
@@ -175,7 +199,19 @@ const findClassRegister = async (data: SubstitutionEntryDTO, sentry: Substitutio
   });
 };
 
-const createClassRegisterWithSubstitution = async (sentry: SubstitutionEntry, data: SubstitutionEntryDTO, transaction: Transaction) => {
+/**
+ * Creates a new class register and associates it with the provided substitution entry.
+ *
+ * @param {SubstitutionEntry} sentry - The substitution entry to associate with the class register.
+ * @param {SubstitutionEntryDTO} data - The data object containing details for the class register creation.
+ * @param {Transaction} transaction - The database transaction object to be used for creating the class register.
+ * @returns {Promise<ClassRegister>} A promise that resolves to the newly created class register.
+ */
+const createClassRegisterWithSubstitution = async (
+  sentry: SubstitutionEntry,
+  data: SubstitutionEntryDTO,
+  transaction: Transaction
+): Promise<ClassRegister> => {
   // Create a new class register and associate it with the substitution entry
   return await ClassRegister.create(
     {
@@ -187,48 +223,68 @@ const createClassRegisterWithSubstitution = async (sentry: SubstitutionEntry, da
   );
 };
 
-const handleTimetableEntryConflict = async (classregister: ClassRegister, data: SubstitutionEntryDTO, transaction: Transaction) => {
-  // Find or create a substitution entry for the provided data
-  const substitutionEntry = await findOrCreateSubstitutionEntry(data, transaction);
+/**
+ * Handles conflicts between timetable entries and substitution entries by updating the class register.
+ *
+ * This asynchronous function nullifies the `timetableEntryId` in the given class register and assigns the provided
+ * substitution entry's ID to the `substitutionEntryId` field of the class register.
+ * The changes are saved to the database using the specified transaction.
+ *
+ * @param {ClassRegister} classregister - The class register object to be updated.
+ * @param {SubstitutionEntry} sentry - The substitution entry containing the ID to be assigned.
+ * @param {Transaction} transaction - The transaction object used for database operations to ensure atomicity.
+ * @returns {Promise<void>} A promise that resolves once the class register is updated and saved successfully.
+ */
+const handleTimetableEntryConflict = async (
+  classregister: ClassRegister,
+  sentry: SubstitutionEntry,
+  transaction: Transaction
+): Promise<void> => {
+  // Nullify the timetable entry ID in the class register
+  classregister.timetableEntryId = null;
 
-  if (substitutionEntry && classregister) {
-    // Nullify the timetable entry ID in the class register
-    classregister.timetableEntryId = null;
+  // Assign the substitution entry ID to the class register
+  classregister.substitutionEntryId = sentry.substitutionEntryId;
 
-    // Assign the substitution entry ID to the class register
-    classregister.substitutionEntryId = substitutionEntry.substitutionEntryId;
-
-    // Save the updated class register
-    await classregister.save({ transaction: transaction });
-  }
+  // Save the updated class register
+  await classregister.save({ transaction: transaction });
 };
 
-const handleSubstitutionEntryConflict = async (classregister: ClassRegister, data: SubstitutionEntryDTO, transaction: Transaction) => {
+/**
+ * Handles the conflict that may arise when updating a substitution entry in a class register.
+ *
+ * This function assigns a new substitution entry to a class register, while ensuring that any
+ * previously associated substitution entry is removed if it is no longer in use. The operation
+ * is performed within the context of a database transaction to ensure consistency.
+ *
+ * @param {ClassRegister} classregister - The class register instance to update with the new substitution entry.
+ * @param {SubstitutionEntry} sentry - The new substitution entry to be associated with the class register.
+ * @param {Transaction} transaction - The Sequelize transaction object to ensure atomic operation.
+ *
+ * @throws {Error} If an error occurs during the update, save, or deletion process within the transaction.
+ *
+ * @async
+ * @function
+ */
+const handleSubstitutionEntryConflict = async (classregister: ClassRegister, sentry: SubstitutionEntry, transaction: Transaction) => {
   const oldSubstitutionEntry = classregister.substitutionEntry;
 
-  // Create a new substitution entry for the updated data
-  const newSubstitutionEntry = await SubstitutionEntry.create(data as unknown as SubstitutionEntry, {
-    transaction: transaction
-  });
+  // Assign the new substitution entry ID to the class register
+  classregister.substitutionEntryId = sentry.substitutionEntryId;
 
-  if (newSubstitutionEntry && classregister) {
-    // Assign the new substitution entry ID to the class register
-    classregister.substitutionEntryId = newSubstitutionEntry.substitutionEntryId;
+  // Save the updated class register with the new substitution entry ID
+  await classregister.save({ transaction: transaction });
 
-    // Save the updated class register with the new substitution entry ID
-    await classregister.save({ transaction: transaction });
+  // Check if the old substitution entry is still being referenced by any class registers
+  if (oldSubstitutionEntry) {
+    const isOldEntryUsed = await ClassRegister.count({
+      where: { substitutionEntryId: oldSubstitutionEntry.substitutionEntryId },
+      transaction: transaction
+    });
 
-    // Check if the old substitution entry is still being referenced by any class registers
-    if (oldSubstitutionEntry) {
-      const isOldEntryUsed = await ClassRegister.count({
-        where: { substitutionEntryId: oldSubstitutionEntry.substitutionEntryId },
-        transaction: transaction
-      });
-
-      // If the old substitution entry is unused, delete it
-      if (isOldEntryUsed === 0) {
-        await oldSubstitutionEntry.destroy({ transaction: transaction });
-      }
+    // If the old substitution entry is unused, delete it
+    if (isOldEntryUsed === 0) {
+      await oldSubstitutionEntry.destroy({ transaction: transaction });
     }
   }
 };

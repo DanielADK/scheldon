@@ -4,6 +4,7 @@ import { getIdFromParam, handleError } from '../lib/controllerTools';
 import { TimetableEntryDTO, TimetableSetDTO } from '@repositories/timetableRepository';
 import Joi from 'joi';
 import { TimetableExport } from '@services/transformers/timetableExport';
+import { SubstitutionType } from '@models/types/SubstitutionType';
 
 /**
  * Schema for creating a timetable set
@@ -27,6 +28,22 @@ export const timetableEntrySchema: Joi.ObjectSchema<TimetableEntryDTO> = Joi.obj
   roomId: Joi.number().required()
 });
 
+/**
+ * Schema for creating a substitution entry
+ */
+export const substitutionEntrySchema: Joi.ObjectSchema = Joi.object({
+  classId: Joi.number().required(),
+  studentGroupId: Joi.number().optional(),
+  hourInDay: Joi.number().required(),
+  subjectId: Joi.number().required(),
+  teacherId: Joi.number().required(),
+  roomId: Joi.number().required(),
+  date: Joi.date().iso().required(),
+  type: Joi.string()
+    .valid(...Object.values(SubstitutionType))
+    .required()
+});
+
 type getterService = (id: number) => Promise<TimetableExport | null>;
 
 /**
@@ -47,6 +64,29 @@ export const createTEntry = async (ctx: Context): Promise<void> => {
     const tentry = await timetableService.createTEntry(tsetId, value);
     ctx.status = 201;
     ctx.body = tentry;
+  } catch (error) {
+    handleError(ctx, error);
+  }
+};
+
+/**
+ * Create a new substitution entry
+ * @param ctx Context
+ */
+
+export const createSEntry = async (ctx: Context): Promise<void> => {
+  const { error, value } = substitutionEntrySchema.validate(ctx.request.body);
+
+  if (error) {
+    ctx.status = 400;
+    ctx.body = { error: error.details[0].message };
+    return;
+  }
+
+  try {
+    const substitutionEntry = await timetableService.createSubstitutionEntry(value);
+    ctx.status = 201;
+    ctx.body = substitutionEntry;
   } catch (error) {
     handleError(ctx, error);
   }
