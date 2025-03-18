@@ -1,5 +1,4 @@
 import { StudentGroup } from '@models/StudentGroup';
-import { GroupCategory } from '@models/GroupCategory';
 import { Transaction } from 'sequelize';
 import * as groupCategoryService from '@services/groupCategoryService';
 
@@ -24,7 +23,7 @@ export const createstudentGroup = async (data: studentGroupDTO): Promise<Student
  * Get all studentGroups
  */
 export const getstudentGroups = async (): Promise<StudentGroup[]> => {
-  return await StudentGroup.findAll({ include: [{ model: GroupCategory }] });
+  return await StudentGroup.findAll();
 };
 
 /**
@@ -32,9 +31,7 @@ export const getstudentGroups = async (): Promise<StudentGroup[]> => {
  * @param studentGroupId
  */
 export const getstudentGroupById = async (studentGroupId: number): Promise<StudentGroup | null> => {
-  return await StudentGroup.findByPk(studentGroupId, {
-    include: [{ model: GroupCategory }] // Připojit informace o kategorii
-  });
+  return await StudentGroup.findByPk(studentGroupId);
 };
 
 /**
@@ -43,8 +40,7 @@ export const getstudentGroupById = async (studentGroupId: number): Promise<Stude
  */
 export const getstudentGroupsByClassId = async (classId: number): Promise<StudentGroup[]> => {
   return await StudentGroup.findAll({
-    where: { classId },
-    include: [{ model: GroupCategory }]
+    where: { classId }
   });
 };
 
@@ -54,8 +50,7 @@ export const getstudentGroupsByClassId = async (classId: number): Promise<Studen
  */
 export const getstudentGroupsByCategoryId = async (categoryId: number): Promise<StudentGroup[]> => {
   return await StudentGroup.findAll({
-    where: { groupCategoryId: categoryId },
-    include: [{ model: GroupCategory }]
+    where: { groupCategoryId: categoryId }
   });
 };
 

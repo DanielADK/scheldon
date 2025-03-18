@@ -6,7 +6,7 @@ const router = new Router();
 // StudentGroup routes
 /**
  * Create a new studentGroup
- * POST /studentGroups
+ * POST /student-groups/
  * @openapi
  * components:
  *   schemas:
@@ -47,7 +47,7 @@ const router = new Router();
  *       required:
  *         - name
  *         - classId
- * /studentGroups:
+ * /student-groups/:
  *   post:
  *     tags:
  *        - StudentGroup
@@ -64,13 +64,13 @@ const router = new Router();
  *       400:
  *         description: Invalid input
  */
-router.post('/studentGroups', studentGroupController.createstudentGroup);
+router.post('/student-groups/', studentGroupController.createstudentGroup);
 
 /**
  * Get a studentGroup by ID
- * GET /studentGroups/{id}
+ * GET /student-groups/{id}
  * @openapi
- * /studentGroups/{id}:
+ * /student-groups/{id}:
  *   get:
  *     tags:
  *        - StudentGroup
@@ -87,13 +87,13 @@ router.post('/studentGroups', studentGroupController.createstudentGroup);
  *       404:
  *         description: studentGroup not found
  */
-router.get('/studentGroups/:id', studentGroupController.getstudentGroupById);
+router.get('/student-groups/:id', studentGroupController.getstudentGroupById);
 
 /**
  * Get all studentGroups of a specific class
- * GET /studentGroups/class/{classId}
+ * GET /student-groups/class/{classId}
  * @openapi
- * /studentGroups/class/{classId}:
+ * /student-groups/class/{classId}:
  *   get:
  *     tags:
  *        - StudentGroup
@@ -116,13 +116,13 @@ router.get('/studentGroups/:id', studentGroupController.getstudentGroupById);
  *       404:
  *         description: Class not found
  */
-router.get('/studentGroups/class/:classId', studentGroupController.getstudentGroupsByClassId);
+router.get('/student-groups/class/:classId', studentGroupController.getstudentGroupsByClassId);
 
 /**
  * Get all studentGroups of a specific category
- * GET /studentGroups/category/{categoryId}
+ * GET /student-groups/category/{categoryId}
  * @openapi
- * /studentGroups/category/{categoryId}:
+ * /student-groups/category/{categoryId}:
  *   get:
  *     tags:
  *        - StudentGroup
@@ -145,13 +145,13 @@ router.get('/studentGroups/class/:classId', studentGroupController.getstudentGro
  *       404:
  *         description: Category not found
  */
-router.get('/studentGroups/category/:categoryId', studentGroupController.getstudentGroupsByCategoryId);
+router.get('/student-groups/category/:categoryId', studentGroupController.getstudentGroupsByCategoryId);
 
 /**
  * Update a studentGroup by ID
- * PUT /studentGroups/{id}
+ * PUT /student-groups/{id}
  * @openapi
- * /studentGroups/{id}:
+ * /student-groups/{id}:
  *   put:
  *     tags:
  *        - StudentGroup
@@ -176,13 +176,13 @@ router.get('/studentGroups/category/:categoryId', studentGroupController.getstud
  *       404:
  *         description: studentGroup not found
  */
-router.put('/studentGroups/:id', studentGroupController.updatestudentGroup);
+router.put('/student-groups/:id', studentGroupController.updatestudentGroup);
 
 /**
  * Delete a studentGroup by ID
- * DELETE /studentGroups/{id}
+ * DELETE /student-groups/{id}
  * @openapi
- * /studentGroups/{id}:
+ * /student-groups/{id}:
  *   delete:
  *     tags:
  *        - StudentGroup
@@ -199,6 +199,6 @@ router.put('/studentGroups/:id', studentGroupController.updatestudentGroup);
  *       404:
  *         description: studentGroup not found
  */
-router.delete('/studentGroups/:id', studentGroupController.deletestudentGroup);
+router.delete('/student-groups/:id', studentGroupController.deletestudentGroup);
 
 export default router;
