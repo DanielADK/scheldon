@@ -3,6 +3,65 @@
 ### Precondition: Create a new class
 #####################################
 
+
+#####################################
+### Precondition: Create a new teacher
+#####################################
+
+### Create new teacher
+POST http://{{ip}}/employees
+Content-Type: application/json
+
+{
+  "username": "jdoee",
+  "name": "John",
+  "surname": "Doee",
+  "degreePre": "Dr.",
+  "degreePost": "PhD LLM",
+  "abbreviation": "JO",
+  "isTeacher": true
+}
+
+> {%
+  client.test("Teacher creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'employeeId'", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("employeeId"), "Response does not contain 'employeeId'");
+    // Save teacherId for subsequent tests
+    client.global.set("createdTeacherId", json.employeeId);
+  });
+%}
+
+#####################################
+### Precondition: Create a new room
+#####################################
+
+### Create new room
+POST http://{{ip}}/rooms
+Content-Type: application/json
+
+{
+  "name": "classroom123",
+  "type": "CLASSROOM",
+  "floor": 1,
+  "studentCapacity": 30,
+  "administratorId": {{createdTeacherId}}
+}
+
+> {%
+  client.test("Room creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'roomId'", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("roomId"), "Response does not contain 'roomId'");
+    // Save roomId for subsequent tests
+    client.global.set("createdRoomId", json.roomId);
+  });
+%}
+
 ### Create new class
 POST http://{{ip}}/classes
 Content-Type: application/json
@@ -11,8 +70,8 @@ Content-Type: application/json
   "name": "Test Class",
   "validFrom": "2023-09-01",
   "validTo": "2024-06-30",
-  "roomId": 1,
-  "employeeId": 1
+  "roomId": {{createdRoomId}},
+  "employeeId": {{createdTeacherId}}
 }
 
 > {%
@@ -32,7 +91,7 @@ Content-Type: application/json
 #####################################
 
 ### Create new student group
-POST http://{{ip}}/studentGroups
+POST http://{{ip}}/student-groups/
 Content-Type: application/json
 
 {
@@ -53,7 +112,7 @@ Content-Type: application/json
 %}
 
 ### Create new student group with invalid input (missing 'name')
-POST http://{{ip}}/studentGroups
+POST http://{{ip}}/student-groups/
 Content-Type: application/json
 
 {
@@ -67,7 +126,7 @@ Content-Type: application/json
 %}
 
 ### Get student group by ID
-GET http://{{ip}}/studentGroups/{{createdStudentGroupId}}
+GET http://{{ip}}/student-groups/{{createdStudentGroupId}}
 
 > {%
   client.test("Get student group status is 200", function () {
@@ -83,7 +142,7 @@ GET http://{{ip}}/studentGroups/{{createdStudentGroupId}}
 %}
 
 ### Get all student groups for the class
-GET http://{{ip}}/studentGroups/class/{{createdClassId}}
+GET http://{{ip}}/student-groups/class/{{createdClassId}}
 
 > {%
   client.test("Get all groups status is 200", function () {
@@ -100,7 +159,7 @@ GET http://{{ip}}/studentGroups/class/{{createdClassId}}
 %}
 
 ### Update student group
-PUT http://{{ip}}/studentGroups/{{createdStudentGroupId}}
+PUT http://{{ip}}/student-groups/{{createdStudentGroupId}}
 Content-Type: application/json
 
 {
@@ -115,11 +174,10 @@ Content-Type: application/json
 %}
 
 ### Update student group with invalid input (missing 'name')
-PUT http://{{ip}}/studentGroups/{{createdStudentGroupId}}
+PUT http://{{ip}}/student-groups/{{createdStudentGroupId}}
 Content-Type: application/json
 
 {
-  "studentGroupId": {{createdStudentGroupId}},
   "classId": {{createdClassId}}
 }
 
@@ -130,7 +188,7 @@ Content-Type: application/json
 %}
 
 ### Delete student group
-DELETE http://{{ip}}/studentGroups/{{createdStudentGroupId}}
+DELETE http://{{ip}}/student-groups/{{createdStudentGroupId}}
 
 > {%
   client.test("Student group deletion status is 200", function () {
@@ -139,7 +197,7 @@ DELETE http://{{ip}}/studentGroups/{{createdStudentGroupId}}
 %}
 
 ### Verify student group deletion (GET on deleted group)
-GET http://{{ip}}/studentGroups/{{createdStudentGroupId}}
+GET http://{{ip}}/student-groups/{{createdStudentGroupId}}
 
 > {%
   client.test("Expected status 404 for deleted student group", function () {
@@ -166,5 +224,41 @@ GET http://{{ip}}/classes/{{createdClassId}}
 > {%
   client.test("Expected status 404 for deleted class", function () {
     client.assert(response.status === 404, "Expected status 404 for a deleted class, but got " + response.status);
+  });
+%}
+
+### Delete room
+DELETE http://{{ip}}/rooms/{{createdRoomId}}
+
+> {%
+  client.test("Room deletion status is 204", function () {
+    client.assert(response.status === 204, "Expected status 204 for room deletion, but got " + response.status);
+  });
+%}
+
+### Verify room deletion (GET on deleted room)
+GET http://{{ip}}/rooms/{{createdRoomId}}
+
+> {%
+  client.test("Expected status 404 for deleted room", function () {
+    client.assert(response.status === 404, "Expected status 404 for a deleted room, but got " + response.status);
+  });
+%}
+
+### Delete employee
+DELETE http://{{ip}}/employees/{{createdTeacherId}}
+
+> {%
+  client.test("Employee deletion status is 204", function () {
+    client.assert(response.status === 204, "Expected status 204 for employee deletion, but got " + response.status);
+  });
+%}
+
+### Verify employee deletion (GET on deleted employee)
+GET http://{{ip}}/employees/{{createdTeacherId}}
+
+> {%
+  client.test("Expected status 404 for deleted employee", function () {
+    client.assert(response.status === 404, "Expected status 404 for a deleted employee, but got " + response.status);
   });
 %}
