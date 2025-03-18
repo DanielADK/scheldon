@@ -26,6 +26,7 @@ import {
   validateTeacherSchedule
 } from '@validators/classValidators';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
+import { GroupCategory } from '@models/GroupCategory';
 
 @Table({
   timestamps: false,
@@ -114,7 +115,10 @@ export class Class extends Model<Class> {
   declare studentGroups: StudentGroup[];
 
   @HasMany(() => Study)
-  declare studentAssignments: Study[];
+  declare studies: Study[];
+
+  @HasMany(() => GroupCategory)
+  declare groupCategories: GroupCategory[];
 
   // Hooks for validation
   @BeforeCreate
