@@ -1,7 +1,7 @@
 import { Study } from '@models/Study';
 import { Op } from 'sequelize';
 
-export interface StudentAssignmentDTO {
+export interface StudyDTO {
   classId: number;
   studentGroupId?: number;
   validFrom?: Date;
@@ -13,7 +13,7 @@ export interface StudentAssignmentDTO {
  * @param studentId
  * @param data
  */
-export const terminateAssignment = async (studentId: number, data: StudentAssignmentDTO) => {
+export const terminateAssignment = async (studentId: number, data: StudyDTO) => {
   // End all ongoing assignments
   await Study.update(
     {
@@ -29,7 +29,7 @@ export const terminateAssignment = async (studentId: number, data: StudentAssign
   );
 };
 
-export const terminateAllAssignments = async (studentId: number, data: StudentAssignmentDTO) => {
+export const terminateAllAssignments = async (studentId: number, data: StudyDTO) => {
   // End all ongoing assignments
   await Study.update(
     {
@@ -44,7 +44,7 @@ export const terminateAllAssignments = async (studentId: number, data: StudentAs
   );
 };
 
-export const createAssignment = async (studentId: number, data: StudentAssignmentDTO) => {
+export const createAssignment = async (studentId: number, data: StudyDTO) => {
   return await Study.create({
     studentId: studentId,
     classId: data.classId,
