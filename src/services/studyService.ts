@@ -1,5 +1,5 @@
 import * as studentAssignmentRepository from '@repositories/studyRepository';
-import { StudentAssignmentDTO } from '@repositories/studyRepository';
+import { StudyDTO } from '@repositories/studyRepository';
 import * as classRepository from '@repositories/classRepository';
 
 /**
@@ -7,14 +7,14 @@ import * as classRepository from '@repositories/classRepository';
  * @param studentId
  * @param data
  */
-export const createAssignment = async (studentId: number, data: StudentAssignmentDTO) => {
+export const startStudy = async (studentId: number, data: StudyDTO) => {
   const classInfo = await classRepository.getClassById(data.classId);
   if (!classInfo) {
     throw new Error('Class not found');
   }
 
-  // If validFrom is not provided, set it to the classes default validFrom
-  const validFrom = data.validFrom ? new Date(data.validFrom) : new Date(classInfo.validFrom);
+  // If validFrom is not provided, set now
+  const validFrom = data.validFrom ? new Date(data.validFrom) : new Date();
   // If validTo is not provided, set it to the classes default validTo
   const validTo = data.validTo ? new Date(data.validTo) : new Date(classInfo.validTo);
 
@@ -24,7 +24,7 @@ export const createAssignment = async (studentId: number, data: StudentAssignmen
     classId: data.classId,
     validFrom: validFrom,
     validTo: validTo
-  } as StudentAssignmentDTO);
+  } as StudyDTO);
 };
 
 /**
@@ -32,7 +32,7 @@ export const createAssignment = async (studentId: number, data: StudentAssignmen
  * @param studentId
  * @param data
  */
-export const terminateAssignment = async (studentId: number, data: StudentAssignmentDTO) => {
+export const stopStudy = async (studentId: number, data: StudyDTO) => {
   const classInfo = await classRepository.getClassById(data.classId);
   if (!classInfo) {
     throw new Error('Class not found');

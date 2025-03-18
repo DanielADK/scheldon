@@ -1,30 +1,30 @@
 import Joi from 'joi';
 import { Context } from 'koa';
-import * as studentAssignmentService from '@services/studyService';
+import * as studyService from '@services/studyService';
 import { getIdFromParam, handleError } from '../lib/controllerTools';
 
 // Schema for assigning a student to a class/studentGroup
-const assignStudentSchema = Joi.object({
+const startStudySchema = Joi.object({
   classId: Joi.number().required(),
   studentGroupId: Joi.number().optional(),
   validFrom: Joi.date().optional(),
   validTo: Joi.date().optional()
 });
 
-const unassignStudentSchema = Joi.object({
+const stopStudySchema = Joi.object({
   classId: Joi.number().required(),
   studentGroupId: Joi.number().optional(),
   validTo: Joi.date().optional()
 });
 
 /**
- * Assign a student to a class
+ * Start student's study
  * @param {Context} ctx - The Koa request/response context object
- * POST /students/:studentId/assign
+ * POST /students/:studentId/start
  */
-export const assignStudent = async (ctx: Context) => {
+export const startStudy = async (ctx: Context) => {
   const studentId = await getIdFromParam(ctx.params.studentId as string);
-  const { error, value } = assignStudentSchema.validate(ctx.request.body);
+  const { error, value } = startStudySchema.validate(ctx.request.body);
 
   if (error) {
     ctx.status = 400;
@@ -33,22 +33,22 @@ export const assignStudent = async (ctx: Context) => {
   }
 
   try {
-    const assignment = await studentAssignmentService.createAssignment(studentId, value);
+    const study = await studyService.startStudy(studentId, value);
 
     ctx.status = 201;
-    ctx.body = assignment;
+    ctx.body = study;
   } catch (error) {
     handleError(ctx, error);
   }
 };
 
 /**
- * Unassign a student from a class
+ * Stop student's study
  * @param ctx - The Koa request/response context object DELETE /students/:studentId/unassign
  */
-export const unassignStudent = async (ctx: Context) => {
+export const stopStudy = async (ctx: Context) => {
   const studentId = await getIdFromParam(ctx.params.studentId as string);
-  const { error, value } = unassignStudentSchema.validate(ctx.request.body);
+  const { error, value } = stopStudySchema.validate(ctx.request.body);
 
   if (error) {
     ctx.status = 400;
@@ -56,7 +56,7 @@ export const unassignStudent = async (ctx: Context) => {
   }
 
   try {
-    await studentAssignmentService.terminateAssignment(studentId, value);
+    await studyService.stopStudy(studentId, value);
 
     ctx.status = 204;
   } catch (error) {
