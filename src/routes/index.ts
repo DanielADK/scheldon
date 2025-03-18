@@ -6,7 +6,8 @@ import classes from '@routes/class';
 import rooms from '@routes/room';
 import swagger from '@routes/swagger';
 import studentGroup from '@routes/studentGroup';
-import timetable from '@routes/timetable';
+import stableTimetable from '@routes/stableTimetable';
+import temporaryTimetable from '@routes/stableTimetable';
 import studentAssignment from '@routes/study';
 import classRegister from './classRegister';
 
@@ -19,7 +20,8 @@ router.use(classes.routes());
 router.use(studentGroup.routes());
 router.use(rooms.routes());
 router.use(studentAssignment.routes());
-router.use(timetable.routes());
+router.use(stableTimetable.routes());
+router.use(temporaryTimetable.routes());
 router.use(classRegister.routes());
 // Swagger
 router.use(swagger.routes());
