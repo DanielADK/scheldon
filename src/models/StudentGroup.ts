@@ -54,10 +54,12 @@ export class StudentGroup extends Model<StudentGroup> {
   @ForeignKey(() => GroupCategory)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
-    allowNull: true,
-    unique: false
+    allowNull: true
   })
-  declare groupCategoryId: number;
+  declare groupCategoryId: number | null;
+
+  @BelongsTo(() => GroupCategory)
+  declare category: GroupCategory;
 
   @BelongsTo(() => Class)
   declare class: Class;
@@ -72,7 +74,7 @@ export class StudentGroup extends Model<StudentGroup> {
   declare substitutionEntries: SubstitutionEntry[];
 
   @HasMany(() => Study)
-  declare studentAssignments: Study[];
+  declare studies: Study[];
 
   @BeforeCreate
   @BeforeUpdate

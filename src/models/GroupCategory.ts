@@ -1,5 +1,6 @@
-import { AutoIncrement, Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import { StudentGroup } from '@models/StudentGroup';
+import { Class } from '@models/Class';
 
 @Table({
   timestamps: false
@@ -16,10 +17,19 @@ export class GroupCategory extends Model<GroupCategory> {
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
-    unique: true
+    allowNull: false
   })
   declare name: string;
+
+  @ForeignKey(() => Class)
+  @Column({
+    type: DataType.INTEGER.UNSIGNED,
+    allowNull: false
+  })
+  declare classId: number;
+
+  @BelongsTo(() => Class)
+  declare class: Class;
 
   @HasMany(() => StudentGroup)
   declare studentGroups: StudentGroup[];
