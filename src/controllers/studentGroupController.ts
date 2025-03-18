@@ -1,13 +1,17 @@
 // Schema for creating and updating a studentGroup
 import Joi from 'joi';
-import { studentGroupDTO } from '@repositories/studentGroupRepository';
+import * as studentGroupRepository from '@repositories/studentGroupRepository';
+import { studentGroupDTO, validateCategoryBelongsToClass } from '@repositories/studentGroupRepository';
+import * as groupCategoryService from '@services/groupCategoryService';
 import * as studentGroupService from '@services/studentGroupService';
 import { Context } from 'koa';
 import { getIdFromParam, handleError } from '../lib/controllerTools';
+import { Transaction } from 'sequelize';
 
 const studentGroupSchema: Joi.ObjectSchema<studentGroupDTO> = Joi.object({
   name: Joi.string().required().min(1).max(100),
-  classId: Joi.number().required()
+  classId: Joi.number().required(),
+  categoryId: Joi.number().allow(null)
 });
 
 /**
@@ -24,6 +28,22 @@ export const createstudentGroup = async (ctx: Context) => {
   }
 
   try {
+    // check if category belongs to the same class as the group
+    if (value.categoryId) {
+      const category = await groupCategoryService.getGroupCategoryById(value.categoryId);
+      if (!category) {
+        ctx.status = 400;
+        ctx.body = { error: 'Category not found' };
+        return;
+      }
+
+      if (category.classId !== value.classId) {
+        ctx.status = 400;
+        ctx.body = { error: 'Group must be in same class as its category' };
+        return;
+      }
+    }
+
     const studentGroup = await studentGroupService.createstudentGroup(value);
     ctx.status = 201;
     ctx.body = studentGroup;
@@ -81,6 +101,19 @@ export const getstudentGroupsByClassId = async (ctx: Context) => {
 };
 
 /**
+ * Get all studentGroups of a specific category
+ * @param ctx
+ */
+export const getstudentGroupsByCategoryId = async (ctx: Context) => {
+  const categoryId = await getIdFromParam(ctx.params.categoryId as string);
+
+  const studentGroups = await studentGroupService.getstudentGroupsByCategoryId(categoryId);
+
+  ctx.status = 200;
+  ctx.body = studentGroups;
+};
+
+/**
  * Update a studentGroup
  * @param ctx
  */
@@ -97,6 +130,11 @@ export const updatestudentGroup = async (ctx: Context) => {
   }
 
   try {
+    // Check if updated category belongs to the same class as the group
+    if (value.categoryId !== undefined && value.categoryId !== null) {
+      await validateCategoryBelongsToClass(value.categoryId, value.classId);
+    }
+
     const [affectedCount] = await studentGroupService.updatestudentGroup(studentGroupId, value);
 
     if (affectedCount > 0) {
@@ -119,6 +157,15 @@ export const deletestudentGroup = async (ctx: Context) => {
   const studentGroupId = await getIdFromParam(ctx.params.id as string);
 
   try {
+    // Check if the group has any students
+    const hasStudents = await studentGroupService.hasStudents(studentGroupId);
+
+    if (hasStudents) {
+      ctx.status = 400;
+      ctx.body = { error: 'studentGroup cannot be deleted because it has students' };
+      return;
+    }
+
     const deleted = await studentGroupService.deletestudentGroup(studentGroupId);
 
     if (!deleted) {
@@ -132,4 +179,14 @@ export const deletestudentGroup = async (ctx: Context) => {
   } catch (error) {
     handleError(ctx, error);
   }
+};
+
+/**
+ * Reset category for all studentGroups in a category
+ * Used when deleting a category
+ * @param categoryId
+ * @param transaction
+ */
+export const resetCategoryForGroups = async (categoryId: number, transaction?: Transaction) => {
+  return await studentGroupRepository.resetCategoryForGroups(categoryId, transaction);
 };

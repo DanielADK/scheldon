@@ -22,6 +22,10 @@ const router = new Router();
  *         classId:
  *           type: integer
  *           example: 1
+ *         categoryId:
+ *           type: integer
+ *           nullable: true
+ *           example: 1
  *       required:
  *         - studentGroupId
  *         - name
@@ -35,6 +39,10 @@ const router = new Router();
  *           example: 'Group A'
  *         classId:
  *           type: integer
+ *           example: 1
+ *         categoryId:
+ *           type: integer
+ *           nullable: true
  *           example: 1
  *       required:
  *         - name
@@ -109,6 +117,35 @@ router.get('/studentGroups/:id', studentGroupController.getstudentGroupById);
  *         description: Class not found
  */
 router.get('/studentGroups/class/:classId', studentGroupController.getstudentGroupsByClassId);
+
+/**
+ * Get all studentGroups of a specific category
+ * GET /studentGroups/category/{categoryId}
+ * @openapi
+ * /studentGroups/category/{categoryId}:
+ *   get:
+ *     tags:
+ *        - StudentGroup
+ *     summary: Get all studentGroups of a specific category
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: List of studentGroups
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/StudentGroup'
+ *       404:
+ *         description: Category not found
+ */
+router.get('/studentGroups/category/:categoryId', studentGroupController.getstudentGroupsByCategoryId);
 
 /**
  * Update a studentGroup by ID

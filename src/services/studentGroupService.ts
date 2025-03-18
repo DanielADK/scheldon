@@ -107,6 +107,14 @@ export const getstudentGroupsByClassId = async (classId: number) => {
 };
 
 /**
+ * Get all studentGroups of a specific category
+ * @param categoryId
+ */
+export const getstudentGroupsByCategoryId = async (categoryId: number) => {
+  return await studentGroupRepository.getstudentGroupsByCategoryId(categoryId);
+};
+
+/**
  * Update a studentGroup by ID
  * @param studentGroupId
  * @param data
@@ -121,4 +129,27 @@ export const updatestudentGroup = async (studentGroupId: number, data: Partial<s
  */
 export const deletestudentGroup = async (studentGroupId: number) => {
   return await studentGroupRepository.deletestudentGroup(studentGroupId);
+};
+
+/**
+ * Reset category for all studentGroups in a category
+ * Used when deleting a category
+ * @param categoryId
+ * @param transaction
+ */
+export const resetCategoryForGroups = async (categoryId: number, transaction?: Transaction) => {
+  return await studentGroupRepository.resetCategoryForGroups(categoryId, transaction);
+};
+
+/**
+ * Check if a studentGroup has any students
+ * @param studentGroupId - The ID of the studentGroup
+ * @returns Promise<boolean>
+ */
+export const hasStudents = async (studentGroupId: number): Promise<boolean> => {
+  const studies = await Study.findOne({
+    where: { studentGroupId }
+  });
+
+  return !!studies;
 };

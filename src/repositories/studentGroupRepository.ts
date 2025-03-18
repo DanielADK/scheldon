@@ -1,4 +1,7 @@
 import { StudentGroup } from '@models/StudentGroup';
+import { GroupCategory } from '@models/GroupCategory';
+import { Transaction } from 'sequelize';
+import * as groupCategoryService from '@services/groupCategoryService';
 
 /**
  * studentGroupDTO interface
@@ -6,6 +9,7 @@ import { StudentGroup } from '@models/StudentGroup';
 export interface studentGroupDTO {
   name: string;
   classId: number;
+  categoryId?: number;
 }
 
 /**
@@ -20,7 +24,7 @@ export const createstudentGroup = async (data: studentGroupDTO): Promise<Student
  * Get all studentGroups
  */
 export const getstudentGroups = async (): Promise<StudentGroup[]> => {
-  return await StudentGroup.findAll();
+  return await StudentGroup.findAll({ include: [{ model: GroupCategory }] });
 };
 
 /**
@@ -28,7 +32,9 @@ export const getstudentGroups = async (): Promise<StudentGroup[]> => {
  * @param studentGroupId
  */
 export const getstudentGroupById = async (studentGroupId: number): Promise<StudentGroup | null> => {
-  return await StudentGroup.findByPk(studentGroupId);
+  return await StudentGroup.findByPk(studentGroupId, {
+    include: [{ model: GroupCategory }] // Připojit informace o kategorii
+  });
 };
 
 /**
@@ -37,7 +43,19 @@ export const getstudentGroupById = async (studentGroupId: number): Promise<Stude
  */
 export const getstudentGroupsByClassId = async (classId: number): Promise<StudentGroup[]> => {
   return await StudentGroup.findAll({
-    where: { classId }
+    where: { classId },
+    include: [{ model: GroupCategory }]
+  });
+};
+
+/**
+ * Get all studentGroups of a specific category
+ * @param categoryId
+ */
+export const getstudentGroupsByCategoryId = async (categoryId: number): Promise<StudentGroup[]> => {
+  return await StudentGroup.findAll({
+    where: { groupCategoryId: categoryId },
+    include: [{ model: GroupCategory }]
   });
 };
 
@@ -45,10 +63,16 @@ export const getstudentGroupsByClassId = async (classId: number): Promise<Studen
  * Update a studentGroup by ID
  * @param studentGroupId
  * @param data
+ * @param transaction
  */
-export const updatestudentGroup = async (studentGroupId: number, data: Partial<studentGroupDTO>): Promise<[affectedRows: number]> => {
+export const updatestudentGroup = async (
+  studentGroupId: number,
+  data: Partial<studentGroupDTO>,
+  transaction?: Transaction
+): Promise<[affectedRows: number]> => {
   return await StudentGroup.update(data, {
-    where: { studentGroupId }
+    where: { studentGroupId },
+    transaction
   });
 };
 
@@ -60,4 +84,39 @@ export const deletestudentGroup = async (studentGroupId: number): Promise<number
   return await StudentGroup.destroy({
     where: { studentGroupId }
   });
+};
+
+/**
+ * Reset category for all studentGroups in a category
+ * @param categoryId
+ * @param transaction
+ */
+export const resetCategoryForGroups = async (categoryId: number, transaction?: Transaction): Promise<[number, StudentGroup[]]> => {
+  return await StudentGroup.update(
+    { groupCategoryId: null },
+    {
+      where: { groupCategoryId: categoryId },
+      transaction,
+      returning: true
+    }
+  );
+};
+
+/**
+ * Validate if a category belongs to the same class as specified.
+ * This function checks whether the provided categoryID exists,
+ * and whether it belongs to the same class as the provided classID.
+ *
+ * @param categoryId - The ID of the category to validate.
+ * @param classId - The ID of the class to validate against.
+ * @throws {Error} - Throws an error if the category is not found or if the class ID does not match.
+ */
+export const validateCategoryBelongsToClass = async (categoryId: number, classId: number) => {
+  const category = await groupCategoryService.getGroupCategoryById(categoryId);
+  if (!category) {
+    throw new Error('Category not found');
+  }
+  if (category.classId !== classId) {
+    throw new Error('Group must be in same class as its category');
+  }
 };
