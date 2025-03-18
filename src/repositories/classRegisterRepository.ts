@@ -86,7 +86,7 @@ export const getStudentsForLesson = async (lessonId: number): Promise<Student[]>
   };
 
   // Find the students based on class and studentGroup
-  const studentAssignments = entry.studentGroupId
+  const study = entry.studentGroupId
     ? await StudentGroup.findByPk(entry.id, {
         include: [
           {
@@ -106,7 +106,7 @@ export const getStudentsForLesson = async (lessonId: number): Promise<Student[]>
         ]
       });
 
-  if (!studentAssignments) throw new Error('No students found for the lesson');
+  if (!study) throw new Error('No students found for the lesson');
 
-  return studentAssignments.studentAssignments.map((assignment) => assignment.student);
+  return study.studies.map((assignment) => assignment.student);
 };

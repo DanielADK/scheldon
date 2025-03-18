@@ -32,5 +32,5 @@ export class Student extends Model<Student> {
   declare surname: string;
 
   @HasMany(() => Study)
-  declare studentAssignments: Study[];
+  declare studies: Study[];
 }
