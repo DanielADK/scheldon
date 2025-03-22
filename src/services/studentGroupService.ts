@@ -119,8 +119,14 @@ export const getstudentGroupsByCategoryId = async (categoryId: number) => {
  * @param studentGroupId
  * @param data
  */
-export const updatestudentGroup = async (studentGroupId: number, data: Partial<studentGroupDTO>) => {
-  return await studentGroupRepository.updatestudentGroup(studentGroupId, data);
+export const updatestudentGroup = async (studentGroupId: number, data: Partial<studentGroupDTO>): Promise<StudentGroup | null> => {
+  const [count] = await studentGroupRepository.updatestudentGroup(studentGroupId, data);
+
+  if (count === 0) {
+    throw new Error('StudentGroup not found or no changes made');
+  }
+
+  return await studentGroupRepository.getstudentGroupById(studentGroupId);
 };
 
 /**
@@ -148,7 +154,7 @@ export const resetCategoryForGroups = async (categoryId: number, transaction?: T
  */
 export const hasStudents = async (studentGroupId: number): Promise<boolean> => {
   const studies = await Study.findOne({
-    where: { studentGroupId }
+    where: { studentGroupId: studentGroupId }
   });
 
   return !!studies;

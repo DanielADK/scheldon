@@ -1,0 +1,281 @@
+### Prerequisite - Create an employee (administrator)
+POST http://{{ip}}/employees
+Content-Type: application/json
+
+{
+  "username": "admin123",
+  "name": "Admin",
+  "surname": "Testing",
+  "degreePre": "Ing.",
+  "degreePost": "Ph.D.",
+  "abbreviation": "AD",
+  "isTeacher": true
+}
+
+> {%
+  client.test("Employee created", function() {
+    client.assert(response.status === 201, "Expected status 201, but received " + response.status);
+  });
+  client.global.set("adminId", response.body.employeeId);
+%}
+
+### Create a room (necessary for class)
+POST http://{{ip}}/rooms
+Content-Type: application/json
+
+{
+  "name": "Test Room 101",
+  "floor": 1,
+  "type": "CLASSROOM",
+  "studentCapacity": 30,
+  "administratorId": {{adminId}}
+}
+
+> {%
+  client.test("Room created", function() {
+    client.assert(response.status === 201, "Expected status 201, but received " + response.status);
+  });
+  client.global.set("roomId", response.body.roomId);
+%}
+
+### Create a class (necessary for student group)
+POST http://{{ip}}/classes
+Content-Type: application/json
+
+{
+  "name": "Test Class",
+  "validFrom": "2023-09-01",
+  "validTo": "2024-06-30",
+  "roomId": {{roomId}},
+  "employeeId": {{adminId}}
+}
+
+> {%
+  client.test("Class created", function() {
+    client.assert(response.status === 201, "Expected status 201, but received " + response.status);
+  });
+  client.global.set("classId", response.body.classId);
+%}
+
+### Create a new group category
+POST http://{{ip}}/group-categories
+Content-Type: application/json
+
+{
+  "classId": {{classId}},
+  "name": "Programming Labs"
+}
+
+> {%
+  client.test("Status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but received " + response.status);
+  });
+  client.test("Response contains 'categoryId'", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("categoryId"), "Response does not contain 'categoryId'");
+    // Store categoryId for subsequent tests
+    client.global.set("createdCategoryId", json.categoryId);
+  });
+%}
+
+### Create a student group in the category
+POST http://{{ip}}/student-groups
+Content-Type: application/json
+
+{
+  "name": "Group A",
+  "classId": {{classId}},
+  "categoryId": {{createdCategoryId}}
+}
+
+> {%
+  client.test("Student group created", function() {
+    client.assert(response.status === 201, "Expected status 201, but received " + response.status);
+  });
+  client.global.set("studentGroupId", response.body.studentGroupId);
+%}
+
+### Get all group categories
+GET http://{{ip}}/group-categories
+
+> {%
+  client.test("Status is 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but received " + response.status);
+  });
+  client.test("Content-Type is application/json", function() {
+    const ct = response.headers.valueOf("content-type");
+    client.assert(ct.includes("application/json"), "Expected Content-Type containing application/json, but received " + ct);
+  });
+%}
+
+### Get category by ID
+GET http://{{ip}}/group-categories/{{createdCategoryId}}
+
+> {%
+  client.test("Status is 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but received " + response.status);
+  });
+  client.test("Response contains expected properties", function() {
+    const category = response.body;
+    client.assert(category.hasOwnProperty("categoryId"), "'categoryId' is missing in the category");
+    client.assert(category.hasOwnProperty("name"), "'name' is missing in the category");
+    client.assert(category.hasOwnProperty("classId"), "'classId' is missing in the category");
+  });
+%}
+
+### Add student group to category
+PUT http://{{ip}}/student-groups/{{studentGroupId}}
+Content-Type: application/json
+
+{
+  "categoryId": {{createdCategoryId}}
+}
+
+> {%
+  client.test("Student group added to category", function() {
+    client.assert(response.status === 200, "Expected status 200, but received " + response.status);
+    const json = response.body;
+    client.assert(json.hasOwnProperty("categoryId"), "Response does not contain 'categoryId'");
+    client.assert(json.categoryId === client.global.get("createdCategoryId"), "Category ID in response does not match the updated category");
+  });
+%}
+
+### Get category with student groups
+GET http://{{ip}}/group-categories/{{createdCategoryId}}/student-groups
+
+> {%
+  client.test("Status is 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but received " + response.status);
+  });
+  client.test("Response contains expected properties", function() {
+    const category = response.body;
+    client.assert(category.hasOwnProperty("categoryId"), "'categoryId' is missing in the category");
+    client.assert(category.hasOwnProperty("name"), "'name' is missing in the category");
+    client.assert(category.hasOwnProperty("studentGroups"), "'studentGroups' is missing in the category");
+    // Student groups should be an array (even empty)
+    client.assert(Array.isArray(category.studentGroups), "'studentGroups' is not an array");
+    // There should be at least one student group
+    client.assert(category.studentGroups.length > 0, "Category should contain at least one student group");
+  });
+%}
+
+### Update group category
+PUT http://{{ip}}/group-categories/{{createdCategoryId}}
+Content-Type: application/json
+
+{
+  "name": "Advanced Programming"
+}
+
+> {%
+  client.test("Status is 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but received " + response.status);
+  });
+%}
+
+### Verify update
+GET http://{{ip}}/group-categories/{{createdCategoryId}}
+
+> {%
+  client.test("Status is 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but received " + response.status);
+  });
+  client.test("Category updated correctly", function() {
+    const category = response.body;
+    client.assert(category.hasOwnProperty("classId"), "'classId' is missing in the category");
+    client.assert(category.hasOwnProperty("name"), "'name' is missing in the category");
+    client.assert(category.hasOwnProperty("categoryId"), "'categoryId' is missing in the category");
+    client.assert(category.name === "Advanced Programming", "Category name was not updated correctly");
+    client.assert(category.classId === client.global.get("createdClassId"), "Category name was not updated correctly");
+    client.assert(category.categoryId === client.global.get("createdCategoryId"), "Category ID was corrupted");
+
+  });
+%}
+
+### Test pagination when retrieving categories
+GET http://{{ip}}/group-categories?page=1&limit=5
+
+> {%
+  client.test("Status is 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but received " + response.status);
+  });
+  client.test("Response contains pagination metadata", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("meta"), "Response does not contain 'meta'");
+    client.assert(json.meta.hasOwnProperty("page"), "'page' is missing in meta");
+    client.assert(json.meta.hasOwnProperty("limit"), "'limit' is missing in meta");
+    client.assert(json.meta.hasOwnProperty("total"), "'total' is missing in meta");
+  });
+%}
+
+### Test invalid input when creating a category (name too short)
+POST http://{{ip}}/group-categories
+Content-Type: application/json
+
+{
+  "name": "AB"
+}
+
+> {%
+  client.test("Status is 400", function() {
+    client.assert(response.status === 400, "Expected status 400, but received " + response.status);
+  });
+  client.test("Response contains error message", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("error"), "Response does not contain 'error'");
+  });
+%}
+
+### Delete student group in category
+DELETE http://{{ip}}/student-groups/{{studentGroupId}}
+
+> {%
+  client.test("Student group deleted", function() {
+    client.assert(response.status === 204, "Expected status 204, but received " + response.status);
+  });
+%}
+
+### Delete group category
+DELETE http://{{ip}}/group-categories/{{createdCategoryId}}
+
+> {%
+  client.test("Status is 204", function() {
+    client.assert(response.status === 204, "Expected status 204, but received " + response.status);
+  });
+%}
+
+### Verify deletion of category
+GET http://{{ip}}/group-categories/{{createdCategoryId}}
+
+> {%
+  client.test("Status is 404", function() {
+    client.assert(response.status === 404, "Expected status 404 for deleted category, but received " + response.status);
+  });
+%}
+
+### Cleanup - delete class
+DELETE http://{{ip}}/classes/{{classId}}
+
+> {%
+  client.test("Class deleted", function() {
+    client.assert(response.status === 204, "Expected status 204, but received " + response.status);
+  });
+%}
+
+### Cleanup - delete room
+DELETE http://{{ip}}/rooms/{{roomId}}
+
+> {%
+  client.test("Room deleted", function() {
+    client.assert(response.status === 204, "Expected status 204, but received " + response.status);
+  });
+%}
+
+### Cleanup - delete employee
+DELETE http://{{ip}}/employees/{{adminId}}
+
+> {%
+  client.test("Employee deleted", function() {
+    client.assert(response.status === 204, "Expected status 204, but received " + response.status);
+  });
+%}

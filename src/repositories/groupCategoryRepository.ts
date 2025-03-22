@@ -5,11 +5,11 @@ import { FindAttributeOptions } from 'sequelize';
  * GroupCategoryDTO interface
  */
 export interface GroupCategoryDTO {
-  name: string;
-  description?: string;
+  name?: string;
+  classId: number;
 }
 
-const groupCategoryAttributes: FindAttributeOptions = ['categoryId', 'name', 'description'];
+const groupCategoryAttributes: FindAttributeOptions = ['categoryId', 'name', `classId`];
 
 /**
  * Create a new group category
@@ -44,7 +44,7 @@ export const getGroupCategories = async (limit: number, offset: number): Promise
  */
 export const getGroupCategoryById = async (categoryId: number): Promise<GroupCategory | null> => {
   return await GroupCategory.findOne({
-    where: { categoryId },
+    where: { categoryId: categoryId },
     attributes: groupCategoryAttributes
   });
 };
@@ -55,7 +55,7 @@ export const getGroupCategoryById = async (categoryId: number): Promise<GroupCat
  */
 export const getGroupCategoryWithStudentGroups = async (categoryId: number): Promise<GroupCategory | null> => {
   return await GroupCategory.findOne({
-    where: { categoryId },
+    where: { categoryId: categoryId },
     include: ['studentGroups'],
     attributes: groupCategoryAttributes
   });
@@ -68,7 +68,7 @@ export const getGroupCategoryWithStudentGroups = async (categoryId: number): Pro
  */
 export const updateGroupCategory = async (categoryId: number, data: Partial<GroupCategoryDTO>): Promise<[affectedRows: number]> => {
   return await GroupCategory.update(data, {
-    where: { categoryId }
+    where: { categoryId: categoryId }
   });
 };
 

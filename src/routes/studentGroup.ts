@@ -22,7 +22,7 @@ const router = new Router();
  *         classId:
  *           type: integer
  *           example: 1
- *         categoryId:
+ *         groupCategoryId:
  *           type: integer
  *           nullable: true
  *           example: 1
@@ -47,7 +47,13 @@ const router = new Router();
  *       required:
  *         - name
  *         - classId
- * /student-groups/:
+ */
+
+/**
+ * Create a new group
+ * GET /student-groups
+ * @openapi
+ * /student-groups:
  *   post:
  *     tags:
  *        - StudentGroup
@@ -64,7 +70,7 @@ const router = new Router();
  *       400:
  *         description: Invalid input
  */
-router.post('/student-groups/', studentGroupController.createstudentGroup);
+router.post('/student-groups', studentGroupController.createstudentGroup);
 
 /**
  * Get a studentGroup by ID
