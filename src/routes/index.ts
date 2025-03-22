@@ -10,6 +10,7 @@ import stableTimetable from '@routes/stableTimetable';
 import temporaryTimetable from '@routes/stableTimetable';
 import studentAssignment from '@routes/study';
 import classRegister from './classRegister';
+import groupCategory from '@routes/groupCategory';
 
 const router = new Router();
 
@@ -18,6 +19,7 @@ router.use(students.routes());
 router.use(employees.routes());
 router.use(classes.routes());
 router.use(studentGroup.routes());
+router.use(groupCategory.routes());
 router.use(rooms.routes());
 router.use(studentAssignment.routes());
 router.use(stableTimetable.routes());
