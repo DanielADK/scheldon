@@ -1,13 +1,3 @@
-
-#####################################
-### Precondition: Create a new class
-#####################################
-
-
-#####################################
-### Precondition: Create a new teacher
-#####################################
-
 ### Create new teacher
 POST http://{{ip}}/employees
 Content-Type: application/json
@@ -33,10 +23,6 @@ Content-Type: application/json
     client.global.set("createdTeacherId", json.employeeId);
   });
 %}
-
-#####################################
-### Precondition: Create a new room
-#####################################
 
 ### Create new room
 POST http://{{ip}}/rooms
@@ -85,10 +71,6 @@ Content-Type: application/json
     client.global.set("createdClassId", json.classId);
   });
 %}
-
-#####################################
-### Student Group Tests
-#####################################
 
 ### Create new student group
 POST http://{{ip}}/student-groups/
@@ -191,8 +173,8 @@ Content-Type: application/json
 DELETE http://{{ip}}/student-groups/{{createdStudentGroupId}}
 
 > {%
-  client.test("Student group deletion status is 200", function () {
-    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  client.test("Student group deletion status is 204", function () {
+    client.assert(response.status === 204, "Expected status 204, but got " + response.status);
   });
 %}
 
