@@ -56,7 +56,7 @@ export class StudentGroup extends Model<StudentGroup> {
     type: DataType.INTEGER.UNSIGNED,
     allowNull: true
   })
-  declare groupCategoryId: number | null;
+  declare categoryId: number | null;
 
   @BelongsTo(() => GroupCategory)
   declare category: GroupCategory;

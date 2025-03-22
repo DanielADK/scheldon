@@ -119,7 +119,7 @@ export const updateGroupCategory = async (ctx: Context) => {
       return;
     }
 
-    const [affectedCount] = await groupCategoryService.updateGroupCategory(categoryId, { name: value.name });
+    const [affectedCount] = await groupCategoryService.updateGroupCategory(categoryId, { name: value.name, classId: value.classId });
 
     if (affectedCount > 0) {
       ctx.status = 200;

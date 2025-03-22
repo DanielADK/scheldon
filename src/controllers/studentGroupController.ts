@@ -1,7 +1,7 @@
 // Schema for creating and updating a studentGroup
 import Joi from 'joi';
 import * as studentGroupRepository from '@repositories/studentGroupRepository';
-import { studentGroupDTO, validateCategoryBelongsToClass } from '@repositories/studentGroupRepository';
+import { studentGroupDTO, validateCategoryBelongsToSameClass } from '@repositories/studentGroupRepository';
 import * as groupCategoryService from '@services/groupCategoryService';
 import * as studentGroupService from '@services/studentGroupService';
 import { Context } from 'koa';
@@ -13,6 +13,11 @@ const studentGroupSchema: Joi.ObjectSchema<studentGroupDTO> = Joi.object({
   classId: Joi.number().required(),
   categoryId: Joi.number().allow(null)
 });
+
+const updateStudentGroupSchema: Joi.ObjectSchema<studentGroupDTO> = Joi.object({
+  name: Joi.string().min(1).max(100),
+  categoryId: Joi.number()
+}).min(1);
 
 /**
  * Create a new studentGroup
@@ -121,7 +126,10 @@ export const updatestudentGroup = async (ctx: Context) => {
   const studentGroupId = await getIdFromParam(ctx.params.id as string);
 
   // Validate request
-  const { error, value } = studentGroupSchema.validate(ctx.request.body);
+  const { error, value } = updateStudentGroupSchema.validate(ctx.request.body, {
+    allowUnknown: false, // Zakázat neznámá pole
+    stripUnknown: true // Odstranit neznámá pole místo vracení chyby
+  });
 
   if (error) {
     ctx.status = 400;
@@ -132,18 +140,19 @@ export const updatestudentGroup = async (ctx: Context) => {
   try {
     // Check if updated category belongs to the same class as the group
     if (value.categoryId !== undefined && value.categoryId !== null) {
-      await validateCategoryBelongsToClass(value.categoryId, value.classId);
+      await validateCategoryBelongsToSameClass(value.categoryId, studentGroupId);
     }
 
-    const [affectedCount] = await studentGroupService.updatestudentGroup(studentGroupId, value);
+    const updatedGroup = await studentGroupService.updatestudentGroup(studentGroupId, value);
 
-    if (affectedCount > 0) {
-      ctx.status = 200;
-      ctx.body = { message: 'studentGroup updated' };
-    } else {
+    if (!updatedGroup) {
       ctx.status = 404;
-      ctx.body = { error: 'studentGroup not found' };
+      ctx.body = { error: 'Update of employee failed.' };
+      return;
     }
+
+    ctx.status = 200;
+    ctx.body = updatedGroup;
   } catch (error) {
     handleError(ctx, error);
   }
@@ -174,8 +183,7 @@ export const deletestudentGroup = async (ctx: Context) => {
       return;
     }
 
-    ctx.status = 200;
-    ctx.body = { message: 'studentGroup deleted successfully' };
+    ctx.status = 204;
   } catch (error) {
     handleError(ctx, error);
   }

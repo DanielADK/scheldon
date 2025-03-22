@@ -50,7 +50,7 @@ export const getstudentGroupsByClassId = async (classId: number): Promise<Studen
  */
 export const getstudentGroupsByCategoryId = async (categoryId: number): Promise<StudentGroup[]> => {
   return await StudentGroup.findAll({
-    where: { groupCategoryId: categoryId }
+    where: { categoryId: categoryId }
   });
 };
 
@@ -63,11 +63,12 @@ export const getstudentGroupsByCategoryId = async (categoryId: number): Promise<
 export const updatestudentGroup = async (
   studentGroupId: number,
   data: Partial<studentGroupDTO>,
-  transaction?: Transaction
-): Promise<[affectedRows: number]> => {
+  transaction?: Transaction | null
+): Promise<[affectedRows: number, updatedStudentGroups: StudentGroup[]]> => {
   return await StudentGroup.update(data, {
-    where: { studentGroupId },
-    transaction
+    where: { studentGroupId: studentGroupId },
+    transaction,
+    returning: true
   });
 };
 
@@ -88,9 +89,9 @@ export const deletestudentGroup = async (studentGroupId: number): Promise<number
  */
 export const resetCategoryForGroups = async (categoryId: number, transaction?: Transaction): Promise<[number, StudentGroup[]]> => {
   return await StudentGroup.update(
-    { groupCategoryId: null },
+    { categoryId: null },
     {
-      where: { groupCategoryId: categoryId },
+      where: { categoryId: categoryId },
       transaction,
       returning: true
     }
@@ -103,15 +104,19 @@ export const resetCategoryForGroups = async (categoryId: number, transaction?: T
  * and whether it belongs to the same class as the provided classID.
  *
  * @param categoryId - The ID of the category to validate.
- * @param classId - The ID of the class to validate against.
+ * @param studentGroupId - The ID of the student group to validate against.
  * @throws {Error} - Throws an error if the category is not found or if the class ID does not match.
  */
-export const validateCategoryBelongsToClass = async (categoryId: number, classId: number) => {
+export const validateCategoryBelongsToSameClass = async (categoryId: number, studentGroupId: number) => {
   const category = await groupCategoryService.getGroupCategoryById(categoryId);
+  const studentGroupsClass = await getstudentGroupById(studentGroupId);
   if (!category) {
     throw new Error('Category not found');
   }
-  if (category.classId !== classId) {
-    throw new Error('Group must be in same class as its category');
+  if (!studentGroupsClass) {
+    throw new Error('Student group not found');
+  }
+  if (category.classId !== studentGroupsClass.classId) {
+    throw new Error('Group must be in same ßclass as its category');
   }
 };
