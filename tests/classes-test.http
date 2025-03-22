@@ -1,3 +1,43 @@
+### Prerequisite - Create an employee
+POST http://{{ip}}/employees
+Content-Type: application/json
+
+{
+  "username": "admin13",
+  "name": "Admi",
+  "surname": "Tsting",
+  "degreePre": "Ing.",
+  "degreePost": "",
+  "abbreviation": "AA",
+  "isTeacher": true
+}
+
+> {%
+  client.test("Employee created", function() {
+    client.assert(response.status === 201, "Expected status 201, but received " + response.status);
+  });
+  client.global.set("employeeId", response.body.employeeId);
+%}
+
+### Create a room (necessary for class)
+POST http://{{ip}}/rooms
+Content-Type: application/json
+
+{
+  "name": "Test Room 102",
+  "floor": 2,
+  "type": "CLASSROOM",
+  "studentCapacity": 32,
+  "administratorId": {{employeeId}}
+}
+
+> {%
+  client.test("Room created", function() {
+    client.assert(response.status === 201, "Expected status 201, but received " + response.status);
+  });
+  client.global.set("roomId", response.body.roomId);
+%}
+
 ### Create new class
 POST http://{{ip}}/classes
 Content-Type: application/json
@@ -6,8 +46,8 @@ Content-Type: application/json
   "name": "A1",
   "validFrom": "2023-09-01",
   "validTo": "2024-06-30",
-  "roomId": 1,
-  "employeeId": 1
+  "roomId": {{roomId}},
+  "employeeId": {{employeeId}}
 }
 
 > {%
@@ -42,8 +82,7 @@ GET http://{{ip}}/classes/{{createdClassId}}
   client.test("Status is 200", function () {
     client.assert(response.status === 200, "Expected status 200, but got " + response.status);
   });
-  client.test("Response contains requi" +
-    "conred properties", function () {
+  client.test("Response contains required properties", function () {
     const json = response.body;
     console.log(json);
     client.assert(json.hasOwnProperty("classId"), "Response does not contain 'classId'");
@@ -86,7 +125,7 @@ Content-Type: application/json
   });
 %}
 
-### Delete class
+### Cleanup - delete class
 DELETE http://{{ip}}/classes/{{createdClassId}}
 
 > {%
@@ -101,5 +140,23 @@ GET http://{{ip}}/classes/{{createdClassId}}
 > {%
   client.test("Status is 404", function () {
     client.assert(response.status === 404, "Expected status 404 for a deleted class, but got " + response.status);
+  });
+%}
+
+### Cleanup - delete room
+DELETE http://{{ip}}/rooms/{{roomId}}
+
+> {%
+  client.test("Room deleted", function() {
+    client.assert(response.status === 204, "Expected status 204, but received " + response.status);
+  });
+%}
+
+### Cleanup - delete employee
+DELETE http://{{ip}}/employees/{{employeeId}}
+
+> {%
+  client.test("Employee deleted", function() {
+    client.assert(response.status === 204, "Expected status 204, but received " + response.status);
   });
 %}
