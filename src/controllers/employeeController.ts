@@ -8,11 +8,11 @@ const employeeSchema: Joi.ObjectSchema<EmployeeDTO> = Joi.object({
   username: Joi.string().required().min(2).max(50),
   name: Joi.string().required().min(2).max(50),
   surname: Joi.string().required().min(2).max(50),
-  degreePre: Joi.string().allow(null).max(20),
-  degreePost: Joi.string().allow(null).max(20),
-  abbreviation: Joi.string().allow(null).max(2),
+  degreePre: Joi.string().max(20).default(null).allow(null, ''),
+  degreePost: Joi.string().max(20).default(null).allow(null, ''),
+  abbreviation: Joi.string().max(2).default(null).allow(null, ''),
   isTeacher: Joi.boolean().required(),
-  isActive: Joi.boolean().allow(null)
+  isActive: Joi.boolean().default(true)
 });
 
 /**
@@ -21,16 +21,16 @@ const employeeSchema: Joi.ObjectSchema<EmployeeDTO> = Joi.object({
  * @param ctx
  */
 export const createEmployee = async (ctx: Context): Promise<void> => {
-  // Validate request
-  const { error, value } = employeeSchema.validate(ctx.request.body);
-
-  if (error) {
-    ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
-    return;
-  }
-
   try {
+    // Validate request
+    const { error, value } = employeeSchema.validate(ctx.request.body);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
     const employee = await employeeService.createEmployee(value);
     ctx.status = 201;
     ctx.body = employee;

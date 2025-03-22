@@ -9,7 +9,7 @@ import studentGroup from '@routes/studentGroup';
 import stableTimetable from '@routes/stableTimetable';
 import temporaryTimetable from '@routes/stableTimetable';
 import studentAssignment from '@routes/study';
-import classRegister from './classRegister';
+import classRegister from '@routes/classRegister';
 import groupCategory from '@routes/groupCategory';
 
 const router = new Router();
