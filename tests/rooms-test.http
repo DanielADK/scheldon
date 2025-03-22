@@ -1,13 +1,34 @@
+### Prerequisite - Create an employee
+POST http://{{ip}}/employees
+Content-Type: application/json
+
+{
+  "username": "roomtest",
+  "name": "room",
+  "surname": "test",
+  "degreePre": "Ing.",
+  "degreePost": "",
+  "abbreviation": "RT",
+  "isTeacher": true
+}
+
+> {%
+  client.test("Employee created", function() {
+    client.assert(response.status === 201, "Expected status 201, but received " + response.status);
+  });
+  client.global.set("employeeId", response.body.employeeId);
+%}
+
 ### Create new room
 POST http://{{ip}}/rooms
 Content-Type: application/json
 
 {
-  "name": "Classroom 101",
+  "name": "Classroom test",
   "type": "CLASSROOM",
   "floor": 1,
   "studentCapacity": 30,
-  "administratorId": 1
+  "administratorId": {{employeeId}}
 }
 
 > {%
@@ -58,11 +79,11 @@ PUT http://{{ip}}/rooms/{{createdRoomId}}
 Content-Type: application/json
 
 {
-  "name": "Classroom 102",
+  "name": "Classroom test2",
   "type": "LAB",
   "floor": 2,
   "studentCapacity": 20,
-  "administratorId": 2
+  "administratorId": {{employeeId}}
 }
 
 > {%
@@ -71,7 +92,7 @@ Content-Type: application/json
   });
 %}
 
-### Delete room
+### Cleanup - delete room
 DELETE http://{{ip}}/rooms/{{createdRoomId}}
 
 > {%
@@ -86,5 +107,14 @@ GET http://{{ip}}/rooms/{{createdRoomId}}
 > {%
   client.test("Status is 404", function () {
     client.assert(response.status === 404, "Expected status 404 for a deleted room, but got " + response.status);
+  });
+%}
+
+### Cleanup - delete employee
+DELETE http://{{ip}}/employees/{{employeeId}}
+
+> {%
+  client.test("Employee deleted", function() {
+    client.assert(response.status === 204, "Expected status 204, but received " + response.status);
   });
 %}
