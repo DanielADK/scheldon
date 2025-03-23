@@ -3,12 +3,12 @@ POST http://{{ip}}/employees
 Content-Type: application/json
 
 {
-  "username": "admin13",
+  "username": "ClassesTest1",
   "name": "Admi",
   "surname": "Tsting",
   "degreePre": "Ing.",
   "degreePost": "",
-  "abbreviation": "AA",
+  "abbreviation": "C1",
   "isTeacher": true
 }
 
@@ -24,7 +24,7 @@ POST http://{{ip}}/rooms
 Content-Type: application/json
 
 {
-  "name": "Test Room 102",
+  "name": "ClassTest Room 101",
   "floor": 2,
   "type": "CLASSROOM",
   "studentCapacity": 32,
@@ -39,13 +39,17 @@ Content-Type: application/json
 %}
 
 ### Create new class
+< {%
+  client.global.set("validFrom", (new Date()).toISOString().split("T")[0])
+  client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split("T")[0])
+%}
 POST http://{{ip}}/classes
 Content-Type: application/json
 
 {
-  "name": "A1",
-  "validFrom": "2023-09-01",
-  "validTo": "2024-06-30",
+  "name": "CT",
+  "validFrom": "{{validFrom}}",
+  "validTo": "{{validTo}}",
   "roomId": {{roomId}},
   "employeeId": {{employeeId}}
 }
@@ -95,7 +99,11 @@ GET http://{{ip}}/classes/{{createdClassId}}
 %}
 
 ### Get classes at a specific time
-GET http://{{ip}}/classes/at-time/2023-10-01T12:00:00Z
+< {%
+  // add 1 day to validFrom
+  client.global.set("attime", new Date(client.global.get("validFrom")).setDate(new Date(client.global.get("validFrom")).getDate() + 1).toISOString().split("T")[0]);
+ %}
+GET http://{{ip}}/classes/at-time/{{attime}}
 
 > {%
   client.test("Status is 200", function () {
@@ -112,9 +120,9 @@ PUT http://{{ip}}/classes/{{createdClassId}}
 Content-Type: application/json
 
 {
-  "name": "A1a",
-  "validFrom": "2023-09-01",
-  "validTo": "2024-06-30",
+  "name": "CT2",
+  "validFrom": "{{validFrom}}",
+  "validTo": "{{validTo}}",
   "roomId": 1,
   "employeeId": 1
 }

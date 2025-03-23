@@ -90,8 +90,6 @@ export const updateClass = async (classId: number, data: ClassDTO): Promise<Clas
     await transaction.rollback();
     throw error;
   }
-
-  //
   return updatedClass;
 };
 

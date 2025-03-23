@@ -38,6 +38,7 @@ export const startStudy = async (ctx: Context) => {
     ctx.status = 201;
     ctx.body = study;
   } catch (error) {
+    console.error('==================\nError:' + error + '\n' + 'Context: ' + JSON.stringify(ctx) + '\n==================\n');
     handleError(ctx, error);
   }
 };

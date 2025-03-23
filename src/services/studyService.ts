@@ -14,14 +14,13 @@ export const startStudy = async (studentId: number, data: StudyDTO) => {
   }
 
   // If validFrom is not provided, set now
-  const validFrom = data.validFrom ? new Date(data.validFrom) : new Date();
-  // If validTo is not provided, set it to the classes default validTo
-  const validTo = data.validTo ? new Date(data.validTo) : new Date(classInfo.validTo);
-
-  // Check if student is not already assigned to the class in the validity period
+  const validFrom = data.validFrom || new Date();
+  // Default validTo is the validTo of the class
+  const validTo = data.validTo || new Date(classInfo.validTo);
 
   return await studentAssignmentRepository.createAssignment(studentId, {
     classId: data.classId,
+    studentGroupId: data.studentGroupId,
     validFrom: validFrom,
     validTo: validTo
   } as StudyDTO);

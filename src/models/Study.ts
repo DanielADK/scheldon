@@ -1,6 +1,8 @@
 import {
   AutoIncrement,
+  BeforeBulkDestroy,
   BeforeCreate,
+  BeforeDestroy,
   BeforeUpdate,
   BelongsTo,
   Column,
@@ -17,17 +19,16 @@ import {
   validateClassDates,
   validateClassExistsWhenStudentGroup,
   validateExclusiveClassAssignment,
-  validatestudentGroupBelongsToClass
+  validatestudentGroupBelongsToClass,
+  validateStudentGroupCategoryDisjunction,
+  validateUniqueStudentGroupAssignment,
+  validateValidToWithinClassValidTo
 } from '@validators/studyValidators';
+import { restrictOnDelete } from '@validators/genericValidators';
 
 @Table({
   timestamps: false,
   indexes: [
-    {
-      name: 'unique_assignment',
-      unique: true,
-      fields: ['studentId', 'classId', 'studentGroupId']
-    },
     {
       name: 'validity_range',
       fields: ['validFrom', 'validTo'],
@@ -111,10 +112,23 @@ export class Study extends Model<Study> {
   @BeforeUpdate
   static async validate(instance: Study) {
     await Promise.all([
-      validatestudentGroupBelongsToClass(instance),
       validateClassDates(instance),
-      validateExclusiveClassAssignment(instance),
-      instance.studentGroupId ? validateClassExistsWhenStudentGroup(instance) : null
+      validatestudentGroupBelongsToClass(instance),
+      validateValidToWithinClassValidTo(instance),
+      !instance.studentGroupId ? validateExclusiveClassAssignment(instance) : null,
+      instance.studentGroupId ? validateUniqueStudentGroupAssignment(instance) : null,
+      instance.studentGroupId ? validateClassExistsWhenStudentGroup(instance) : null,
+      instance.studentGroupId ? validateStudentGroupCategoryDisjunction(instance) : null
     ]);
+  }
+
+  @BeforeDestroy
+  @BeforeBulkDestroy
+  static async tryRemove(instance: StudentGroup) {
+    await restrictOnDelete(
+      StudentGroup as { new (): Model } & typeof Model,
+      'studentGroupId' as string as keyof Model,
+      instance.studentGroupId
+    );
   }
 }

@@ -79,7 +79,7 @@ const router = new Router();
 
 /**
  * @openapi
- * /students/{studentId}/study/start:
+ * /study/{studentId}/start:
  *   post:
  *     tags:
  *       - Study
@@ -120,8 +120,8 @@ router.post('/study/:studentId/start', studentAssignmentController.startStudy);
 
 /**
  * @openapi
- * /students/{studentId}/study/stop:
- *   delete:
+ * /study/{studentId}/stop:
+ *   post:
  *     tags:
  *       - Study
  *     summary: Unassign a student from a class or studentGroup
@@ -153,7 +153,6 @@ router.post('/study/:studentId/start', studentAssignmentController.startStudy);
  *                   type: string
  *                   example: "Student is not assigned to the class"
  */
-// Terminate assignment (end of study)
-router.delete('/students/:studentId/study/stop', studentAssignmentController.stopStudy);
+router.post('/study/:studentId/stop', studentAssignmentController.stopStudy);
 
 export default router;

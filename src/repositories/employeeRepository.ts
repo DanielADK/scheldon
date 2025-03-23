@@ -108,6 +108,7 @@ export const updateEmployee = async (id: number, data: Partial<Employee>): Promi
  */
 export const deleteEmployee = async (id: number): Promise<number> => {
   return await Employee.destroy({
-    where: { employeeId: id }
+    where: { employeeId: id },
+    individualHooks: true
   });
 };

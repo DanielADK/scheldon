@@ -187,10 +187,6 @@ GET http://{{ip}}/student-groups/{{createdStudentGroupId}}
   });
 %}
 
-#####################################
-### Cleanup: Delete the created class
-#####################################
-
 ### Delete class
 DELETE http://{{ip}}/classes/{{createdClassId}}
 

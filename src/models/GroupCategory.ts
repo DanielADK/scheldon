@@ -1,6 +1,18 @@
-import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import {
+  AutoIncrement,
+  BeforeDestroy,
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  HasMany,
+  Model,
+  PrimaryKey,
+  Table
+} from 'sequelize-typescript';
 import { StudentGroup } from '@models/StudentGroup';
 import { Class } from '@models/Class';
+import { restrictOnDelete } from '@validators/genericValidators';
 
 @Table({
   timestamps: false
@@ -24,14 +36,15 @@ export class GroupCategory extends Model<GroupCategory> {
   @ForeignKey(() => Class)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
-    allowNull: false
+    allowNull: false,
+    onDelete: 'RESTRICT'
   })
   declare classId: number;
 
-  @BelongsTo(() => Class)
+  @BelongsTo(() => Class, { onDelete: 'RESTRICT' })
   declare class: Class;
 
-  @HasMany(() => StudentGroup)
+  @HasMany(() => StudentGroup, { onDelete: 'RESTRICT' })
   declare studentGroups: StudentGroup[];
 
   /*@BeforeCreate
@@ -39,4 +52,9 @@ export class GroupCategory extends Model<GroupCategory> {
   static async validate(instance: StudentGroup) {
     await validatestudentGroupNameAndClass(instance);
   }*/
+
+  @BeforeDestroy
+  static async tryRemove(instance: GroupCategory) {
+    await restrictOnDelete(StudentGroup as { new (): Model } & typeof Model, 'categoryId' as string as keyof Model, instance.categoryId);
+  }
 }

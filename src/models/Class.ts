@@ -79,11 +79,12 @@ export class Class extends Model<Class> {
   @Column({
     type: DataType.INTEGER.UNSIGNED,
     allowNull: false,
-    unique: false
+    unique: false,
+    onDelete: 'RESTRICT'
   })
   declare roomId: number;
 
-  @BelongsTo(() => Room)
+  @BelongsTo(() => Room, { onDelete: 'RESTRICT' })
   declare room: Room;
 
   // Class Teacher
@@ -91,7 +92,8 @@ export class Class extends Model<Class> {
   @Column({
     type: DataType.INTEGER.UNSIGNED,
     allowNull: false,
-    unique: false
+    unique: false,
+    onDelete: 'RESTRICT'
   })
   declare employeeId: number;
 
@@ -102,22 +104,22 @@ export class Class extends Model<Class> {
   })
   declare createdAt: string;
 
-  @BelongsTo(() => Employee)
+  @BelongsTo(() => Employee, { onDelete: 'RESTRICT' })
   declare employee: Employee;
 
-  @HasMany(() => TimetableEntry)
+  @HasMany(() => TimetableEntry, { onDelete: 'RESTRICT' })
   declare timetableEntries: TimetableEntry[];
 
-  @HasMany(() => SubstitutionEntry)
+  @HasMany(() => SubstitutionEntry, { onDelete: 'RESTRICT' })
   declare substitutionEntries: SubstitutionEntry[];
 
-  @HasMany(() => StudentGroup)
+  @HasMany(() => StudentGroup, { onDelete: 'RESTRICT' })
   declare studentGroups: StudentGroup[];
 
-  @HasMany(() => Study)
+  @HasMany(() => Study, { onDelete: 'RESTRICT' })
   declare studies: Study[];
 
-  @HasMany(() => GroupCategory)
+  @HasMany(() => GroupCategory, { onDelete: 'RESTRICT' })
   declare groupCategories: GroupCategory[];
 
   // Hooks for validation

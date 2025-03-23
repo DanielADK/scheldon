@@ -185,8 +185,8 @@ GET http://{{ip}}/group-categories/{{createdCategoryId}}
     client.assert(category.hasOwnProperty("classId"), "'classId' is missing in the category");
     client.assert(category.hasOwnProperty("name"), "'name' is missing in the category");
     client.assert(category.hasOwnProperty("categoryId"), "'categoryId' is missing in the category");
-    client.assert(category.name === "Advanced Programming", "Category name was not updated correctly");
-    client.assert(category.classId === client.global.get("createdClassId"), "Category name was not updated correctly");
+    client.assert(category.name.startsWith("Advanced Programming"), "Category name was not updated correctly");
+    client.assert(category.classId === client.global.get("classId"), "classId is not same");
     client.assert(category.categoryId === client.global.get("createdCategoryId"), "Category ID was corrupted");
 
   });

@@ -15,3 +15,17 @@ export const validatestudentGroupNameAndClass = async (instance: StudentGroup) =
     throw new Error('studentGroup name already exists within the class');
   }
 };
+
+/**
+ * Validate restriction for deletion if there are dependencies
+ */
+export const validateStudentGroupOnDelete = async (instance: StudentGroup) => {
+  const relatedRecordsCount = await StudentGroup.count({
+    where: { studentGroupId: instance.studentGroupId },
+    include: [{ all: true }] // Adjust include to load the required relations explicitly
+  });
+
+  if (relatedRecordsCount > 0) {
+    throw new Error('Cannot delete studentGroup as it has dependent records');
+  }
+};
