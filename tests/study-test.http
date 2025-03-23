@@ -1,0 +1,346 @@
+### Create new teacher
+POST http://{{ip}}/employees
+Content-Type: application/json
+
+{
+  "username": "studymate",
+  "name": "John",
+  "surname": "Doee",
+  "degreePre": "Dr.",
+  "degreePost": "PhD LLM",
+  "abbreviation": "S1",
+  "isTeacher": true
+}
+
+> {%
+  client.test("Teacher creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'employeeId'", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("employeeId"), "Response does not contain 'employeeId'");
+    // Save teacherId for subsequent tests
+    client.global.set("teacher1", json.employeeId);
+  });
+%}
+
+### Create new student
+POST http://{{ip}}/students
+Content-Type: application/json
+
+{
+  "username": "studystudent1",
+  "name": "John",
+  "surname": "Doe"
+}
+
+> {%
+  client.test("Status is 201", function () {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'studentId'", function () {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("studentId"), "Response does not contain 'studentId'");
+
+    client.global.set("student1", json.studentId);
+  });
+%}
+
+### Create new room
+POST http://{{ip}}/rooms
+Content-Type: application/json
+
+{
+  "name": "studyroom1",
+  "type": "CLASSROOM",
+  "floor": 1,
+  "studentCapacity": 30,
+  "administratorId": {{teacher1}}
+}
+
+> {%
+  client.test("Room creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'roomId'", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("roomId"), "Response does not contain 'roomId'");
+    // Save roomId for subsequent tests
+    client.global.set("room1", json.roomId);
+  });
+%}
+
+### Create new class1
+POST http://{{ip}}/classes
+Content-Type: application/json
+
+{
+  "name": "StudyClass1",
+  "validFrom": "2023-09-01",
+  "validTo": "2024-06-30",
+  "roomId": {{room1}},
+  "employeeId": {{teacher1}}
+}
+
+> {%
+  client.test("Class creation status is 201", function () {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'classId'", function () {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("classId"), "Response does not contain 'classId'");
+    // Save classId for subsequent tests
+    client.global.set("class1", json.classId);
+  });
+%}
+
+### Begin study at class1
+POST http://{{ip}}/study/{{student1}}/start
+Content-Type: application/json
+
+{
+  "classId": {{class1}},
+  "validFrom": "2023-09-01"
+}
+
+> {%
+  client.test("Study start status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response confirms study began", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("studentId"), "Response does not contain 'studentId'");
+    client.assert(json.hasOwnProperty("classId"), "Response does not contain 'classId'");
+    client.assert(json.hasOwnProperty("validFrom"), "Response does not contain 'validFrom'");
+    client.assert(json.hasOwnProperty("validTo"), "Response does not contain 'validTo'");
+  });
+%}
+
+
+### Test duplicit studing at class1
+POST http://{{ip}}/study/{{student1}}/start
+Content-Type: application/json
+
+{
+  "classId": {{class1}},
+  "validFrom": "2023-09-02"
+}
+
+> {%
+  client.test("Study start status is 400", function() {
+    client.assert(response.status === 400, "Expected status 400, but got " + response.status);
+  });
+  client.test("Response confirms study began", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("error"), "Expected error message for duplicate enrollment, but got " + JSON.stringify(json));
+  });
+%}
+
+### Create a new group category
+POST http://{{ip}}/group-categories
+Content-Type: application/json
+
+{
+  "classId": {{class1}},
+  "name": "Programming Labs"
+}
+
+> {%
+  client.test("Status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but received " + response.status);
+  });
+  client.test("Response contains 'categoryId'", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("categoryId"), "Response does not contain 'categoryId'");
+    // Store categoryId for subsequent tests
+    client.global.set("category1", json.categoryId);
+  });
+%}
+
+### Create new student group in category1
+POST http://{{ip}}/student-groups/
+Content-Type: application/json
+
+{
+  "name": "StudyStudentGroup1",
+  "classId": {{class1}},
+  "categoryId": {{category1}}
+}
+
+> {%
+  client.test("StudentGroup creation status is 201", function () {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'studentGroupId'", function () {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("studentGroupId"), "Response does not contain 'studentGroupId'");
+    // Save studentGroupId for subsequent tests
+    client.global.set("studentGroup1", json.studentGroupId);
+  });
+%}
+
+### Create new student group2 in category1
+POST http://{{ip}}/student-groups/
+Content-Type: application/json
+
+{
+  "name": "StudyStudentGroup2",
+  "classId": {{class1}},
+  "categoryId": {{category1}}
+}
+
+> {%
+  client.test("StudentGroup creation status is 201", function () {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'studentGroupId'", function () {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("studentGroupId"), "Response does not contain 'studentGroupId'");
+    // Save studentGroupId for subsequent tests
+    client.global.set("studentGroup2", json.studentGroupId);
+  });
+%}
+
+### Assign student to group1
+POST http://{{ip}}/study/{{student1}}/start
+Content-Type: application/json
+
+{
+  "classId": {{class1}},
+  "studentGroupId": {{studentGroup1}},
+  "validFrom": "2023-09-01"
+}
+
+> {%
+  client.test("Study creation status is 201", function () {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains required attributes", function () {
+    const json = response.body;
+    client.assert(json.studentId == client.global.get("student1"), "studentId does not match the expected value");
+    client.assert(json.classId == client.global.get("class1"), "classId does not match the expected value");
+    client.assert(json.studentGroupId == client.global.get("studentGroup1"), "studentGroupId does not match the expected value");
+    client.assert(new Date(json.validFrom).toISOString().startsWith("2023-09-01"), "validFrom does not match the expected value");
+  });
+%}
+
+### Deny assign student to group1 again
+POST http://{{ip}}/study/{{student1}}/start
+Content-Type: application/json
+
+{
+  "classId": {{class1}},
+  "studentGroupId": {{studentGroup1}},
+  "validFrom": "2023-09-01"
+}
+
+> {%
+  client.test("Study creation status is 400", function () {
+    client.assert(response.status === 400, "Expected status 400, but got " + response.status);
+  });
+  client.test("Response contains errror message", function () {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("error"), "Response does not contain error message");
+    client.assert(json.error.startsWith("Student is already assigned to this student group"), "Invalid error reason");
+  });
+%}
+
+### Deny assign student to group2 (same category)
+POST http://{{ip}}/study/{{student1}}/start
+Content-Type: application/json
+
+{
+  "classId": {{class1}},
+  "studentGroupId": {{studentGroup2}},
+  "validFrom": "2023-09-01"
+}
+
+> {%
+  client.test("Study creation status is 400", function () {
+    client.assert(response.status === 400, "Expected status 400, but got " + response.status);
+  });
+  client.test("Response contains errror message", function () {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("error"), "Response does not contain error message");
+    client.assert(json.error.startsWith("Student is already assigned to another student group in the same group category"), "Invalid error reason");
+  });
+%}
+
+### End Study in group1
+POST http://{{ip}}/study/{{student1}}/stop
+Content-Type: application/json
+
+{
+  "classId": {{class1}},
+  "studentGroupId": {{studentGroup1}},
+  "validTo": "2023-10-01"
+}
+
+> {%
+  client.test("Study halt status is 204", function() {
+    client.assert(response.status === 204, "Expected status 204, but got " + response.status);
+  });
+%}
+
+### Assign student to group2 (same category)
+POST http://{{ip}}/study/{{student1}}/start
+Content-Type: application/json
+
+{
+  "classId": {{class1}},
+  "studentGroupId": {{studentGroup2}},
+  "validFrom": "2023-10-02"
+}
+
+> {%
+  client.test("Study creation status is 201", function () {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains errror message", function () {
+    const json = response.body;
+    client.assert(json.studentId == client.global.get("student1"), "studentId does not match the expected value");
+    client.assert(json.classId == client.global.get("class1"), "classId does not match the expected value");
+    client.assert(json.studentGroupId == client.global.get("studentGroup2"), "studentGroupId does not match the expected value");
+    client.assert(new Date(json.validFrom).toISOString().startsWith("2023-10-02"), "validFrom does not match the expected value");
+  });
+%}
+
+### Delete group2 - ondelete: restrict
+DELETE http://{{ip}}/student-groups/{{studentGroup2}}
+Content-Type: application/json
+
+> {%
+  client.test("Deletion status is 400", function() {
+    client.assert(response.status === 400, "Expected status 400, but got " + response.status);
+  });
+%}
+
+### Delete group1 - ondelete: restrict
+DELETE http://{{ip}}/student-groups/{{studentGroup1}}
+Content-Type: application/json
+
+> {%
+  client.test("Deletion status is 400", function() {
+    client.assert(response.status === 400, "Expected status 400, but got " + response.status);
+  });
+%}
+
+### Delete the group category - ondelete: restrict
+DELETE http://{{ip}}/group-categories/{{category1}}
+Content-Type: application/json
+
+> {%
+  client.test("Deletion status is 400", function() {
+    client.assert(response.status === 400, "Expected status 400, but got " + response.status);
+  });
+%}
+
+### Delete the class - ondelete: restrict
+DELETE http://{{ip}}/classes/{{class1}}
+Content-Type: application/json
+
+> {%
+  client.test("Deletion status is 400", function() {
+    client.assert(response.status === 400, "Expected status 400, but got " + response.status);
+  });
+%}

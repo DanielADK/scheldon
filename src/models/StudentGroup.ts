@@ -1,6 +1,7 @@
 import {
   AutoIncrement,
   BeforeCreate,
+  BeforeDestroy,
   BeforeUpdate,
   BelongsTo,
   Column,
@@ -17,6 +18,7 @@ import { validatestudentGroupNameAndClass } from '@validators/studentGroupValida
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { GroupCategory } from '@models/GroupCategory';
+import { restrictOnDelete } from '@validators/genericValidators';
 
 @Table({
   timestamps: false,
@@ -33,7 +35,8 @@ export class StudentGroup extends Model<StudentGroup> {
   @Column({
     type: DataType.INTEGER.UNSIGNED,
     primaryKey: true,
-    autoIncrement: true
+    autoIncrement: true,
+    onDelete: 'RESTRICT'
   })
   declare studentGroupId: number;
 
@@ -47,38 +50,58 @@ export class StudentGroup extends Model<StudentGroup> {
   @Column({
     type: DataType.INTEGER.UNSIGNED,
     allowNull: false,
-    unique: false
+    unique: false,
+    onDelete: 'RESTRICT'
   })
   declare classId: number;
 
   @ForeignKey(() => GroupCategory)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
-    allowNull: true
+    allowNull: true,
+    unique: false,
+    onDelete: 'RESTRICT'
   })
   declare categoryId: number | null;
 
-  @BelongsTo(() => GroupCategory)
+  @BelongsTo(() => GroupCategory, { onDelete: 'RESTRICT' })
   declare category: GroupCategory;
 
-  @BelongsTo(() => Class)
+  @BelongsTo(() => Class, { onDelete: 'RESTRICT' })
   declare class: Class;
 
-  @BelongsTo(() => GroupCategory)
+  @BelongsTo(() => GroupCategory, { onDelete: 'RESTRICT' })
   declare groupCategory: GroupCategory;
 
-  @HasMany(() => TimetableEntry)
+  @HasMany(() => TimetableEntry, { onDelete: 'RESTRICT' })
   declare timetableEntries: TimetableEntry[];
 
-  @HasMany(() => SubstitutionEntry)
+  @HasMany(() => SubstitutionEntry, { onDelete: 'RESTRICT' })
   declare substitutionEntries: SubstitutionEntry[];
 
-  @HasMany(() => Study)
+  @HasMany(() => Study, { onDelete: 'RESTRICT' })
   declare studies: Study[];
 
   @BeforeCreate
   @BeforeUpdate
   static async validate(instance: StudentGroup) {
-    await validatestudentGroupNameAndClass(instance);
+    await Promise.all([await validatestudentGroupNameAndClass(instance)]);
+  }
+
+  @BeforeDestroy
+  static async tryRemove(instance: StudentGroup) {
+    await Promise.all([
+      await restrictOnDelete(Study as { new (): Model } & typeof Model, 'studentGroupId' as string as keyof Model, instance.studentGroupId),
+      await restrictOnDelete(
+        TimetableEntry as { new (): Model } & typeof Model,
+        'studentGroupId' as string as keyof Model,
+        instance.studentGroupId
+      ),
+      await restrictOnDelete(
+        SubstitutionEntry as { new (): Model } & typeof Model,
+        'studentGroupId' as string as keyof Model,
+        instance.studentGroupId
+      )
+    ]);
   }
 }

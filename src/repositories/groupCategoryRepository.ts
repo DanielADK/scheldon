@@ -78,6 +78,7 @@ export const updateGroupCategory = async (categoryId: number, data: Partial<Grou
  */
 export const deleteGroupCategory = async (categoryId: number): Promise<number> => {
   return await GroupCategory.destroy({
-    where: { categoryId }
+    where: { categoryId: categoryId },
+    individualHooks: true
   });
 };

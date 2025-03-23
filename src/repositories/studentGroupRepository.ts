@@ -78,7 +78,8 @@ export const updatestudentGroup = async (
  */
 export const deletestudentGroup = async (studentGroupId: number): Promise<number> => {
   return await StudentGroup.destroy({
-    where: { studentGroupId }
+    where: { studentGroupId: studentGroupId },
+    individualHooks: true
   });
 };
 

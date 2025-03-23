@@ -16,16 +16,16 @@ const classSchema: Joi.ObjectSchema<ClassDTO> = Joi.object({
  * Create a new class
  */
 export const createClass = async (ctx: Context) => {
-  // Validate request
-  const { error, value } = classSchema.validate(ctx.request.body);
-
-  if (error) {
-    ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
-    return;
-  }
-
   try {
+    // Validate request
+    const { error, value } = classSchema.validate(ctx.request.body);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
     const classObj = await classService.createClass(value);
     ctx.status = 201;
     ctx.body = classObj;
@@ -38,53 +38,60 @@ export const createClass = async (ctx: Context) => {
  * Get all classes
  */
 export const getAllClasses = async (ctx: Context) => {
-  // Pagination
-  const page = parseInt(ctx.query.page as string) || 1;
-  const limit = parseInt(ctx.query.limit as string) || 10;
+  try {
+    // Pagination
+    const page = parseInt(ctx.query.page as string) || 1;
+    const limit = parseInt(ctx.query.limit as string) || 10;
 
-  const classes = await classService.getAllClasses(page, limit);
+    const classes = await classService.getAllClasses(page, limit);
 
-  ctx.status = 200;
-  ctx.body = {
-    data: classes.rows,
-    meta: {
-      total: classes.count,
-      page,
-      limit
-    }
-  };
+    ctx.status = 200;
+    ctx.body = {
+      data: classes.rows,
+      meta: {
+        total: classes.count,
+        page,
+        limit
+      }
+    };
+  } catch (error) {
+    handleError(ctx, error);
+  }
 };
 
 /**
  * Get class with the specified ID
  */
 export const getClassById = async (ctx: Context) => {
-  const classId = await getIdFromParam(ctx.params.id as string);
+  try {
+    const classId = await getIdFromParam(ctx.params.id as string);
 
-  const classObj = await classService.getClassById(classId);
+    const classObj = await classService.getClassById(classId);
 
-  if (!classObj) {
-    ctx.status = 404;
-    ctx.body = { error: 'Class not found' };
-    return;
+    if (!classObj) {
+      ctx.status = 404;
+      ctx.body = { error: 'Class not found' };
+      return;
+    }
+
+    ctx.status = 200;
+    ctx.body = classObj;
+  } catch (error) {
+    handleError(ctx, error);
   }
-
-  ctx.status = 200;
-  ctx.body = classObj;
 };
 /**
  * Get all classes at the specified time
  */
 export const getClassesAtTime = async (ctx: Context) => {
-  const { time } = ctx.params;
-
-  if (!time) {
-    ctx.status = 400;
-    ctx.body = { error: 'Time is required' };
-    return;
-  }
-
   try {
+    const { time } = ctx.params;
+    if (!time) {
+      ctx.status = 400;
+      ctx.body = { error: 'Time is required' };
+      return;
+    }
+
     const classes = await classService.getClassesAtTime(time);
 
     if (!classes || classes.length === 0) {
@@ -101,18 +108,17 @@ export const getClassesAtTime = async (ctx: Context) => {
 };
 
 export const updateClass = async (ctx: Context) => {
-  const classId = await getIdFromParam(ctx.params.id as string);
-
-  // Validate request
-  const { error, value } = classSchema.validate(ctx.request.body);
-
-  if (error) {
-    ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
-    return;
-  }
-
   try {
+    const classId = await getIdFromParam(ctx.params.id as string);
+    // Validate request
+    const { error, value } = classSchema.validate(ctx.request.body);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
     const updatedClass = await classService.updateClass(classId, value);
     ctx.status = 200;
     ctx.body = updatedClass;
@@ -125,15 +131,19 @@ export const updateClass = async (ctx: Context) => {
  * Delete class with the specified ID
  */
 export const deleteClass = async (ctx: Context) => {
-  const classId = await getIdFromParam(ctx.params.id as string);
+  try {
+    const classId = await getIdFromParam(ctx.params.id as string);
 
-  const deletedCount = await classService.deleteClass(classId);
+    const deletedCount = await classService.deleteClass(classId);
 
-  if (deletedCount === 0) {
-    ctx.status = 404;
-    ctx.body = { error: 'Class not found' };
-    return;
+    if (deletedCount === 0) {
+      ctx.status = 404;
+      ctx.body = { error: 'Class not found' };
+      return;
+    }
+
+    ctx.status = 204;
+  } catch (error) {
+    handleError(ctx, error);
   }
-
-  ctx.status = 204;
 };

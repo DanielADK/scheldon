@@ -139,33 +139,25 @@ export const updateGroupCategory = async (ctx: Context) => {
  */
 export const deleteGroupCategory = async (ctx: Context) => {
   const categoryId = await getIdFromParam(ctx.params.id as string);
-  if (isNaN(categoryId)) {
-    ctx.status = 400;
-    ctx.body = { error: 'Invalid group category ID' };
-    return;
+  try {
+    const groupCategory = await groupCategoryService.getGroupCategoryById(categoryId);
+
+    if (!groupCategory) {
+      ctx.status = 404;
+      ctx.body = { error: 'Group category not found' };
+      return;
+    }
+
+    const deletedCount = await groupCategoryService.deleteGroupCategory(categoryId);
+
+    if (!deletedCount) {
+      ctx.status = 404;
+      ctx.body = { error: 'Group category not found' };
+      return;
+    }
+
+    ctx.status = 204;
+  } catch (error) {
+    handleError(ctx, error);
   }
-
-  const groupCategory = await groupCategoryService.getGroupCategoryById(categoryId);
-
-  if (!groupCategory) {
-    ctx.status = 404;
-    ctx.body = { error: 'Group category not found' };
-    return;
-  }
-
-  if (groupCategory.studentGroups?.length > 0) {
-    ctx.status = 400;
-    ctx.body = { error: 'Cannot delete group category with existing student groups' };
-    return;
-  }
-
-  const deletedCount = await groupCategoryService.deleteGroupCategory(categoryId);
-
-  if (deletedCount === 0) {
-    ctx.status = 404;
-    ctx.body = { error: 'Group category not found' };
-    return;
-  }
-
-  ctx.status = 204;
 };
