@@ -1,6 +1,7 @@
 import {
   AutoIncrement,
   BeforeCreate,
+  BeforeDestroy,
   BeforeUpdate,
   BelongsTo,
   Column,
@@ -13,6 +14,9 @@ import {
 import { RoomType } from '@models/types/RoomType';
 import { Employee } from '@models/Employee';
 import { validateClassroom, validateOffice } from '@validators/roomValidators';
+import { restrictOnDelete } from '@validators/genericValidators';
+import { SubstitutionEntry } from '@models/SubstitutionEntry';
+import { TimetableEntry } from '@models/TimetableEntry';
 
 @Table({
   timestamps: false
@@ -64,17 +68,27 @@ export class Room extends Model<Room> {
   @ForeignKey(() => Employee)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
-    allowNull: false
+    allowNull: false,
+    onDelete: 'RESTRICT'
   })
   declare administratorId: number;
 
   // Mapping
-  @BelongsTo(() => Employee)
+  @BelongsTo(() => Employee, { onDelete: 'RESTRICT' })
   declare administrator: Employee;
 
   @BeforeCreate
   @BeforeUpdate
   static async validate(instance: Room): Promise<void> {
     await Promise.all([validateOffice(instance), validateClassroom(instance)]);
+  }
+
+  @BeforeDestroy
+  static async tryRemove(instance: Room) {
+    await Promise.all([
+      await restrictOnDelete(Employee as { new (): Model } & typeof Model, 'roomId' as string as keyof Model, instance.roomId),
+      await restrictOnDelete(SubstitutionEntry as { new (): Model } & typeof Model, 'roomId' as string as keyof Model, instance.roomId),
+      await restrictOnDelete(TimetableEntry as { new (): Model } & typeof Model, 'roomId' as string as keyof Model, instance.roomId)
+    ]);
   }
 }
