@@ -41,86 +41,101 @@ export const createEmployee = async (ctx: Context): Promise<void> => {
 
 // Get all employees
 export const getAllEmployees = async (ctx: Context): Promise<void> => {
-  // Pagination
-  const page = parseInt(ctx.query.page as string) || 1;
-  const limit = parseInt(ctx.query.limit as string) || 10;
+  try {
+    // Pagination
+    const page = parseInt(ctx.query.page as string) || 1;
+    const limit = parseInt(ctx.query.limit as string) || 10;
 
-  // Get all employees
-  const employees = await employeeService.getAllEmployees(page, limit);
+    // Get all employees
+    const employees = await employeeService.getAllEmployees(page, limit);
 
-  ctx.status = 200;
-  ctx.body = {
-    data: employees.rows,
-    meta: {
-      total: employees.count,
-      page,
-      limit
-    }
-  };
+    ctx.status = 200;
+    ctx.body = {
+      data: employees.rows,
+      meta: {
+        total: employees.count,
+        page,
+        limit
+      }
+    };
+  } catch (error) {
+    handleError(ctx, error);
+  }
 };
 
-// Get employee by id
 export const getEmployeeById = async (ctx: Context): Promise<void> => {
-  const id = await getIdFromParam(ctx.params.id as string);
+  try {
+    const id = await getIdFromParam(ctx.params.id as string);
 
-  const employee = await employeeService.getEmployeeById(id);
+    const employee = await employeeService.getEmployeeById(id);
 
-  if (!employee) {
-    ctx.status = 404;
-    ctx.body = { error: 'Employee not found' };
-    return;
+    if (!employee) {
+      ctx.status = 404;
+      ctx.body = { error: 'Employee not found' };
+      return;
+    }
+
+    ctx.status = 200;
+    ctx.body = employee;
+  } catch (error) {
+    handleError(ctx, error);
   }
-
-  ctx.status = 200;
-  ctx.body = employee;
 };
 
 // Get employee by username
 export const getEmployeeByUsername = async (ctx: Context): Promise<void> => {
-  const username = ctx.params.username as string;
+  try {
+    const username = ctx.params.username as string;
 
-  const employee = await employeeService.getEmployeeByUsername(username);
+    const employee = await employeeService.getEmployeeByUsername(username);
 
-  if (!employee) {
-    ctx.status = 404;
-    ctx.body = { error: 'Employee not found' };
-    return;
+    if (!employee) {
+      ctx.status = 404;
+      ctx.body = { error: 'Employee not found' };
+      return;
+    }
+
+    ctx.status = 200;
+    ctx.body = employee;
+  } catch (error) {
+    handleError(ctx, error);
   }
-
-  ctx.status = 200;
-  ctx.body = employee;
 };
 
 // Get employee by abbreviation
 export const getEmployeeByAbbreviation = async (ctx: Context): Promise<void> => {
-  const abbreviation = ctx.params.abbreviation as string;
+  try {
+    const abbreviation = ctx.params.abbreviation as string;
 
-  const employee = await employeeService.getEmployeeByAbbreviation(abbreviation);
+    const employee = await employeeService.getEmployeeByAbbreviation(abbreviation);
 
-  if (!employee) {
-    ctx.status = 404;
-    ctx.body = { error: 'Employee not found' };
-    return;
+    if (!employee) {
+      ctx.status = 404;
+      ctx.body = { error: 'Employee not found' };
+      return;
+    }
+
+    ctx.status = 200;
+    ctx.body = employee;
+  } catch (error) {
+    handleError(ctx, error);
   }
-
-  ctx.status = 200;
-  ctx.body = employee;
 };
 
 // Update an employee
 export const updateEmployee = async (ctx: Context): Promise<void> => {
-  const id = await getIdFromParam(ctx.params.id as string);
-
-  // Validate request
-  const { error, value } = employeeSchema.validate(ctx.request.body);
-
-  if (error) {
-    ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
-    return;
-  }
-
   try {
+    const id = await getIdFromParam(ctx.params.id as string);
+
+    // Validate request
+    const { error, value } = employeeSchema.validate(ctx.request.body);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
     const updatedEmployee = await employeeService.updateEmployee(id, value);
 
     // If employee not found after update
@@ -142,15 +157,19 @@ export const updateEmployee = async (ctx: Context): Promise<void> => {
  * @param ctx
  */
 export const deleteEmployee = async (ctx: Context): Promise<void> => {
-  const id = await getIdFromParam(ctx.params.id as string);
+  try {
+    const id = await getIdFromParam(ctx.params.id as string);
 
-  const deletedCount = await employeeService.deleteEmployee(id);
+    const deletedCount = await employeeService.deleteEmployee(id);
 
-  if (deletedCount === 0) {
-    ctx.status = 404;
-    ctx.body = { error: 'Employee not found' };
-    return;
+    if (deletedCount === 0) {
+      ctx.status = 404;
+      ctx.body = { error: 'Employee not found' };
+      return;
+    }
+
+    ctx.status = 204;
+  } catch (error) {
+    handleError(ctx, error);
   }
-
-  ctx.status = 204;
 };
