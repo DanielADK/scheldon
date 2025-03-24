@@ -19,7 +19,7 @@ Content-Type: application/json
   client.global.set("employeeId", response.body.employeeId);
 %}
 
-### Create a room (necessary for class)
+### Create a room1
 POST http://{{ip}}/rooms
 Content-Type: application/json
 
@@ -35,14 +35,32 @@ Content-Type: application/json
   client.test("Room created", function() {
     client.assert(response.status === 201, "Expected status 201, but received " + response.status);
   });
-  client.global.set("roomId", response.body.roomId);
+  client.global.set("roomId1", response.body.roomId);
+%}
+
+### Create a room2
+POST http://{{ip}}/rooms
+Content-Type: application/json
+
+{
+  "name": "ClassTest Room 102",
+  "floor": 2,
+  "type": "CLASSROOM",
+  "studentCapacity": 32,
+  "administratorId": {{employeeId}}
+}
+
+> {%
+  client.test("Room created", function() {
+    client.assert(response.status === 201, "Expected status 201, but received " + response.status);
+  });
+  client.global.set("roomId2", response.body.roomId);
 %}
 
 ### Create new class
 < {%
-  client.global.set("validFrom", (new Date()).toISOString().split("T")[0])
-  client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split("T")[0])
-%}
+  client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split("T")[0])
+  client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split("T")[0])%}
 POST http://{{ip}}/classes
 Content-Type: application/json
 
@@ -50,7 +68,7 @@ Content-Type: application/json
   "name": "CT",
   "validFrom": "{{validFrom}}",
   "validTo": "{{validTo}}",
-  "roomId": {{roomId}},
+  "roomId": {{roomId1}},
   "employeeId": {{employeeId}}
 }
 
@@ -101,7 +119,7 @@ GET http://{{ip}}/classes/{{createdClassId}}
 ### Get classes at a specific time
 < {%
   // add 1 day to validFrom
-  client.global.set("attime", new Date(client.global.get("validFrom")).setDate(new Date(client.global.get("validFrom")).getDate() + 1).toISOString().split("T")[0]);
+  client.global.set("attime", new Date(new Date(client.global.get("validFrom")).setDate(new Date(client.global.get("validFrom")).getDate() + 1)).toISOString().split("T")[0]);
  %}
 GET http://{{ip}}/classes/at-time/{{attime}}
 
@@ -123,18 +141,49 @@ Content-Type: application/json
   "name": "CT2",
   "validFrom": "{{validFrom}}",
   "validTo": "{{validTo}}",
-  "roomId": 1,
-  "employeeId": 1
+  "roomId": {{roomId2}},
+  "employeeId": {{employeeId}}
 }
 
 > {%
-  client.test("Status is 200", function () {
+  client.test("Status is 200", function() {
     client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Response contains required properties", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("classId"), "Response does not contain 'classId'");
+    client.assert(json.hasOwnProperty("name"), "Response does not contain 'name'");
+    client.assert(json.hasOwnProperty("validFrom"), "Response does not contain 'validFrom'");
+    client.assert(json.hasOwnProperty("validTo"), "Response does not contain 'validTo'");
+    client.assert(json.hasOwnProperty("roomId"), "Response does not contain 'roomId'");
+    client.assert(json.hasOwnProperty("employeeId"), "Response does not contain 'employeeId'");
+  });
+  client.test("Returned classId is different from createdClassId", function() {
+    const json = response.body;
+    client.assert(json.classId !== client.global.get("createdClassId"), "Returned classId is the same as createdClassId");
+    client.global.set("classId2", json.classId);
+  });
+  client.test("Returned name is 'CT2'", function() {
+    const json = response.body;
+    client.assert(json.name === "CT2", "Expected name 'CT2', but got " + json.name);
+  });
+  client.test("Returned roomId is roomId2", function() {
+    const json = response.body;
+    client.assert(json.roomId === client.global.get("roomId2"), "Expected roomId to be " + client.global.get("roomId2") + ", but got " + json.roomId);
   });
 %}
 
 ### Cleanup - delete class
 DELETE http://{{ip}}/classes/{{createdClassId}}
+
+> {%
+  client.test("Status is 204", function () {
+    client.assert(response.status === 204, "Expected status 204, but got " + response.status);
+  });
+%}
+
+### Cleanup - delete class2
+DELETE http://{{ip}}/classes/{{classId2}}
 
 > {%
   client.test("Status is 204", function () {
@@ -151,8 +200,17 @@ GET http://{{ip}}/classes/{{createdClassId}}
   });
 %}
 
-### Cleanup - delete room
-DELETE http://{{ip}}/rooms/{{roomId}}
+### Cleanup - delete room1
+DELETE http://{{ip}}/rooms/{{roomId1}}
+
+> {%
+  client.test("Room deleted", function() {
+    client.assert(response.status === 204, "Expected status 204, but received " + response.status);
+  });
+%}
+
+### Cleanup - delete room2
+DELETE http://{{ip}}/rooms/{{roomId2}}
 
 > {%
   client.test("Room deleted", function() {

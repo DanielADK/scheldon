@@ -1,6 +1,5 @@
 import {
   AutoIncrement,
-  BeforeBulkDestroy,
   BeforeCreate,
   BeforeDestroy,
   BeforeUpdate,
@@ -123,7 +122,6 @@ export class Study extends Model<Study> {
   }
 
   @BeforeDestroy
-  @BeforeBulkDestroy
   static async tryRemove(instance: StudentGroup) {
     await restrictOnDelete(
       StudentGroup as { new (): Model } & typeof Model,

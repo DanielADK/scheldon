@@ -27,6 +27,7 @@ import {
 } from '@validators/classValidators';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
 import { GroupCategory } from '@models/GroupCategory';
+import { QueryOptions } from '@models/types/QueryOptions';
 
 @Table({
   timestamps: false,
@@ -125,15 +126,15 @@ export class Class extends Model<Class> {
   // Hooks for validation
   @BeforeCreate
   @BeforeUpdate
-  static async validate(instance: Class) {
+  static async validate(instance: Class, options: QueryOptions) {
     await Promise.all([
-      validateClassDates(instance),
-      validateClassName(instance),
-      validateClassInterval(instance),
-      validateTeacherExistence(instance),
-      validateRoomExistence(instance),
-      validateTeacherSchedule(instance),
-      validateRoomSchedule(instance)
+      validateClassDates(instance, options),
+      validateClassName(instance, options),
+      validateClassInterval(instance, options),
+      validateTeacherExistence(instance, options),
+      validateRoomExistence(instance, options),
+      validateTeacherSchedule(instance, options),
+      validateRoomSchedule(instance, options)
     ]);
   }
 }
