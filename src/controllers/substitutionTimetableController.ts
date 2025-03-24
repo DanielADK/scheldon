@@ -35,15 +35,15 @@ type getterService = (id: number) => Promise<TimetableExport | null>;
  * @param ctx Context
  */
 export const createCustomLessonRecord = async (ctx: Context): Promise<void> => {
-  const { error, value } = createLessonRecordSchema.validate(ctx.request.body);
-
-  if (error) {
-    ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
-    return;
-  }
-
   try {
+    const { error, value } = createLessonRecordSchema.validate(ctx.request.body);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
     const lessonRecord = await lessonRecordService.createCustomLessonRecord(value);
     ctx.status = 201;
     ctx.body = lessonRecord;
