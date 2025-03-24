@@ -61,22 +61,23 @@ export const updateClass = async (classId: number, data: ClassDTO): Promise<Clas
         throw new Error('Cannot update an expired class');
       }
 
+      // End validity of the existing class
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const oldValidTo: string = existingClass.validTo;
+      await existingClass.update({ validTo: yesterday.toISOString() }, { transaction: transaction });
+
       // Create a new class with the updated data
       const newClass = await Class.create(
         {
-          name: existingClass.name,
+          name: data.name,
           validFrom: new Date().toISOString(),
-          validTo: existingClass.validTo,
-          roomId: roomId ?? existingClass.roomId,
-          employeeId: employeeId ?? existingClass.employeeId
+          validTo: oldValidTo,
+          roomId: roomId ?? data.roomId,
+          employeeId: employeeId ?? data.employeeId
         } as Class,
         { transaction: transaction }
       );
-
-      // End validity of the existing class
-      await existingClass.update('validTo', new Date(new Date().getTime() - 1).toISOString(), {
-        transaction: transaction
-      });
 
       // Copy studentGroups and their assignments to the new class
       await studentGroupService.transferstudentGroups(existingClass, newClass, transaction);

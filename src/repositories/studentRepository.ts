@@ -97,6 +97,7 @@ export const updateStudent = async (id: number, data: StudentDTO): Promise<[affe
  */
 export const deleteStudent = async (id: number): Promise<number> => {
   return await Student.destroy({
-    where: { studentId: id }
+    where: { studentId: id },
+    individualHooks: true
   });
 };

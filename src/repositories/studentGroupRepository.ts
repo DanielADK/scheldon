@@ -40,7 +40,7 @@ export const getstudentGroupById = async (studentGroupId: number): Promise<Stude
  */
 export const getstudentGroupsByClassId = async (classId: number): Promise<StudentGroup[]> => {
   return await StudentGroup.findAll({
-    where: { classId }
+    where: { classId: classId }
   });
 };
 

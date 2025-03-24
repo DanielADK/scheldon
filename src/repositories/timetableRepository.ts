@@ -284,7 +284,11 @@ const handleSubstitutionEntryConflict = async (classregister: ClassRegister, sen
 
     // If the old substitution entry is unused, delete it
     if (isOldEntryUsed === 0) {
-      await oldSubstitutionEntry.destroy({ transaction: transaction });
+      await SubstitutionEntry.destroy({
+        where: { substitutionEntryId: oldSubstitutionEntry.substitutionEntryId },
+        transaction,
+        individualHooks: true
+      });
     }
   }
 };
