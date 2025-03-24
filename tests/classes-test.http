@@ -60,7 +60,8 @@ Content-Type: application/json
 ### Create new class
 < {%
   client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split("T")[0])
-  client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split("T")[0])%}
+  client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split("T")[0])
+%}
 POST http://{{ip}}/classes
 Content-Type: application/json
 
