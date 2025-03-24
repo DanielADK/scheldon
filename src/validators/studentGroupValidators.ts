@@ -1,31 +1,20 @@
 import { StudentGroup } from '@models/StudentGroup';
+import { validator } from '@validators/genericValidators';
+import { QueryOptions } from '@models/types/QueryOptions';
 
 /**
  * Validate unique combination of classId and name
  */
-export const validatestudentGroupNameAndClass = async (instance: StudentGroup) => {
+export const validatestudentGroupNameAndClass: validator<StudentGroup> = async (instance: StudentGroup, options?: QueryOptions | null) => {
   const existingstudentGroup = await StudentGroup.findOne({
     where: {
       name: instance.name,
       classId: instance.classId
-    }
+    },
+    ...options
   });
 
   if (existingstudentGroup) {
     throw new Error('studentGroup name already exists within the class');
-  }
-};
-
-/**
- * Validate restriction for deletion if there are dependencies
- */
-export const validateStudentGroupOnDelete = async (instance: StudentGroup) => {
-  const relatedRecordsCount = await StudentGroup.count({
-    where: { studentGroupId: instance.studentGroupId },
-    include: [{ all: true }] // Adjust include to load the required relations explicitly
-  });
-
-  if (relatedRecordsCount > 0) {
-    throw new Error('Cannot delete studentGroup as it has dependent records');
   }
 };

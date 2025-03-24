@@ -1,10 +1,24 @@
-import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import {
+  AutoIncrement,
+  BeforeCreate,
+  BeforeUpdate,
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  PrimaryKey,
+  Table
+} from 'sequelize-typescript';
 import { Class } from '@models/Class';
 import { Subject } from '@models/Subject';
 import { Employee } from '@models/Employee';
 import { Room } from '@models/Room';
 import { StudentGroup } from '@models/StudentGroup';
 import { SubstitutionType } from '@models/types/SubstitutionType';
+import { validateDayInWeekRange, validateHourInDayRange } from '@validators/timetableEntryValidators';
+import { validateStudentGroupInClass } from '@validators/substitutionEntryValidators';
+import { QueryOptions } from '@models/types/QueryOptions';
 
 @Table({
   timestamps: false,
@@ -101,14 +115,13 @@ export class SubstitutionEntry extends Model<SubstitutionEntry> {
   @BelongsTo(() => Room)
   declare room: Room;
 
-  /*TODO
-   @BeforeCreate
+  @BeforeCreate
   @BeforeUpdate
-  static async validate(instance: SubstitutionEntry): Promise<void> {
+  static async validate(instance: SubstitutionEntry, options?: QueryOptions | null): Promise<void> {
     await Promise.all([
-      validateDayInWeekRange(instance),
-      validateHourInDayRange(instance),
-      instance.studentGroupId ? validateStudentGroupInClass(instance) : null
+      validateDayInWeekRange(instance, options),
+      validateHourInDayRange(instance, options),
+      instance.studentGroupId ? validateStudentGroupInClass(instance, options) : null
     ]);
-  }*/
+  }
 }
