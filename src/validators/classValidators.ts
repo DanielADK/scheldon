@@ -2,22 +2,25 @@ import { Op } from 'sequelize';
 import { Class } from '@models/Class';
 import { Room } from '@models/Room';
 import { Employee } from '@models/Employee';
+import { QueryOptions } from '@models/types/QueryOptions';
+import { validator } from '@validators/genericValidators';
 
 /**
  * Validate class dates
  * @param instance
  */
-export const validateClassDates = async (instance: Class) => {
+export const validateClassDates: validator<Class> = async (instance: Class) => {
   if (new Date(instance.validFrom) > new Date(instance.validTo)) {
-    throw new Error('validFrom must be less than validTo');
+    throw new Error('The validation start date must be earlier than the validation end date');
   }
 };
 
 /**
  * Validate class name
  * @param instance
+ * @param options
  */
-export const validateClassName = async (instance: Class) => {
+export const validateClassName: validator<Class> = async (instance: Class, options?: QueryOptions | null) => {
   const existingClass = await Class.findOne({
     where: {
       name: instance.name,
@@ -30,7 +33,8 @@ export const validateClassName = async (instance: Class) => {
       classId: {
         [Op.ne]: instance.classId
       }
-    }
+    },
+    ...options
   });
 
   if (existingClass) {
@@ -41,8 +45,9 @@ export const validateClassName = async (instance: Class) => {
 /**
  * Validate class interval
  * @param instance
+ * @param options
  */
-export const validateClassInterval = async (instance: Class) => {
+export const validateClassInterval: validator<Class> = async (instance: Class, options?: QueryOptions | null) => {
   const existingClass = await Class.findOne({
     where: {
       name: instance.name,
@@ -57,7 +62,8 @@ export const validateClassInterval = async (instance: Class) => {
       classId: {
         [Op.ne]: instance.classId // Ignore current instance during update
       }
-    }
+    },
+    ...options
   });
 
   if (existingClass) {
@@ -68,10 +74,12 @@ export const validateClassInterval = async (instance: Class) => {
 /**
  * Validate employee existence
  * @param instance
+ * @param options
  */
-export const validateTeacherExistence = async (instance: Class) => {
+export const validateTeacherExistence: validator<Class> = async (instance: Class, options?: QueryOptions | null) => {
   const teacher = await Employee.findOne({
-    where: { employeeId: instance.employeeId, isTeacher: true }
+    where: { employeeId: instance.employeeId, isTeacher: true },
+    ...options
   });
 
   if (!teacher) {
@@ -82,8 +90,9 @@ export const validateTeacherExistence = async (instance: Class) => {
 /**
  * Validate employee schedule
  * @param instance
+ * @param options
  */
-export const validateTeacherSchedule = async (instance: Class) => {
+export const validateTeacherSchedule: validator<Class> = async (instance: Class, options?: QueryOptions | null) => {
   const existingTeacher = await Class.findOne({
     where: {
       employeeId: instance.employeeId,
@@ -96,7 +105,8 @@ export const validateTeacherSchedule = async (instance: Class) => {
       classId: {
         [Op.ne]: instance.classId // Ignore current instance during update
       }
-    }
+    },
+    ...options
   });
 
   if (existingTeacher) {
@@ -107,13 +117,15 @@ export const validateTeacherSchedule = async (instance: Class) => {
 /**
  * Validate room existence
  * @param instance
+ * @param options
  */
-export const validateRoomExistence = async (instance: Class) => {
+export const validateRoomExistence: validator<Class> = async (instance: Class, options?: QueryOptions | null) => {
   const room = await Room.findOne({
     where: {
       roomId: instance.roomId,
       type: 'classroom'
-    }
+    },
+    ...options
   });
 
   if (!room) {
@@ -124,15 +136,17 @@ export const validateRoomExistence = async (instance: Class) => {
 /**
  * Validate room schedule
  * @param instance
+ * @param options
  */
-export const validateRoomSchedule = async (instance: Class) => {
+export const validateRoomSchedule: validator<Class> = async (instance: Class, options?: QueryOptions | null) => {
   const existingRoom = await Class.findOne({
     where: {
       roomId: instance.roomId,
       validFrom: { [Op.lte]: instance.validTo },
       validTo: { [Op.gte]: instance.validFrom },
       classId: { [Op.ne]: instance.classId }
-    }
+    },
+    ...options
   });
 
   if (existingRoom) {

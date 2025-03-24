@@ -1,36 +1,66 @@
 import { Model, WhereOptions } from 'sequelize';
+import { QueryOptions } from '@models/types/QueryOptions';
 
-export async function restrictOnDelete<T extends Model>(
+export const restrictOnDelete = async function <T extends Model>(
   /**
-   * Throws an error if there are related rows associated with the specified `id` in the given model.
+   * Ensures that a specified record can only be deleted if no related dependent records exist.
    *
-   * This function is commonly used to enforce referential integrity in cases where records
-   * in a database cannot be deleted if dependent/associated records exist.
+   * @template T - A class that extends the Sequelize `Model` class.
+   * @param modelToCheck - The Sequelize model constructor to check for dependent records.
+   * @param foreignKeyColumn - The column in the dependent model that references the parent record.
+   * @param recordId - The ID of the record in the parent model to check for dependencies.
+   * @param options - (Optional) Additional query options, such as a transaction.
    *
-   * @template T - The type of the Sequelize model extending the "Model" base class.
-   * @param {({ new (): T } & typeof Model)} model - The Sequelize model to check for associated records.
-   * @param {keyof T} foreignKey - The name of the foreign key column that establishes the relationship.
-   * @param {string} id - The identifier to search for in the foreign key column.
-   * @throws {Error} Throws an error if dependent records exist in the database.
+   * @throws {Error} If dependent records exist, throws an error with the message:
+   * "Cannot delete, related records exist."
+   *
    * @example
-   * import { restrictOnDelete } from './restrictOnDelete';
+   * import { restrictOnDelete } from './helpers';
    * import { User, Post } from './models';
    *
-   * async function deleteUser(userId: string): Promise<void> {
-   *   // Ensure the user can only be deleted if there are no associated posts
+   * async function deleteUser(userId: number) {
    *   await restrictOnDelete(Post, 'userId', userId);
-   *   // If no error is thrown, we can safely delete the user
    *   await User.destroy({ where: { id: userId } });
    * }
    */
-  model: { new (): T } & typeof Model,
-  foreignKey: keyof T,
-  id: string | number
+  modelToCheck: { new (): T } & typeof Model,
+  foreignKeyColumn: keyof T,
+  recordId: string | number,
+  options?: QueryOptions | null
 ): Promise<void> {
-  const dependentRows = await model.count({
-    where: { [foreignKey]: id } as WhereOptions<T>
+  const dependentRows = await modelToCheck.count({
+    where: { [foreignKeyColumn]: recordId } as WhereOptions<T>,
+    ...options
   });
   if (dependentRows > 0) {
-    throw new Error('Cannot delete, related records exists.');
+    throw new Error('Cannot delete, related records exist.');
   }
+};
+
+export interface validator<T extends Model> {
+  /**
+   * Interface representing a validation function for Sequelize models.
+   *
+   * This interface defines a contract for a function that performs validation
+   * on a given instance of a model and optionally accepts query options (e.g., transactions).
+   *
+   * @template T - A class extending the Sequelize `Model` class.
+   *
+   * @param instance - The instance of the model to validate.
+   * @param options - (Optional) Additional query options, such as a transaction.
+   *
+   * @returns A `Promise<void>` that resolves when the validation completes successfully
+   * or rejects with an error if validation fails.
+   *
+   * @example
+   * import { validator } from './validators';
+   * import { User } from './models';
+   *
+   * const validateUser: validator<User> = async (user, options) => {
+   *   if (!user.name) {
+   *     throw new Error('User must have a name.');
+   *   }
+   * };
+   */
+  (instance: T, options?: QueryOptions | null): Promise<void>;
 }
