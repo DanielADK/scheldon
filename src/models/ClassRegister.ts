@@ -22,7 +22,8 @@ export class ClassRegister extends Model<ClassRegister> {
   @ForeignKey(() => TimetableEntry)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
-    allowNull: true
+    allowNull: true,
+    onDelete: 'RESTRICT'
   })
   declare timetableEntryId: number | null;
 
@@ -30,7 +31,8 @@ export class ClassRegister extends Model<ClassRegister> {
   @ForeignKey(() => SubstitutionEntry)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
-    allowNull: true
+    allowNull: true,
+    onDelete: 'RESTRICT'
   })
   declare substitutionEntryId: number | null;
 
@@ -70,22 +72,18 @@ export class ClassRegister extends Model<ClassRegister> {
   @BelongsTo(() => TimetableEntry, {
     foreignKey: 'entryId',
     constraints: false,
-    scope: {
-      entryType: 'TimetableEntry'
-    }
+    onDelete: 'RESTRICT'
   })
   declare timetableEntry: TimetableEntry | null;
 
   @BelongsTo(() => SubstitutionEntry, {
     foreignKey: 'entryId',
     constraints: false,
-    scope: {
-      entryType: 'SubstitutionEntry'
-    }
+    onDelete: 'RESTRICT'
   })
   declare substitutionEntry: SubstitutionEntry | null;
 
-  @HasMany(() => Attendance)
+  @HasMany(() => Attendance, { onDelete: 'RESTRICT' })
   declare attendances: Attendance[];
 
   /*
