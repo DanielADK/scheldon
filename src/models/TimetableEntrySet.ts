@@ -11,11 +11,12 @@ export class TimetableEntrySet extends Model<TimetableEntrySet> {
   @Column({
     type: DataType.INTEGER.UNSIGNED,
     primaryKey: true,
-    allowNull: false
+    allowNull: false,
+    onDelete: 'CASCADE'
   })
   declare timetableEntryId: number;
 
-  @BelongsTo(() => TimetableEntry)
+  @BelongsTo(() => TimetableEntry, { onDelete: 'CASCADE' })
   declare timetableEntry: TimetableEntry;
 
   @PrimaryKey
@@ -23,10 +24,11 @@ export class TimetableEntrySet extends Model<TimetableEntrySet> {
   @Column({
     type: DataType.INTEGER.UNSIGNED,
     primaryKey: true,
-    allowNull: false
+    allowNull: false,
+    onDelete: 'CASCADE'
   })
   declare timetableSetId: number;
 
-  @BelongsTo(() => TimetableSet)
+  @BelongsTo(() => TimetableSet, { onDelete: 'CASCADE' })
   declare timetableSet: TimetableSet;
 }

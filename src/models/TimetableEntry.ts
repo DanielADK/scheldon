@@ -1,6 +1,7 @@
 import {
   AutoIncrement,
   BeforeCreate,
+  BeforeDestroy,
   BeforeUpdate,
   BelongsTo,
   BelongsToMany,
@@ -25,6 +26,8 @@ import {
   validateUniqueEntry
 } from '@validators/timetableEntryValidators';
 import { QueryOptions } from '@models/types/QueryOptions';
+import { restrictOnDelete } from '@validators/genericValidators';
+import { ClassRegister } from '@models/ClassRegister';
 
 @Table({
   timestamps: false,
@@ -67,35 +70,40 @@ export class TimetableEntry extends Model<TimetableEntry> {
   @ForeignKey(() => Class)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
-    allowNull: false
+    allowNull: false,
+    onDelete: 'RESTRICT'
   })
   declare classId: number;
 
   @ForeignKey(() => StudentGroup)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
-    allowNull: true
+    allowNull: true,
+    onDelete: 'RESTRICT'
   })
   declare studentGroupId: number | null;
 
   @ForeignKey(() => Subject)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
-    allowNull: false
+    allowNull: false,
+    onDelete: 'RESTRICT'
   })
   declare subjectId: number;
 
   @ForeignKey(() => Employee)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
-    allowNull: false
+    allowNull: false,
+    onDelete: 'RESTRICT'
   })
   declare teacherId: number;
 
   @ForeignKey(() => Room)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
-    allowNull: false
+    allowNull: false,
+    onDelete: 'RESTRICT'
   })
   declare roomId: number;
 
@@ -103,19 +111,19 @@ export class TimetableEntry extends Model<TimetableEntry> {
   @BelongsToMany(() => TimetableSet, () => TimetableEntrySet)
   declare timetableSets: TimetableSet[];
 
-  @BelongsTo(() => Class)
+  @BelongsTo(() => Class, { onDelete: 'RESTRICT' })
   declare class: Class;
 
-  @BelongsTo(() => StudentGroup)
+  @BelongsTo(() => StudentGroup, { onDelete: 'RESTRICT' })
   declare studentGroup: StudentGroup | null;
 
-  @BelongsTo(() => Subject)
+  @BelongsTo(() => Subject, { onDelete: 'RESTRICT' })
   declare subject: Subject;
 
-  @BelongsTo(() => Employee)
+  @BelongsTo(() => Employee, { onDelete: 'RESTRICT' })
   declare teacher: Employee;
 
-  @BelongsTo(() => Room)
+  @BelongsTo(() => Room, { onDelete: 'RESTRICT' })
   declare room: Room;
 
   @BeforeCreate
@@ -126,6 +134,22 @@ export class TimetableEntry extends Model<TimetableEntry> {
       validateDayInWeekRange(instance, options),
       validateHourInDayRange(instance, options),
       instance.studentGroupId ? validateStudentGroupInClass(instance, options) : null
+    ]);
+  }
+
+  @BeforeDestroy
+  static async tryRemove(instance: TimetableEntry) {
+    await Promise.all([
+      await restrictOnDelete(
+        TimetableEntrySet as { new (): Model } & typeof Model,
+        'timetableEntryId' as string as keyof Model,
+        instance.timetableEntryId
+      ),
+      await restrictOnDelete(
+        ClassRegister as { new (): Model } & typeof Model,
+        'timetableEntryId' as string as keyof Model,
+        instance.timetableEntryId
+      )
     ]);
   }
 }

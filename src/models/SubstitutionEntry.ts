@@ -61,35 +61,40 @@ export class SubstitutionEntry extends Model<SubstitutionEntry> {
   @ForeignKey(() => Class)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
-    allowNull: false
+    allowNull: false,
+    onDelete: 'RESTRICT'
   })
   declare classId: number;
 
   @ForeignKey(() => StudentGroup)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
-    allowNull: true
+    allowNull: true,
+    onDelete: 'RESTRICT'
   })
   declare studentGroupId: number | null;
 
   @ForeignKey(() => Subject)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
-    allowNull: false
+    allowNull: false,
+    onDelete: 'RESTRICT'
   })
   declare subjectId: number;
 
   @ForeignKey(() => Employee)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
-    allowNull: false
+    allowNull: false,
+    onDelete: 'RESTRICT'
   })
   declare teacherId: number;
 
   @ForeignKey(() => Room)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
-    allowNull: false
+    allowNull: false,
+    onDelete: 'RESTRICT'
   })
   declare roomId: number;
 
@@ -100,19 +105,19 @@ export class SubstitutionEntry extends Model<SubstitutionEntry> {
   declare type: SubstitutionType;
 
   // Mappings
-  @BelongsTo(() => Class)
+  @BelongsTo(() => Class, { onDelete: 'RESTRICT' })
   declare class: Class;
 
-  @BelongsTo(() => StudentGroup)
+  @BelongsTo(() => StudentGroup, { onDelete: 'RESTRICT' })
   declare studentGroup: StudentGroup | null;
 
-  @BelongsTo(() => Subject)
+  @BelongsTo(() => Subject, { onDelete: 'RESTRICT' })
   declare subject: Subject;
 
-  @BelongsTo(() => Employee)
+  @BelongsTo(() => Employee, { onDelete: 'RESTRICT' })
   declare teacher: Employee;
 
-  @BelongsTo(() => Room)
+  @BelongsTo(() => Room, { onDelete: 'RESTRICT' })
   declare room: Room;
 
   @BeforeCreate
