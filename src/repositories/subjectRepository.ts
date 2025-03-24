@@ -77,6 +77,7 @@ export const updateSubject = async (subjectId: number, data: Partial<SubjectDTO>
  */
 export const deleteSubject = async (subjectId: number): Promise<number> => {
   return await Subject.destroy({
-    where: { subjectId: subjectId }
+    where: { subjectId: subjectId },
+    individualHooks: true
   });
 };

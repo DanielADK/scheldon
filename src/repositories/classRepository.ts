@@ -104,6 +104,7 @@ export const updateClass = async (classId: number, data: ClassDTO): Promise<[num
  */
 export const deleteClass = async (classId: number): Promise<number> => {
   return await Class.destroy({
-    where: { classId: classId }
+    where: { classId: classId },
+    individualHooks: true
   });
 };
