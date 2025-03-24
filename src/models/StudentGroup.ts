@@ -19,6 +19,7 @@ import { SubstitutionEntry } from '@models/SubstitutionEntry';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { GroupCategory } from '@models/GroupCategory';
 import { restrictOnDelete } from '@validators/genericValidators';
+import { QueryOptions } from '@models/types/QueryOptions';
 
 @Table({
   timestamps: false,
@@ -84,8 +85,8 @@ export class StudentGroup extends Model<StudentGroup> {
 
   @BeforeCreate
   @BeforeUpdate
-  static async validate(instance: StudentGroup) {
-    await Promise.all([await validatestudentGroupNameAndClass(instance)]);
+  static async validate(instance: StudentGroup, options?: QueryOptions | null) {
+    await Promise.all([await validatestudentGroupNameAndClass(instance, options)]);
   }
 
   @BeforeDestroy

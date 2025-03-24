@@ -1,10 +1,16 @@
 import { TimetableEntry } from '@models/TimetableEntry';
+import { validator } from '@validators/genericValidators';
+import { QueryOptions } from '@models/types/QueryOptions';
+import { SubstitutionEntry } from '@models/SubstitutionEntry';
 
 /**
  * Validate employee is a teacher
  */
-export const validateTeacherRole = async (instance: TimetableEntry): Promise<void> => {
-  const fetchedTeacher = await instance.$get('teacher');
+export const validateTeacherRole: validator<TimetableEntry> = async (
+  instance: TimetableEntry,
+  options?: QueryOptions | null
+): Promise<void> => {
+  const fetchedTeacher = await instance.$get('teacher', options || undefined);
   if (!fetchedTeacher) {
     throw new Error('Teacher not found');
   }
@@ -18,9 +24,12 @@ export const validateTeacherRole = async (instance: TimetableEntry): Promise<voi
 /**
  * Validate the studentGroup is in the class
  */
-export const validateStudentGroupInClass = async (instance: TimetableEntry): Promise<void> => {
+export const validateStudentGroupInClass: validator<TimetableEntry> = async (
+  instance: TimetableEntry,
+  options?: QueryOptions | null
+): Promise<void> => {
   if (!instance.studentGroup) {
-    instance.studentGroup = await instance.$get('studentGroup');
+    instance.studentGroup = await instance.$get('studentGroup', options || undefined);
   }
   if (instance.studentGroup && instance.classId !== instance.studentGroup.classId) {
     throw new Error('studentGroup is not in the class');
@@ -30,7 +39,7 @@ export const validateStudentGroupInClass = async (instance: TimetableEntry): Pro
 /**
  * Validate the teacher is teaching the subject
  */
-export const validateDayInWeekRange = async (instance: TimetableEntry): Promise<void> => {
+export const validateDayInWeekRange: validator<TimetableEntry | SubstitutionEntry> = async (instance: TimetableEntry|SubstitutionEntry): Promise<void> => {
   if (instance.dayInWeek < 0 || instance.dayInWeek > 6) {
     throw new Error('Day in week is out of range. Expected value between 0 (Mo) and 6 (Su)');
   }
@@ -39,7 +48,7 @@ export const validateDayInWeekRange = async (instance: TimetableEntry): Promise<
 /**
  * Validate the hour in day is in range
  */
-export const validateHourInDayRange = async (instance: TimetableEntry): Promise<void> => {
+export const validateHourInDayRange: validator<TimetableEntry | SubstitutionEntry > = async (instance: TimetableEntry | SubstitutionEntry): Promise<void> => {
   if (instance.hourInDay < 0 || instance.hourInDay > 10) {
     throw new Error('Hour in day is out of range. Expected value between 0 and 10');
   }
@@ -48,7 +57,10 @@ export const validateHourInDayRange = async (instance: TimetableEntry): Promise<
 /**
  * Validate unique entry by class, studentGroup, day, hour, teacher, room, subject in timetable set (with nullable studentGroup)
  */
-export const validateUniqueEntry = async (instance: TimetableEntry): Promise<void> => {
+export const validateUniqueEntry: validator<TimetableEntry> = async (
+  instance: TimetableEntry,
+  options?: QueryOptions | null
+): Promise<void> => {
   const existing = await TimetableEntry.findOne({
     where: {
       classId: instance.classId,
@@ -58,7 +70,8 @@ export const validateUniqueEntry = async (instance: TimetableEntry): Promise<voi
       teacherId: instance.teacherId,
       roomId: instance.roomId,
       subjectId: instance.subjectId
-    }
+    },
+    ...options
   });
 
   if (existing) {

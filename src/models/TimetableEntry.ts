@@ -24,6 +24,7 @@ import {
   validateStudentGroupInClass,
   validateUniqueEntry
 } from '@validators/timetableEntryValidators';
+import { QueryOptions } from '@models/types/QueryOptions';
 
 @Table({
   timestamps: false,
@@ -119,12 +120,12 @@ export class TimetableEntry extends Model<TimetableEntry> {
 
   @BeforeCreate
   @BeforeUpdate
-  static async validate(instance: TimetableEntry): Promise<void> {
+  static async validate(instance: TimetableEntry, options?: QueryOptions | null): Promise<void> {
     await Promise.all([
-      validateUniqueEntry(instance),
-      validateDayInWeekRange(instance),
-      validateHourInDayRange(instance),
-      instance.studentGroupId ? validateStudentGroupInClass(instance) : null
+      validateUniqueEntry(instance, options),
+      validateDayInWeekRange(instance, options),
+      validateHourInDayRange(instance, options),
+      instance.studentGroupId ? validateStudentGroupInClass(instance, options) : null
     ]);
   }
 }

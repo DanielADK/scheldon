@@ -2,6 +2,7 @@ import { AutoIncrement, BeforeCreate, BeforeUpdate, BelongsToMany, Column, DataT
 import { TimetableEntry } from '@models/TimetableEntry';
 import { TimetableEntrySet } from '@models/TimetableEntrySet';
 import { validateDates, validateUniqueInterval } from '@validators/timetableSetValidator';
+import { QueryOptions } from '@models/types/QueryOptions';
 
 @Table({
   timestamps: false,
@@ -53,7 +54,7 @@ export class TimetableSet extends Model<TimetableSet> {
 
   @BeforeCreate
   @BeforeUpdate
-  static async validate(instance: TimetableSet): Promise<void> {
-    await Promise.all([validateDates(instance), validateUniqueInterval(instance)]);
+  static async validate(instance: TimetableSet, options?: QueryOptions | null): Promise<void> {
+    await Promise.all([validateDates(instance, options), validateUniqueInterval(instance, options)]);
   }
 }

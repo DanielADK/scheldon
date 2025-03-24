@@ -1,14 +1,17 @@
 import { Study } from '@models/Study';
 import { Op } from 'sequelize';
 import { StudentGroup } from '@models/StudentGroup';
+import { validator } from '@validators/genericValidators';
+import { QueryOptions } from '@models/types/QueryOptions';
 
 /**
  * Validate studentGroup belongs to class
  * @param instance
+ * @param options
  */
-export const validatestudentGroupBelongsToClass = async (instance: Study) => {
+export const validatestudentGroupBelongsToClass: validator<Study> = async (instance: Study, options?: QueryOptions | null) => {
   if (!instance.studentGroup) {
-    instance.studentGroup = await instance.$get('studentGroup');
+    instance.studentGroup = await instance.$get('studentGroup', options || undefined);
   }
 
   if (instance.studentGroup && instance.studentGroup.classId !== instance.classId) {
@@ -19,9 +22,10 @@ export const validatestudentGroupBelongsToClass = async (instance: Study) => {
 /**
  * Validate class dates
  * @param instance
+ * @param options
  */
-export const validateClassDates = async (instance: Study) => {
-  const fetchedClass = await instance.$get('class');
+export const validateClassDates: validator<Study> = async (instance: Study, options?: QueryOptions | null) => {
+  const fetchedClass = await instance.$get('class', options || undefined);
   if (!fetchedClass) {
     throw new Error('Class not found');
   }
@@ -39,14 +43,15 @@ export const validateClassDates = async (instance: Study) => {
   }
 };
 
-export const validateExclusiveClassAssignment = async (instance: Study) => {
+export const validateExclusiveClassAssignment: validator<Study> = async (instance: Study, options?: QueryOptions | null) => {
   const actualAssignments = await Study.findAll({
     where: {
       studentId: instance.studentId,
       studentGroupId: { [Op.is]: null },
       validTo: { [Op.gte]: instance.validFrom },
       validFrom: { [Op.lte]: instance.validTo }
-    }
+    },
+    ...options
   });
 
   if (actualAssignments.length > 0) {
@@ -54,7 +59,7 @@ export const validateExclusiveClassAssignment = async (instance: Study) => {
   }
 };
 
-export const validateUniqueStudentGroupAssignment = async (instance: Study) => {
+export const validateUniqueStudentGroupAssignment: validator<Study> = async (instance: Study, options?: QueryOptions | null) => {
   const existingAssignments = await Study.findOne({
     where: {
       studentId: instance.studentId,
@@ -62,7 +67,8 @@ export const validateUniqueStudentGroupAssignment = async (instance: Study) => {
       studentGroupId: instance.studentGroupId,
       validTo: { [Op.gte]: instance.validFrom },
       validFrom: { [Op.lte]: instance.validTo }
-    }
+    },
+    ...options
   });
 
   if (existingAssignments) {
@@ -70,7 +76,7 @@ export const validateUniqueStudentGroupAssignment = async (instance: Study) => {
   }
 };
 
-export const validateClassExistsWhenStudentGroup = async (instance: Study) => {
+export const validateClassExistsWhenStudentGroup: validator<Study> = async (instance: Study, options?: QueryOptions | null) => {
   const actualAssignments = await Study.findAll({
     where: {
       studentId: instance.studentId,
@@ -82,7 +88,8 @@ export const validateClassExistsWhenStudentGroup = async (instance: Study) => {
       validFrom: {
         [Op.lte]: instance.validTo
       }
-    }
+    },
+    ...options
   });
   // Find assignment where classId is number and studentGroupId is null
   const assignment = actualAssignments.find((assignment) => assignment.classId && !assignment.studentGroupId);
@@ -91,12 +98,12 @@ export const validateClassExistsWhenStudentGroup = async (instance: Study) => {
   }
 };
 
-export const validateStudentGroupCategoryDisjunction = async (instance: Study) => {
+export const validateStudentGroupCategoryDisjunction: validator<Study> = async (instance: Study, options?: QueryOptions | null) => {
   if (!instance.studentGroupId) {
     return;
   }
   // Fetch the current studentGroup for the instance
-  const studentGroup = instance.studentGroup || (await instance.$get('studentGroup'));
+  const studentGroup = instance.studentGroup || (await instance.$get('studentGroup', options || undefined));
   if (!studentGroup) {
     throw new Error('Student group not found');
   }
@@ -122,7 +129,8 @@ export const validateStudentGroupCategoryDisjunction = async (instance: Study) =
           categoryId: studentGroup.categoryId
         }
       }
-    ]
+    ],
+    ...options
   });
 
   if (conflictingAssignments) {
@@ -130,8 +138,8 @@ export const validateStudentGroupCategoryDisjunction = async (instance: Study) =
   }
 };
 
-export const validateValidToWithinClassValidTo = async (instance: Study) => {
-  const fetchedClass = await instance.$get('class');
+export const validateValidToWithinClassValidTo: validator<Study> = async (instance: Study, options?: QueryOptions | null) => {
+  const fetchedClass = await instance.$get('class', options || undefined);
   if (!fetchedClass) {
     throw new Error('Class not found');
   }
