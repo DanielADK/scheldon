@@ -15,16 +15,16 @@ const subjectSchema: Joi.ObjectSchema<SubjectDTO> = Joi.object({
  * POST /subjects
  */
 export const createSubject = async (ctx: Context) => {
-  // Validate request
-  const { error, value } = subjectSchema.validate(ctx.request.body);
-
-  if (error) {
-    ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
-    return;
-  }
-
   try {
+    // Validate request
+    const { error, value } = subjectSchema.validate(ctx.request.body);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
     const subject = await subjectService.createSubject(value);
     ctx.status = 201;
     ctx.body = subject;
@@ -33,72 +33,80 @@ export const createSubject = async (ctx: Context) => {
   }
 };
 
-// Schema for getting a subjects
 export const getAllSubjects = async (ctx: Context) => {
-  // Pagination
-  const page = parseInt(ctx.query.page as string) || 1;
-  const limit = parseInt(ctx.query.limit as string) || 10;
-
-  // Get all subjects
-  const subjects = await subjectService.getAllSubjects(page, limit);
-
-  ctx.status = 200;
-  ctx.body = {
-    data: subjects.rows,
-    meta: {
-      total: subjects.count,
-      page,
-      limit
-    }
-  };
-};
-
-// Schema for getting a subject by ID
-export const getSubjectById = async (ctx: Context) => {
-  const subjectId = await getIdFromParam(ctx.params.id as string);
-
-  const subject = await subjectService.getSubjectById(subjectId);
-
-  if (!subject) {
-    ctx.status = 404;
-    ctx.body = { error: 'Subject not found' };
-    return;
-  }
-
-  ctx.status = 200;
-  ctx.body = subject;
-};
-
-// Schema for getting a subject by abbreviation
-export const getSubjectByAbbreviation = async (ctx: Context) => {
-  const abbreviation = ctx.params.abbreviation as string;
-
-  const subject = await subjectService.getSubjectByAbbreviation(abbreviation);
-
-  if (!subject) {
-    ctx.status = 404;
-    ctx.body = { error: 'Subject not found' };
-    return;
-  }
-
-  ctx.status = 200;
-  ctx.body = subject;
-};
-
-// Schema for deleting a subject
-export const updateSubject = async (ctx: Context) => {
-  const subjectId = await getIdFromParam(ctx.params.id as string);
-
-  // Validate request
-  const { error, value } = subjectSchema.validate(ctx.request.body);
-
-  if (error) {
-    ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
-    return;
-  }
-
   try {
+    // Pagination
+    const page = parseInt(ctx.query.page as string) || 1;
+    const limit = parseInt(ctx.query.limit as string) || 10;
+
+    // Get all subjects
+    const subjects = await subjectService.getAllSubjects(page, limit);
+
+    ctx.status = 200;
+    ctx.body = {
+      data: subjects.rows,
+      meta: {
+        total: subjects.count,
+        page,
+        limit
+      }
+    };
+  } catch (error) {
+    handleError(ctx, error);
+  }
+};
+
+export const getSubjectById = async (ctx: Context) => {
+  try {
+    const subjectId = await getIdFromParam(ctx.params.id as string);
+
+    const subject = await subjectService.getSubjectById(subjectId);
+
+    if (!subject) {
+      ctx.status = 404;
+      ctx.body = { error: 'Subject not found' };
+      return;
+    }
+
+    ctx.status = 200;
+    ctx.body = subject;
+  } catch (error) {
+    handleError(ctx, error);
+  }
+};
+
+export const getSubjectByAbbreviation = async (ctx: Context) => {
+  try {
+    const abbreviation = ctx.params.abbreviation as string;
+
+    const subject = await subjectService.getSubjectByAbbreviation(abbreviation);
+
+    if (!subject) {
+      ctx.status = 404;
+      ctx.body = { error: 'Subject not found' };
+      return;
+    }
+
+    ctx.status = 200;
+    ctx.body = subject;
+  } catch (error) {
+    handleError(ctx, error);
+  }
+};
+
+export const updateSubject = async (ctx: Context) => {
+  try {
+    const subjectId = await getIdFromParam(ctx.params.id as string);
+
+    // Validate request
+    const { error, value } = subjectSchema.validate(ctx.request.body);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
     const [affectedCount] = await subjectService.updateSubject(subjectId, value);
 
     if (affectedCount > 0) {
@@ -113,22 +121,25 @@ export const updateSubject = async (ctx: Context) => {
   }
 };
 
-// Schema for deleting a subject
 export const deleteSubject = async (ctx: Context) => {
-  const subjectId = await getIdFromParam(ctx.params.id as string);
-  if (isNaN(subjectId)) {
-    ctx.status = 400;
-    ctx.body = { error: 'Invalid subject ID' };
-    return;
+  try {
+    const subjectId = await getIdFromParam(ctx.params.id as string);
+    if (isNaN(subjectId)) {
+      ctx.status = 400;
+      ctx.body = { error: 'Invalid subject ID' };
+      return;
+    }
+
+    const deletedCount = await subjectService.deleteSubject(subjectId);
+
+    if (deletedCount === 0) {
+      ctx.status = 404;
+      ctx.body = { error: 'Subject not found' };
+      return;
+    }
+
+    ctx.status = 204;
+  } catch (error) {
+    handleError(ctx, error);
   }
-
-  const deletedCount = await subjectService.deleteSubject(subjectId);
-
-  if (deletedCount === 0) {
-    ctx.status = 404;
-    ctx.body = { error: 'Subject not found' };
-    return;
-  }
-
-  ctx.status = 204;
 };

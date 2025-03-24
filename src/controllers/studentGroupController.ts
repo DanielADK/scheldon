@@ -24,15 +24,15 @@ const updateStudentGroupSchema: Joi.ObjectSchema<studentGroupDTO> = Joi.object({
  * @param ctx
  */
 export const createstudentGroup = async (ctx: Context) => {
-  const { error, value } = studentGroupSchema.validate(ctx.request.body);
-
-  if (error) {
-    ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
-    return;
-  }
-
   try {
+    const { error, value } = studentGroupSchema.validate(ctx.request.body);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
     // check if category belongs to the same class as the group
     if (value.categoryId) {
       const category = await groupCategoryService.getGroupCategoryById(value.categoryId);

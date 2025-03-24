@@ -38,22 +38,26 @@ export const createGroupCategory = async (ctx: Context) => {
  * GET /group-categories
  */
 export const getAllGroupCategories = async (ctx: Context) => {
-  // Pagination
-  const page = parseInt(ctx.query.page as string) || 1;
-  const limit = parseInt(ctx.query.limit as string) || 10;
+  try {
+    // Pagination
+    const page = parseInt(ctx.query.page as string) || 1;
+    const limit = parseInt(ctx.query.limit as string) || 10;
 
-  // Get all group categories
-  const groupCategories = await groupCategoryService.getAllGroupCategories(page, limit);
+    // Get all group categories
+    const groupCategories = await groupCategoryService.getAllGroupCategories(page, limit);
 
-  ctx.status = 200;
-  ctx.body = {
-    data: groupCategories.rows,
-    meta: {
-      total: groupCategories.count,
-      page,
-      limit
-    }
-  };
+    ctx.status = 200;
+    ctx.body = {
+      data: groupCategories.rows,
+      meta: {
+        total: groupCategories.count,
+        page,
+        limit
+      }
+    };
+  } catch (error) {
+    handleError(ctx, error);
+  }
 };
 
 /**
@@ -61,18 +65,22 @@ export const getAllGroupCategories = async (ctx: Context) => {
  * GET /group-categories/:id
  */
 export const getGroupCategoryById = async (ctx: Context) => {
-  const categoryId = await getIdFromParam(ctx.params.id as string);
+  try {
+    const categoryId = await getIdFromParam(ctx.params.id as string);
 
-  const groupCategory = await groupCategoryService.getGroupCategoryById(categoryId);
+    const groupCategory = await groupCategoryService.getGroupCategoryById(categoryId);
 
-  if (!groupCategory) {
-    ctx.status = 404;
-    ctx.body = { error: 'Group category not found' };
-    return;
+    if (!groupCategory) {
+      ctx.status = 404;
+      ctx.body = { error: 'Group category not found' };
+      return;
+    }
+
+    ctx.status = 200;
+    ctx.body = groupCategory;
+  } catch (error) {
+    handleError(ctx, error);
   }
-
-  ctx.status = 200;
-  ctx.body = groupCategory;
 };
 
 /**
@@ -80,18 +88,22 @@ export const getGroupCategoryById = async (ctx: Context) => {
  * GET /group-categories/:id/student-groups
  */
 export const getGroupCategoryWithStudentGroups = async (ctx: Context) => {
-  const categoryId = await getIdFromParam(ctx.params.id as string);
+  try {
+    const categoryId = await getIdFromParam(ctx.params.id as string);
 
-  const groupCategory = await groupCategoryService.getGroupCategoryWithStudentGroups(categoryId);
+    const groupCategory = await groupCategoryService.getGroupCategoryWithStudentGroups(categoryId);
 
-  if (!groupCategory) {
-    ctx.status = 404;
-    ctx.body = { error: 'Group category not found' };
-    return;
+    if (!groupCategory) {
+      ctx.status = 404;
+      ctx.body = { error: 'Group category not found' };
+      return;
+    }
+
+    ctx.status = 200;
+    ctx.body = groupCategory;
+  } catch (error) {
+    handleError(ctx, error);
   }
-
-  ctx.status = 200;
-  ctx.body = groupCategory;
 };
 
 /**
@@ -99,18 +111,18 @@ export const getGroupCategoryWithStudentGroups = async (ctx: Context) => {
  * @param ctx
  */
 export const updateGroupCategory = async (ctx: Context) => {
-  const categoryId = await getIdFromParam(ctx.params.id as string);
-
-  // Validate request - only name can be updated
-  const { error, value } = Joi.object({ name: Joi.string().required().min(3).max(50) }).validate(ctx.request.body);
-
-  if (error) {
-    ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
-    return;
-  }
-
   try {
+    const categoryId = await getIdFromParam(ctx.params.id as string);
+
+    // Validate request - only name can be updated
+    const { error, value } = Joi.object({ name: Joi.string().required().min(3).max(50) }).validate(ctx.request.body);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
     const existingCategory = await groupCategoryService.getGroupCategoryById(categoryId);
 
     if (!existingCategory) {
@@ -138,8 +150,8 @@ export const updateGroupCategory = async (ctx: Context) => {
  * DELETE /group-categories/:id
  */
 export const deleteGroupCategory = async (ctx: Context) => {
-  const categoryId = await getIdFromParam(ctx.params.id as string);
   try {
+    const categoryId = await getIdFromParam(ctx.params.id as string);
     const groupCategory = await groupCategoryService.getGroupCategoryById(categoryId);
 
     if (!groupCategory) {

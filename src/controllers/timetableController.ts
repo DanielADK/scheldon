@@ -47,20 +47,20 @@ export const substitutionEntrySchema: Joi.ObjectSchema = Joi.object({
 type getterService = (id: number) => Promise<TimetableExport | null>;
 
 /**
- * Create a new timetable set
+ * Create a new timetable entry
  * @param ctx Context
  */
 export const createTEntry = async (ctx: Context): Promise<void> => {
-  const tsetId: number = await getIdFromParam(ctx.params.id);
-  const { error, value } = timetableEntrySchema.validate(ctx.request.body);
-
-  if (error) {
-    ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
-    return;
-  }
-
   try {
+    const tsetId: number = await getIdFromParam(ctx.params.id);
+    const { error, value } = timetableEntrySchema.validate(ctx.request.body);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
     const tentry = await timetableService.createTEntry(tsetId, value);
     ctx.status = 201;
     ctx.body = tentry;
@@ -73,17 +73,16 @@ export const createTEntry = async (ctx: Context): Promise<void> => {
  * Create a new substitution entry
  * @param ctx Context
  */
-
 export const createSEntry = async (ctx: Context): Promise<void> => {
-  const { error, value } = substitutionEntrySchema.validate(ctx.request.body);
-
-  if (error) {
-    ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
-    return;
-  }
-
   try {
+    const { error, value } = substitutionEntrySchema.validate(ctx.request.body);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
     const substitutionEntry = await timetableService.createSubstitutionEntry(value);
     ctx.status = 201;
     ctx.body = substitutionEntry;
@@ -97,15 +96,15 @@ export const createSEntry = async (ctx: Context): Promise<void> => {
  * @param ctx Context
  */
 export const createTSet = async (ctx: Context): Promise<void> => {
-  const { error, value } = timetableSetSchema.validate(ctx.request.body);
-
-  if (error) {
-    ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
-    return;
-  }
-
   try {
+    const { error, value } = timetableSetSchema.validate(ctx.request.body);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
     const tset = await timetableService.createTSet(value);
     ctx.status = 201;
     ctx.body = tset;

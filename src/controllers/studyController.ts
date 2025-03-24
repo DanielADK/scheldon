@@ -23,22 +23,21 @@ const stopStudySchema = Joi.object({
  * POST /students/:studentId/start
  */
 export const startStudy = async (ctx: Context) => {
-  const studentId = await getIdFromParam(ctx.params.studentId as string);
-  const { error, value } = startStudySchema.validate(ctx.request.body);
-
-  if (error) {
-    ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
-    return;
-  }
-
   try {
+    const studentId = await getIdFromParam(ctx.params.studentId as string);
+    const { error, value } = startStudySchema.validate(ctx.request.body);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
     const study = await studyService.startStudy(studentId, value);
 
     ctx.status = 201;
     ctx.body = study;
   } catch (error) {
-    console.error('==================\nError:' + error + '\n' + 'Context: ' + JSON.stringify(ctx) + '\n==================\n');
     handleError(ctx, error);
   }
 };
@@ -48,17 +47,17 @@ export const startStudy = async (ctx: Context) => {
  * @param ctx - The Koa request/response context object DELETE /students/:studentId/unassign
  */
 export const stopStudy = async (ctx: Context) => {
-  const studentId = await getIdFromParam(ctx.params.studentId as string);
-  const { error, value } = stopStudySchema.validate(ctx.request.body);
-
-  if (error) {
-    ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
-  }
-
   try {
-    await studyService.stopStudy(studentId, value);
+    const studentId = await getIdFromParam(ctx.params.studentId as string);
+    const { error, value } = stopStudySchema.validate(ctx.request.body);
 
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
+    await studyService.stopStudy(studentId, value);
     ctx.status = 204;
   } catch (error) {
     handleError(ctx, error);

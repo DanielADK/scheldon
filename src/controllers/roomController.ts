@@ -25,15 +25,15 @@ const roomSchema: Joi.ObjectSchema<RoomDTO> = Joi.object({
 });
 
 export const createRoom = async (ctx: Context): Promise<Room | void> => {
-  const { error, value } = roomSchema.validate(ctx.request.body);
-
-  if (error) {
-    ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
-    return;
-  }
-
   try {
+    const { error, value } = roomSchema.validate(ctx.request.body);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
     const room = await roomService.createRoom(value);
     ctx.status = 201;
     ctx.body = room;
@@ -46,33 +46,41 @@ export const createRoom = async (ctx: Context): Promise<Room | void> => {
  * Get all rooms
  */
 export const getAllRooms = async (ctx: Context): Promise<void> => {
-  const page: number = parseInt(ctx.query.page as string) || 1;
-  const limit: number = parseInt(ctx.query.limit as string) || 10;
+  try {
+    const page: number = parseInt(ctx.query.page as string) || 1;
+    const limit: number = parseInt(ctx.query.limit as string) || 10;
 
-  const rooms: { rows: Room[]; count: number } = await roomService.getAllRooms(page, limit);
+    const rooms: { rows: Room[]; count: number } = await roomService.getAllRooms(page, limit);
 
-  ctx.status = 200;
-  ctx.body = {
-    data: rooms.rows,
-    meta: {
-      total: rooms.count,
-      page: 1,
-      limit: 10
-    }
-  };
+    ctx.status = 200;
+    ctx.body = {
+      data: rooms.rows,
+      meta: {
+        total: rooms.count,
+        page: 1,
+        limit: 10
+      }
+    };
+  } catch (error) {
+    handleError(ctx, error);
+  }
 };
 
 /**
  * Get room by id
  */
 export const getRoomById = async (ctx: Context): Promise<void> => {
-  const id: number = await getIdFromParam(ctx.params.id);
-  const room: Room | null = await roomService.getRoomById(id);
-  if (room) {
-    ctx.body = room;
-  } else {
-    ctx.status = 404;
-    ctx.body = { error: 'Room not found' };
+  try {
+    const id: number = await getIdFromParam(ctx.params.id);
+    const room: Room | null = await roomService.getRoomById(id);
+    if (room) {
+      ctx.body = room;
+    } else {
+      ctx.status = 404;
+      ctx.body = { error: 'Room not found' };
+    }
+  } catch (error) {
+    handleError(ctx, error);
   }
 };
 
@@ -108,14 +116,18 @@ export const updateRoom = async (ctx: Context): Promise<void> => {
  * Delete room
  */
 export const deleteRoom = async (ctx: Context): Promise<void> => {
-  const roomId: number = await getIdFromParam(ctx.params.id);
-  const deletedCount = await roomService.deleteRoom(roomId);
+  try {
+    const roomId: number = await getIdFromParam(ctx.params.id);
+    const deletedCount = await roomService.deleteRoom(roomId);
 
-  if (deletedCount === 0) {
-    ctx.status = 404;
-    ctx.body = { error: 'Room not found' };
-    return;
+    if (deletedCount === 0) {
+      ctx.status = 404;
+      ctx.body = { error: 'Room not found' };
+      return;
+    }
+
+    ctx.status = 204;
+  } catch (error) {
+    handleError(ctx, error);
   }
-
-  ctx.status = 204;
 };
