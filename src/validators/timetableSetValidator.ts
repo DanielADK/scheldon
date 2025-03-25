@@ -35,3 +35,22 @@ export const validateUniqueInterval: validator<TimetableSet> = async (
     throw new Error('Timetable set already exists within the validity period of another timetable set');
   }
 };
+
+/**
+ * Validate unique timetable set name
+ * @param instance
+ * @param options
+ */
+export const validateUniqueName: validator<TimetableSet> = async (instance: TimetableSet, options?: QueryOptions | null): Promise<void> => {
+  const existingSet = await TimetableSet.findOne({
+    where: {
+      name: instance.name,
+      timetableSetId: { [Op.ne]: instance.timetableSetId }
+    },
+    ...options
+  });
+
+  if (existingSet) {
+    throw new Error(`A timetable set with the name "${instance.name}" already exists`);
+  }
+};

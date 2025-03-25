@@ -1156,3 +1156,178 @@ Content-Type: application/json
     client.global.set("timetableEntryId", json.timetableEntryId);
   });
 %}
+
+### 39. Can't create timetable set with overlapping date range (complete overlap)
+< {%
+  client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() - 2)).toISOString().split("T")[0])
+  client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split("T")[0])
+%}
+POST http://{{ip}}/timetables/stable/set
+Content-Type: application/json
+
+{
+  "name": "Completely Overlapping TSet",
+  "validFrom": "{{validFrom}}",
+  "validTo": "{{validTo}}"
+}
+
+> {%
+  client.test("Complete overlap timetable set creation fails with 400", function() {
+    client.assert(response.status === 400, "Expected status 400, but got " + response.status);
+  });
+  client.test("Response contains error about overlapping date range", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("error"), "Response does not contain 'error'");
+  });
+%}
+
+### 40. Can't create timetable set with overlapping date range (partial overlap at start)
+< {%
+  client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() - 2)).toISOString().split("T")[0])
+  client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 0)).toISOString().split("T")[0])
+%}
+POST http://{{ip}}/timetables/stable/set
+Content-Type: application/json
+
+{
+  "name": "Start Overlapping TSet",
+  "validFrom": "{{validFrom}}",
+  "validTo": "{{validTo}}"
+}
+
+> {%
+  client.test("Start overlap timetable set creation fails with 400", function() {
+    client.assert(response.status === 400, "Expected status 400, but got " + response.status);
+  });
+  client.test("Response contains error about overlapping date range", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("error"), "Response does not contain 'error'");
+    client.assert(json.error.toLowerCase().includes("set already exists"), "Expected error message to mention that set already exists");
+  });
+%}
+
+### 41. Can't create timetable set with overlapping date range (partial overlap at end)
+< {%
+  client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() - 0)).toISOString().split("T")[0])
+  client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 2)).toISOString().split("T")[0])
+%}
+POST http://{{ip}}/timetables/stable/set
+Content-Type: application/json
+
+{
+  "name": "End Overlapping TSet",
+  "validFrom": "{{validFrom}}",
+  "validTo": "{{validTo}}"
+}
+
+> {%
+  client.test("End overlap timetable set creation fails with 400", function() {
+    client.assert(response.status === 400, "Expected status 400, but got " + response.status);
+  });
+  client.test("Response contains error about overlapping date range", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("error"), "Response does not contain 'error'");
+    client.assert(json.error.toLowerCase().includes("set already exists"), "Expected error message to mention that set already exists");
+  });
+%}
+
+### 42. Can't create timetable set with overlapping date range (encompassing overlap)
+< {%
+  client.global.set("validFrom", new Date(new Date().setMonth(new Date().getDay() - 10)).toISOString().split("T")[0])
+  client.global.set("validTo", new Date(new Date().setMonth(new Date().getDay() + 10)).toISOString().split("T")[0])
+%}
+POST http://{{ip}}/timetables/stable/set
+Content-Type: application/json
+
+{
+  "name": "Encompassing Overlapping TSet",
+  "validFrom": "{{validFrom}}",
+  "validTo": "{{validTo}}"
+}
+
+> {%
+  client.test("Encompassing overlap timetable set creation fails with 400", function() {
+    client.assert(response.status === 400, "Expected status 400, but got " + response.status);
+  });
+  client.test("Response contains error about overlapping date range", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("error"), "Response does not contain 'error'");
+    client.assert(json.error.toLowerCase().includes("set already exists"), "Expected error message to mention that set already exists");
+  });
+%}
+
+### 43. Can create timetable set with non-overlapping date range (before)
+< {%
+  client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() - 3)).toISOString().split("T")[0])
+  client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() - 2)).toISOString().split("T")[0])
+%}
+POST http://{{ip}}/timetables/stable/set
+Content-Type: application/json
+
+{
+  "name": "Before Main TSet",
+  "validFrom": "{{validFrom}}",
+  "validTo": "{{validTo}}"
+}
+
+> {%
+  client.test("Non-overlapping (before) timetable set creation succeeds with 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains timetableSetId", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("timetableSetId"), "Response does not contain 'timetableSetId'");
+    client.global.set("beforeTSetId", json.timetableSetId);
+  });
+%}
+
+### 44. Can create timetable set with non-overlapping date range (after)
+< {%
+  client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() + 2)).toISOString().split("T")[0])
+  client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split("T")[0])
+%}
+POST http://{{ip}}/timetables/stable/set
+Content-Type: application/json
+
+{
+  "name": "After Main TSet",
+  "validFrom": "{{validFrom}}",
+  "validTo": "{{validTo}}"
+}
+
+> {%
+  client.test("Non-overlapping (after) timetable set creation succeeds with 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains timetableSetId", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("timetableSetId"), "Response does not contain 'timetableSetId'");
+    client.global.set("afterTSetId", json.timetableSetId);
+  });
+%}
+
+### 45. Can't create timetable set with duplicate name
+< {%
+  client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() + 10)).toISOString().split("T")[0])
+  client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 12)).toISOString().split("T")[0])
+%}
+POST http://{{ip}}/timetables/stable/set
+Content-Type: application/json
+
+{
+  "name": "After Main TSet",
+  "validFrom": "{{validFrom}}",
+  "validTo": "{{validTo}}"
+}
+
+> {%
+  client.test("Duplicate name timetable set creation fails with 400", function() {
+    client.assert(response.status === 400, "Expected status 400, but got " + response.status);
+  });
+  client.test("Response contains error about duplicate name", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("error"), "Response does not contain 'error'");
+    client.assert(json.error.includes("name") || json.error.includes("duplicate"),
+      "Expected error message to mention 'name' or 'duplicate'");
+  });
+%}
