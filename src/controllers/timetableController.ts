@@ -173,3 +173,35 @@ export const getTimetableByIdAndDateController = async (ctx: Context, idAtGetter
     handleError(ctx, error);
   }
 };
+
+/**
+ * Retrieves timetable entries associated with a specific set and sends them in the response body.
+ *
+ * @param {Context} ctx - The Koa context object containing request and response data. It should include
+ * the set identifier in the request parameters under `ctx.params.id`.
+ * @return {Promise<void>} A promise that resolves when the operation is complete. The response contains
+ * the retrieved entries or an error if the operation fails.
+ */
+export async function getEntriesBySet(ctx: Context): Promise<void> {
+  try {
+    const tsetId: number = await getIdFromParam(ctx.params.id);
+
+    const entries = await timetableService.getEntriesBySet(tsetId);
+
+    ctx.status = 200;
+    ctx.body = entries;
+  } catch (error) {
+    handleError(ctx, error);
+  }
+}
+
+export async function getAllSets(ctx: Context): Promise<void> {
+  try {
+    const allSets = await timetableService.getAllSets();
+
+    ctx.status = 200;
+    ctx.body = allSets;
+  } catch (error) {
+    handleError(ctx, error);
+  }
+}

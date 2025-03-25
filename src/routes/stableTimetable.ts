@@ -59,8 +59,46 @@ const router = new Router();
  *         - name
  *         - validFrom
  *         - validTo
- *
- * /timetables/stable/set/{id}/entry:
+ */
+
+/**
+ * @openapi
+ * /timetables/stable/sets:
+ *   post:
+ *     tags:
+ *       - Timetable
+ *     summary: Create a new timetable set
+ *     requestBody:
+ *       description: Timetable set details
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/TimetableSetDTO'
+ *     responses:
+ *       201:
+ *         description: Timetable set created
+ *       400:
+ *         description: Bad request
+ */
+router.post('/timetables/stable/sets', timetableController.createTSet);
+
+/**
+ * @openapi
+ * /timetables/stable/sets:
+ *   get:
+ *     tags:
+ *       - Timetable
+ *     summary: Get all timetable sets
+ *     responses:
+ *       200:
+ *         description: List of all timetable sets retrieved successfully
+ */
+router.get('/timetables/stable/sets', (ctx) => timetableController.getAllSets(ctx));
+
+/**
+ * @openapi
+ * /timetables/stable/sets/{id}/entries:
  *   post:
  *     tags:
  *       - Timetable
@@ -88,33 +126,34 @@ const router = new Router();
  *       400:
  *         description: Bad request or Timetable set not found
  */
-router.post('/timetables/stable/set/:id/entry', timetableController.createTEntry);
+router.post('/timetables/stable/sets/:id/entries', timetableController.createTEntry);
 
 /**
  * @openapi
- * /timetables/stable/set:
- *   post:
+ * /timetables/stable/sets/{id}/entries:
+ *   get:
  *     tags:
  *       - Timetable
- *     summary: Create a new timetable set
- *     requestBody:
- *       description: Timetable set details
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/TimetableSetDTO'
+ *     summary: Get all timetable entries in a specific timetable set
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: ID of the timetable set
  *     responses:
- *       201:
- *         description: Timetable set created
+ *       200:
+ *         description: List of all timetable entries in the specified set retrieved successfully
  *       400:
- *         description: Bad request
+ *         description: Timetable set not found or no entries found
  */
-router.post('/timetables/stable/set', timetableController.createTSet);
+router.get('/timetables/stable/sets/:id/entries', (ctx) => timetableController.getEntriesBySet(ctx));
 
 /**
  * @openapi
- * /timetables/stable/class/{id}:
+ * /timetables/stable/classes/{id}:
  *   get:
  *     tags:
  *       - Timetable
@@ -130,14 +169,14 @@ router.post('/timetables/stable/set', timetableController.createTSet);
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
- *       404:
+ *       400:
  *         description: Timetable not found
  */
-router.get('/timetables/stable/class/:id', (ctx) => getTimetableByIdController(ctx, timetableService.getTimetableByClassId));
+router.get('/timetables/stable/classes/:id', (ctx) => getTimetableByIdController(ctx, timetableService.getTimetableByClassId));
 
 /**
  * @openapi
- * /timetables/stable/class/{id}/at/{date}:
+ * /timetables/stable/classes/{id}/at/{date}:
  *   get:
  *     tags:
  *       - Timetable
@@ -160,16 +199,16 @@ router.get('/timetables/stable/class/:id', (ctx) => getTimetableByIdController(c
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
- *       404:
+ *       400:
  *         description: Timetable not found
  */
-router.get('/timetables/stable/class/:id/at/:date', (ctx) =>
+router.get('/timetables/stable/classes/:id/at/:date', (ctx) =>
   getTimetableByIdAndDateController(ctx, timetableService.getTimetableByClassIdAt)
 );
 
 /**
  * @openapi
- * /timetables/stable/teacher/{id}:
+ * /timetables/stable/teachers/{id}:
  *   get:
  *     tags:
  *       - Timetable
@@ -185,14 +224,14 @@ router.get('/timetables/stable/class/:id/at/:date', (ctx) =>
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
- *       404:
+ *       400:
  *         description: Timetable not found
  */
-router.get('/timetables/stable/teacher/:id', (ctx) => getTimetableByIdController(ctx, timetableService.getTimetableByEmployeeId));
+router.get('/timetables/stable/teachers/:id', (ctx) => getTimetableByIdController(ctx, timetableService.getTimetableByEmployeeId));
 
 /**
  * @openapi
- * /timetables/stable/teacher/{id}/at/{date}:
+ * /timetables/stable/teachers/{id}/at/{date}:
  *   get:
  *     tags:
  *       - Timetable
@@ -215,16 +254,16 @@ router.get('/timetables/stable/teacher/:id', (ctx) => getTimetableByIdController
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
- *       404:
+ *       400:
  *         description: Timetable not found
  */
-router.get('/timetables/stable/teacher/:id/at/:date', (ctx) =>
+router.get('/timetables/stable/teachers/:id/at/:date', (ctx) =>
   getTimetableByIdAndDateController(ctx, timetableService.getTimetableByEmployeeIdAt)
 );
 
 /**
  * @openapi
- * /timetables/stable/room/{id}:
+ * /timetables/stable/rooms/{id}:
  *   get:
  *     tags:
  *       - Timetable
@@ -247,14 +286,14 @@ router.get('/timetables/stable/teacher/:id/at/:date', (ctx) =>
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
- *       404:
+ *       400:
  *         description: Timetable not found
  */
-router.get('/timetables/stable/room/:id', (ctx) => getTimetableByIdController(ctx, timetableService.getTimetableByRoomId));
+router.get('/timetables/stable/rooms/:id', (ctx) => getTimetableByIdController(ctx, timetableService.getTimetableByRoomId));
 
 /**
  * @openapi
- * /timetables/stable/room/{id}/at/{date}:
+ * /timetables/stable/rooms/{id}/at/{date}:
  *   get:
  *     tags:
  *       - Timetable
@@ -277,10 +316,10 @@ router.get('/timetables/stable/room/:id', (ctx) => getTimetableByIdController(ct
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
- *       404:
+ *       400:
  *         description: Timetable not found
  */
-router.get('/timetables/stable/room/:id/at/:date', (ctx) =>
+router.get('/timetables/stable/rooms/:id/at/:date', (ctx) =>
   getTimetableByIdAndDateController(ctx, timetableService.getTimetableByRoomIdAt)
 );
 

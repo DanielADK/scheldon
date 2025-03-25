@@ -214,3 +214,31 @@ export const getTimetableByRoomIdAt = async (roomId: number, date: Date): Promis
 export const getTSetById = async (tsetId: number): Promise<TimetableSet | null> => {
   return await TimetableSet.findByPk(tsetId);
 };
+
+/**
+ * Retrieves a list of entries for a given set.
+ *
+ * @param {number} tsetId - The unique identifier of the set for which the entries are to be retrieved.
+ * @returns {Promise<TimetableEntry[]>} A promise that resolves to an array of entries associated with the specified set ID.
+ */
+export async function getEntriesBySet(tsetId: number): Promise<TimetableEntry[]> {
+  const entries = await timetableRepository.getEntries(tsetId);
+  const cleanedEntries = [];
+
+  for (const entry of entries) {
+    // create a new clean object without the timetableEntrySet property
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { TimetableEntrySet, ...cleanDuplicate } = entry.get({ plain: true });
+
+    // convert back to a TimetableEntry instance
+    cleanedEntries.push(cleanDuplicate as TimetableEntry);
+  }
+
+  return cleanedEntries;
+}
+
+export async function getAllSets(): Promise<TimetableSet[]> {
+  return await TimetableSet.findAll();
+}

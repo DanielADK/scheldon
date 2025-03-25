@@ -371,3 +371,36 @@ export const getTimetableByParam = async (
     transaction: transaction
   });
 };
+
+/**
+ * Retrieves timetable entries associated with a specific timetable set ID.
+ *
+ * @param {number} tsetId - The ID of the timetable set to retrieve entries from.
+ * @return {Promise<TimetableEntry[]>} A promise that resolves to an object containing the timetable entries and their total count.
+ * @throws {Error} If the timetable set with the specified ID is not found.
+ */
+export async function getEntries(tsetId: number): Promise<TimetableEntry[]> {
+  const timetableSet = await TimetableSet.findByPk(tsetId, {
+    include: [
+      {
+        model: TimetableEntry,
+        required: true
+      }
+    ]
+  });
+
+  if (!timetableSet) {
+    throw new Error('Timetable set not found');
+  }
+
+  return timetableSet.timetableEntries;
+}
+
+/**
+ * Fetches all timetable sets from the database.
+ *
+ * @return {Promise<TimetableSet[]>} A promise that resolves to an array of all timetable sets.
+ */
+export async function getAllSets(): Promise<TimetableSet[]> {
+  return await TimetableSet.findAll({});
+}
