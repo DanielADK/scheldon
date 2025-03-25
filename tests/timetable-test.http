@@ -214,7 +214,7 @@ Content-Type: application/json
   client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split("T")[0])
   client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split("T")[0])
 %}
-POST http://{{ip}}/timetables/stable/set
+POST http://{{ip}}/timetables/stable/sets
 Content-Type: application/json
 
 {
@@ -232,17 +232,14 @@ Content-Type: application/json
     client.assert(json.hasOwnProperty("id") || json.hasOwnProperty("timetableSetId"),
       "Response does not contain timetable set ID");
 
-    // Save the ID regardless of which property name is used
-    if (json.hasOwnProperty("id")) {
-      client.global.set("timetableSetId", json.id);
-    } else if (json.hasOwnProperty("timetableSetId")) {
+    if (json.hasOwnProperty("timetableSetId")) {
       client.global.set("timetableSetId", json.timetableSetId);
     }
   });
 %}
 
 ### 2. Create Timetable Set – Edge Case: Duplicate name
-POST http://{{ip}}/timetables/stable/set
+POST http://{{ip}}/timetables/stable/sets
 Content-Type: application/json
 
 {
@@ -264,7 +261,7 @@ Content-Type: application/json
 %}
 
 ### 3. Create Timetable Set – Edge Case: validFrom later than validTo
-POST http://{{ip}}/timetables/stable/set
+POST http://{{ip}}/timetables/stable/sets
 Content-Type: application/json
 
 {
@@ -285,7 +282,7 @@ Content-Type: application/json
 %}
 
 ### 4. Create Timetable Set – Missing required fields
-POST http://{{ip}}/timetables/stable/set
+POST http://{{ip}}/timetables/stable/sets
 Content-Type: application/json
 
 {
@@ -304,7 +301,7 @@ Content-Type: application/json
 %}
 
 ### 5. Create Timetable Entry – Valid Request for class assignment
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -330,7 +327,7 @@ Content-Type: application/json
 %}
 
 ### 6. Create Timetable Entry – Valid Request for student group
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -355,7 +352,7 @@ Content-Type: application/json
 %}
 
 ### 7. Create Timetable Entry – Edge Case: Invalid studentGroupId type
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -380,7 +377,7 @@ Content-Type: application/json
 %}
 
 ### 8. Create Timetable Entry – Edge Case: Out-of-range dayInWeek
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -405,7 +402,7 @@ Content-Type: application/json
 %}
 
 ### 9. Create Timetable Entry – Edge Case: Out-of-range hourInDay
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -430,7 +427,7 @@ Content-Type: application/json
 %}
 
 ### 10. Create Timetable Entry – Non-existent TimetableSet ID
-POST http://{{ip}}/timetables/stable/set/9999/entry
+POST http://{{ip}}/timetables/stable/sets/9999/entries
 Content-Type: application/json
 
 {
@@ -450,7 +447,7 @@ Content-Type: application/json
 %}
 
 ### 11. Create Timetable Entry – Edge Case: Non-existent classId
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -471,7 +468,7 @@ Content-Type: application/json
 %}
 
 ### 12. Create Timetable Entry – Edge Case: Non-existent studentGroupId
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -492,7 +489,7 @@ Content-Type: application/json
 %}
 
 ### 13. Create Timetable Entry – Edge Case: Overlapping entry for the same class and time
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -517,7 +514,7 @@ Content-Type: application/json
   });
 %}
 ### 14. Get Timetable by Class ID – Valid Request
-GET http://{{ip}}/timetables/stable/class/{{classId}}
+GET http://{{ip}}/timetables/stable/classes/{{classId}}
 Accept: application/json
 
 > {%
@@ -557,7 +554,7 @@ Accept: application/json
 %}
 
 ### 15. Get Timetable by Class ID – Non-existent Class ID
-GET http://{{ip}}/timetables/stable/class/9999
+GET http://{{ip}}/timetables/stable/classes/9999
 Accept: application/json
 
 > {%
@@ -574,7 +571,7 @@ Accept: application/json
 < {%
   client.global.set("now", new Date().toISOString().split('T')[0]); // now in YYYY-MM-DD
 %}
-GET http://{{ip}}/timetables/stable/class/{{classId}}/at/{{now}}
+GET http://{{ip}}/timetables/stable/classes/{{classId}}/at/{{now}}
 Accept: application/json
 
 > {%
@@ -619,7 +616,7 @@ Accept: application/json
 %}
 
 ### 17. Get Timetable by ClassID and Date – Invalid Date Format
-GET http://{{ip}}/timetables/stable/class/{{classId}}/at/invalid-date
+GET http://{{ip}}/timetables/stable/classes/{{classId}}/at/invalid-date
 Accept: application/json
 
 > {%
@@ -641,7 +638,7 @@ Accept: application/json
   futureDate.setFullYear(futureDate.getFullYear() + 1);
   client.global.set("futureDate", futureDate.toISOString().split('T')[0]); // future date in YYYY-MM-DD
 %}
-GET http://{{ip}}/timetables/stable/class/{{classId}}/at/{{futureDate}}
+GET http://{{ip}}/timetables/stable/classes/{{classId}}/at/{{futureDate}}
 Accept: application/json
 
 > {%
@@ -662,7 +659,7 @@ Accept: application/json
 %}
 
 ### 19. Get Timetable by Teacher ID – Valid Request
-GET http://{{ip}}/timetables/stable/teacher/{{teacherId}}
+GET http://{{ip}}/timetables/stable/teachers/{{teacherId}}
 Accept: application/json
 
 > {%
@@ -705,7 +702,7 @@ Accept: application/json
 %}
 
 ### 20. Get Timetable by Teacher ID – Non-existent Teacher ID
-GET http://{{ip}}/timetables/stable/teacher/9999
+GET http://{{ip}}/timetables/stable/teachers/9999
 Accept: application/json
 
 > {%
@@ -721,7 +718,7 @@ Accept: application/json
 < {%
   client.global.set("now", new Date().toISOString().split('T')[0]); // now in YYYY-MM-DD
 %}
-GET http://{{ip}}/timetables/stable/teacher/{{teacherId}}/at/{{now}}
+GET http://{{ip}}/timetables/stable/teachers/{{teacherId}}/at/{{now}}
 Accept: application/json
 
 > {%
@@ -763,7 +760,7 @@ Accept: application/json
 %}
 
 ### 22. Get Timetable by Teacher ID and Date – Invalid Date Format
-GET http://{{ip}}/timetables/stable/teacher/{{teacherId}}/at/invalid-date
+GET http://{{ip}}/timetables/stable/teachers/{{teacherId}}/at/invalid-date
 Accept: application/json
 
 > {%
@@ -779,7 +776,7 @@ Accept: application/json
   now.setFullYear(now.getFullYear() + 100);
   client.global.set("hunderedYears", now.toISOString().split('T')[0]);
 %}
-GET http://{{ip}}/timetables/stable/teacher/{{teacherId}}/at/{{hunderedYears}}
+GET http://{{ip}}/timetables/stable/teachers/{{teacherId}}/at/{{hunderedYears}}
 Accept: application/json
 
 > {%
@@ -792,7 +789,7 @@ Accept: application/json
 %}
 
 ### 24. Get Timetable by Room ID – Valid Request
-GET http://{{ip}}/timetables/stable/room/{{roomId}}
+GET http://{{ip}}/timetables/stable/rooms/{{roomId}}
 Accept: application/json
 
 > {%
@@ -836,7 +833,7 @@ Accept: application/json
 %}
 
 ### 25. Get Timetable by Room ID – Non-existent Room ID
-GET http://{{ip}}/timetables/stable/room/9999
+GET http://{{ip}}/timetables/stable/rooms/9999
 Accept: application/json
 
 > {%
@@ -852,7 +849,7 @@ Accept: application/json
 < {%
     client.global.set("now", new Date().toISOString().split('T')[0]); // now in YYYY-MM-DD
     %}
-GET http://{{ip}}/timetables/stable/room/{{roomId}}/at/{{now}}
+GET http://{{ip}}/timetables/stable/rooms/{{roomId}}/at/{{now}}
 Accept: application/json
 
 > {%
@@ -862,7 +859,7 @@ Accept: application/json
 %}
 
 ### 27. Get Timetable by Room ID and Date – Invalid Date Format
-GET http://{{ip}}/timetables/stable/room/{{roomId}}/at/invalid-date
+GET http://{{ip}}/timetables/stable/rooms/{{roomId}}/at/invalid-date
 Accept: application/json
 
 > {%
@@ -877,7 +874,7 @@ Accept: application/json
   now.setFullYear(now.getFullYear() + 100);
   client.global.set("hunderedYears", now.toISOString().split('T')[0]);
 %}
-GET http://{{ip}}/timetables/stable/room/{{roomId}}/at/{{hunderedYears}}
+GET http://{{ip}}/timetables/stable/rooms/{{roomId}}/at/{{hunderedYears}}
 Accept: application/json
 
 > {%
@@ -891,7 +888,7 @@ Accept: application/json
 
 ### 29. Create Timetable Entry with Missing Required Fields
 // Missing hourInDay, subjectId, teacherId
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -906,7 +903,7 @@ Content-Type: application/json
 %}
 
 ### 30. Create Timetable Entry at day 5 hour 5
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -932,7 +929,7 @@ Content-Type: application/json
 %}
 
 ### 31. Create Timetable Entry with Teacher Conflict (Same teacher, same time)
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -959,7 +956,7 @@ Content-Type: application/json
 %}
 
 ### 32. Create Timetable Entry with Room Conflict (Same room, same time)
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -987,7 +984,7 @@ Content-Type: application/json
 
 
 ### 33. Create Timetable Entry with Class conflict (Same class, same time, 2 entities)
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -1016,7 +1013,7 @@ Content-Type: application/json
 
 
 ### 34. Create first Timetable Entry without student group conflict (same Class, different groups, different rooms, different teacher)
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -1043,7 +1040,7 @@ Content-Type: application/json
 %}
 
 ### 35. Create Timetable Entry with Student Group conflict (same Student Groups at the same time)
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -1072,7 +1069,7 @@ Content-Type: application/json
 
 
 ### 36. Create Timetable Entry with StudentGroup and Class conflict (cant create for student group and class at same time)
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -1102,7 +1099,7 @@ Content-Type: application/json
 
 
 ### 37. Create Timetable Entry with Class and Student Group conflict (cant create for class and subclass at same time)
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -1131,7 +1128,7 @@ Content-Type: application/json
 
 
 ### 38. Create second Timetable Entry without student group conflict (same Class, different groups, different rooms, different teacher)
-POST http://{{ip}}/timetables/stable/set/{{timetableSetId}}/entry
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 Content-Type: application/json
 
 {
@@ -1153,7 +1150,7 @@ Content-Type: application/json
     const json = response.body;
     client.assert(typeof json === "object", "Response is not a valid object");
     client.assert(json.hasOwnProperty("timetableEntryId"), "Response does not contain timetable entry ID");
-    client.global.set("timetableEntryId", json.timetableEntryId);
+    client.global.set("timetableEntryId2", json.timetableEntryId);
   });
 %}
 
@@ -1162,7 +1159,7 @@ Content-Type: application/json
   client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() - 2)).toISOString().split("T")[0])
   client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split("T")[0])
 %}
-POST http://{{ip}}/timetables/stable/set
+POST http://{{ip}}/timetables/stable/sets
 Content-Type: application/json
 
 {
@@ -1186,7 +1183,7 @@ Content-Type: application/json
   client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() - 2)).toISOString().split("T")[0])
   client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 0)).toISOString().split("T")[0])
 %}
-POST http://{{ip}}/timetables/stable/set
+POST http://{{ip}}/timetables/stable/sets
 Content-Type: application/json
 
 {
@@ -1211,7 +1208,7 @@ Content-Type: application/json
   client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() - 0)).toISOString().split("T")[0])
   client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 2)).toISOString().split("T")[0])
 %}
-POST http://{{ip}}/timetables/stable/set
+POST http://{{ip}}/timetables/stable/sets
 Content-Type: application/json
 
 {
@@ -1236,7 +1233,7 @@ Content-Type: application/json
   client.global.set("validFrom", new Date(new Date().setMonth(new Date().getDay() - 10)).toISOString().split("T")[0])
   client.global.set("validTo", new Date(new Date().setMonth(new Date().getDay() + 10)).toISOString().split("T")[0])
 %}
-POST http://{{ip}}/timetables/stable/set
+POST http://{{ip}}/timetables/stable/sets
 Content-Type: application/json
 
 {
@@ -1261,7 +1258,7 @@ Content-Type: application/json
   client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() - 3)).toISOString().split("T")[0])
   client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() - 2)).toISOString().split("T")[0])
 %}
-POST http://{{ip}}/timetables/stable/set
+POST http://{{ip}}/timetables/stable/sets
 Content-Type: application/json
 
 {
@@ -1286,7 +1283,7 @@ Content-Type: application/json
   client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() + 2)).toISOString().split("T")[0])
   client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split("T")[0])
 %}
-POST http://{{ip}}/timetables/stable/set
+POST http://{{ip}}/timetables/stable/sets
 Content-Type: application/json
 
 {
@@ -1311,7 +1308,7 @@ Content-Type: application/json
   client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() + 10)).toISOString().split("T")[0])
   client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 12)).toISOString().split("T")[0])
 %}
-POST http://{{ip}}/timetables/stable/set
+POST http://{{ip}}/timetables/stable/sets
 Content-Type: application/json
 
 {
@@ -1329,5 +1326,61 @@ Content-Type: application/json
     client.assert(json.hasOwnProperty("error"), "Response does not contain 'error'");
     client.assert(json.error.includes("name") || json.error.includes("duplicate"),
       "Expected error message to mention 'name' or 'duplicate'");
+  });
+%}
+
+### 46. Get all timetable sets
+GET http://{{ip}}/timetables/stable/sets
+
+> {%
+  client.test("Get all timetable sets succeeds with 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Response is an array", function() {
+    const json = response.body;
+    client.assert(Array.isArray(json), "Response is not an array");
+  });
+  client.test("Response contains at least two timetable sets", function() {
+    const json = response.body;
+    client.assert(json.length >= 2, "Expected at least 2 timetable sets, but got " + json.length);
+  });
+  client.test("Response contains created timetable sets", function() {
+    const json = response.body;
+    const afterTSetId = client.global.get("afterTSetId");
+    const timetableSetId = client.global.get("timetableSetId");
+
+    const foundAfterTSet = json.some(set => set.timetableSetId === parseInt(afterTSetId));
+    const foundfirstTSet = json.some(set => set.timetableSetId === parseInt(timetableSetId));
+
+    client.assert(foundAfterTSet, "Created timetable from AfterTSet set not found in response");
+    client.assert(foundfirstTSet, "First created timetable set not found in response");
+  });
+%}
+
+### 47. Get all entries for base timetable set
+GET http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
+
+> {%
+  client.test("Get entries for base timetable set succeeds with 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Response is an array", function() {
+    const json = response.body;
+    client.assert(Array.isArray(json), "Response is not an array");
+  });
+  client.test("Response contains exactly two entries", function() {
+    const json = response.body;
+    client.assert(json.length >= 2, "Expected more than 2 timetable entries, but got " + json.length);
+  });
+  client.test("Response contains created entries for base timetable set", function() {
+    const json = response.body;
+    const entryId1 = client.global.get("timetableEntryId");
+    const entryId2 = client.global.get("timetableEntryId2");
+
+    const foundEntry1 = json.some(entry => entry.timetableEntryId === parseInt(entryId1));
+    const foundEntry2 = json.some(entry => entry.timetableEntryId === parseInt(entryId2));
+
+    client.assert(foundEntry1, "First created entry not found in response");
+    client.assert(foundEntry2, "Second created entry not found in response");
   });
 %}
