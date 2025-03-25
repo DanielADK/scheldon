@@ -20,10 +20,15 @@ import { Room } from '@models/Room';
 import { TimetableEntrySet } from '@models/TimetableEntrySet';
 import { StudentGroup } from '@models/StudentGroup';
 import {
+  validateClassAvailability,
+  validateClassStudentGroupConflict,
   validateDayInWeekRange,
   validateHourInDayRange,
+  validateRoomAvailability,
+  validateStudentGroupAvailability,
   validateStudentGroupInClass,
-  validateUniqueEntry
+  validateTeacherAvailability,
+  validateTimetableSetInClassRange
 } from '@validators/timetableEntryValidators';
 import { QueryOptions } from '@models/types/QueryOptions';
 import { restrictOnDelete } from '@validators/genericValidators';
@@ -130,10 +135,15 @@ export class TimetableEntry extends Model<TimetableEntry> {
   @BeforeUpdate
   static async validate(instance: TimetableEntry, options?: QueryOptions | null): Promise<void> {
     await Promise.all([
-      validateUniqueEntry(instance, options),
       validateDayInWeekRange(instance, options),
       validateHourInDayRange(instance, options),
-      instance.studentGroupId ? validateStudentGroupInClass(instance, options) : null
+      instance.studentGroupId ? validateStudentGroupInClass(instance, options) : null,
+      validateTeacherAvailability(instance, options),
+      validateRoomAvailability(instance, options),
+      validateClassAvailability(instance, options),
+      validateStudentGroupAvailability(instance, options),
+      validateTimetableSetInClassRange(instance, options),
+      validateClassStudentGroupConflict(instance, options)
     ]);
   }
 

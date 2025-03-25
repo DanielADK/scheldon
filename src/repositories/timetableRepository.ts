@@ -9,7 +9,7 @@ import { Subject } from '@models/Subject';
 import { Room } from '@models/Room';
 import { StudentGroup } from '@models/StudentGroup';
 import { sequelize } from '../index';
-import { getLessonBulkInTSetPeriod } from '@repositories/DEPRlessonRecordRepository';
+import { getLessonBulkInTSetPeriod } from '@repositories/classRegisterRepository';
 import { ClassRegister } from '@models/ClassRegister';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
 import { getDayInWeek } from '../lib/timeLib';
@@ -38,38 +38,24 @@ export interface SubstitutionEntryDTO extends EntryDTO {
   type: string;
 }
 
-/**
- * Create a new timetable set
- * @param tset TimetableSet
- * @param data TimetableSetDTO
- */
-export const createTEntry = async (tset: TimetableSet, data: TimetableEntryDTO): Promise<TimetableEntry> => {
-  const transaction: Transaction = await sequelize.transaction();
+export const createTEntry = async (tset: TimetableSet, data: TimetableEntryDTO, transaction: Transaction): Promise<TimetableEntry> => {
+  // First, create the TimetableEntry and directly associate it with the TimetableSet using $create
+  const tentry = (await tset.$create('timetableEntry', data as TimetableEntry, {
+    transaction: transaction,
+    hooks: false // Skip initial validation
+  })) as TimetableEntry;
 
-  try {
-    const tentry = await TimetableEntry.create(data as TimetableEntry, {
-      transaction: transaction
-    });
+  await TimetableEntry.validate(tentry, { transaction: transaction });
 
-    // Add TimetableEntry to TimetableSet
-    await tset.$add('TimetableEntry', tentry, { transaction: transaction });
+  // Create LessonsRecords in TSet validity period
+  const lessons: ClassRegister[] = await getLessonBulkInTSetPeriod(tset, tentry);
 
-    // Create LessonsRecords in TSet validity period
-    const lessons: ClassRegister[] = await getLessonBulkInTSetPeriod(tset, tentry);
+  await ClassRegister.bulkCreate(lessons, {
+    transaction: transaction,
+    validate: true
+  });
 
-    await ClassRegister.bulkCreate(lessons, {
-      transaction: transaction,
-      validate: true
-    });
-
-    await transaction.commit();
-
-    return tentry;
-  } catch (err) {
-    // Rollback if error
-    await transaction.rollback();
-    throw err;
-  }
+  return tentry;
 };
 
 /**

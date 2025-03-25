@@ -9,6 +9,7 @@ import { getCurrentTimetableHour } from '../lib/timeLib';
 import { col, fn, Op, where, WhereOptions } from 'sequelize';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
+import { TimetableSet } from '@models/TimetableSet';
 
 export interface classRegisterRecordDTO {
   lessonId: number;
@@ -109,4 +110,35 @@ export const getStudentsForLesson = async (lessonId: number): Promise<Student[]>
   if (!study) throw new Error('No students found for the lesson');
 
   return study.studies.map((assignment) => assignment.student);
+};
+
+export const getLessonBulkInTSetPeriod = async (tset: TimetableSet, data: TimetableEntry): Promise<ClassRegister[]> => {
+  const lessons: ClassRegister[] = [];
+  const validTo: Date = new Date(tset.validTo);
+  const date: Date = new Date(tset.validFrom);
+
+  // Find first occurrence of TimeTableEntry dayInWeek from validFrom date
+  // Convert Sun-Sat to Mon-Sun
+  let dayInWeekFrom = date.getDay();
+  dayInWeekFrom = dayInWeekFrom === 0 ? 6 : dayInWeekFrom - 1;
+
+  // Calculate the difference between the two days with overflow
+  let dateDiff = data.dayInWeek - dayInWeekFrom;
+  dateDiff = dateDiff < 0 ? dateDiff + 7 : dateDiff;
+
+  // Set the date to the first occurrence of the dayInWeek
+  date.setDate(date.getDate() + dateDiff);
+
+  // Fill the timetable set with lessons between dates
+  while (date < validTo) {
+    lessons.push({
+      timetableEntryId: data.timetableEntryId,
+      date: new Date(date)
+    } as ClassRegister);
+
+    // Add week to date
+    date.setDate(date.getDate() + 7);
+  }
+
+  return lessons;
 };

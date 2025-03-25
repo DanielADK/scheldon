@@ -20,7 +20,7 @@ export const timetableSetSchema: Joi.ObjectSchema<TimetableSetDTO> = Joi.object(
  */
 export const timetableEntrySchema: Joi.ObjectSchema<TimetableEntryDTO> = Joi.object({
   classId: Joi.number().required(),
-  studentGroupId: Joi.number().optional(),
+  studentGroupId: Joi.number().optional().allow(null),
   dayInWeek: Joi.number().required().min(0).max(6),
   hourInDay: Joi.number().required().min(0).max(10),
   subjectId: Joi.number().required(),
@@ -33,7 +33,7 @@ export const timetableEntrySchema: Joi.ObjectSchema<TimetableEntryDTO> = Joi.obj
  */
 export const substitutionEntrySchema: Joi.ObjectSchema = Joi.object({
   classId: Joi.number().required(),
-  studentGroupId: Joi.number().optional(),
+  studentGroupId: Joi.number().optional().allow(null),
   hourInDay: Joi.number().required(),
   subjectId: Joi.number().required(),
   teacherId: Joi.number().required(),
@@ -44,7 +44,8 @@ export const substitutionEntrySchema: Joi.ObjectSchema = Joi.object({
     .required()
 });
 
-type getterService = (id: number) => Promise<TimetableExport | null>;
+type idGetterService = (id: number) => Promise<TimetableExport | null>;
+type idAtGetterService = (id: number, date: Date) => Promise<TimetableExport | null>;
 
 /**
  * Create a new timetable entry
@@ -61,9 +62,10 @@ export const createTEntry = async (ctx: Context): Promise<void> => {
       return;
     }
 
-    const tentry = await timetableService.createTEntry(tsetId, value);
-    ctx.status = 201;
-    ctx.body = tentry;
+    const { entry, isNew } = await timetableService.createTEntry(tsetId, value);
+
+    ctx.status = isNew ? 200 : 201;
+    ctx.body = entry;
   } catch (error) {
     handleError(ctx, error);
   }
@@ -118,7 +120,7 @@ export const createTSet = async (ctx: Context): Promise<void> => {
  * @param ctx Context
  * @param getterService
  */
-export const timetableGetByIdController = async (ctx: Context, getterService: getterService) => {
+export const getTimetableByIdController = async (ctx: Context, getterService: idGetterService) => {
   try {
     const id: number = await getIdFromParam(ctx.params.id);
 
@@ -127,6 +129,41 @@ export const timetableGetByIdController = async (ctx: Context, getterService: ge
     if (!timetable) {
       ctx.status = 404;
       ctx.body = { error: 'Timetable not found' };
+      return;
+    }
+
+    ctx.status = 200;
+    ctx.body = timetable;
+  } catch (error) {
+    handleError(ctx, error);
+  }
+};
+
+/**
+ * Get timetable by ID and date using a getterService
+ * @param ctx Context
+ * @param idAtGetterService
+ */
+export const getTimetableByIdAndDateController = async (ctx: Context, idAtGetterService: idAtGetterService): Promise<void> => {
+  try {
+    const id: number = await getIdFromParam(ctx.params.id);
+    const date: string = ctx.params.date;
+
+    // Validate date format
+    const dateValidationSchema = Joi.date().iso().required();
+    const { value, error } = dateValidationSchema.validate(date);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: 'Invalid date format. Use YYY-MM-DD format.' };
+      return;
+    }
+
+    const timetable: TimetableExport | null = await idAtGetterService(id, value);
+
+    if (!timetable) {
+      ctx.status = 404;
+      ctx.body = { error: 'Timetable not found for the given ID and date' };
       return;
     }
 

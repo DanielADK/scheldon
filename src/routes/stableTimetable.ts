@@ -1,6 +1,6 @@
 import Router from 'koa-router';
 import * as timetableController from '@controllers/timetableController';
-import { timetableGetByIdController } from '@controllers/timetableController';
+import { getTimetableByIdAndDateController, getTimetableByIdController } from '@controllers/timetableController';
 import * as timetableService from '@services/timetableService';
 
 const router = new Router();
@@ -81,12 +81,12 @@ const router = new Router();
  *           schema:
  *             $ref: '#/components/schemas/TimetableEntryDTO'
  *     responses:
+ *       200:
+ *         description: Timetable entry found
  *       201:
  *         description: Timetable entry created
  *       400:
- *         description: Bad request
- *       404:
- *         description: Timetable set not found
+ *         description: Bad request or Timetable set not found
  */
 router.post('/timetables/stable/set/:id/entry', timetableController.createTEntry);
 
@@ -133,7 +133,7 @@ router.post('/timetables/stable/set', timetableController.createTSet);
  *       404:
  *         description: Timetable not found
  */
-router.get('/timetables/stable/class/:id', (ctx) => timetableGetByIdController(ctx, timetableService.getTimetableByClassId));
+router.get('/timetables/stable/class/:id', (ctx) => getTimetableByIdController(ctx, timetableService.getTimetableByClassId));
 
 /**
  * @openapi
@@ -163,12 +163,9 @@ router.get('/timetables/stable/class/:id', (ctx) => timetableGetByIdController(c
  *       404:
  *         description: Timetable not found
  */
-/*router.get('/timetables/stable/class/:id/at/:date', (ctx) =>
-  getCurrentTimetableByIdController(
-    ctx,
-    lessonRecordService.getTimetableByClassId
-  )
-);*/
+router.get('/timetables/stable/class/:id/at/:date', (ctx) =>
+  getTimetableByIdAndDateController(ctx, timetableService.getTimetableByClassIdAt)
+);
 
 /**
  * @openapi
@@ -191,7 +188,7 @@ router.get('/timetables/stable/class/:id', (ctx) => timetableGetByIdController(c
  *       404:
  *         description: Timetable not found
  */
-router.get('/timetables/stable/teacher/:id', (ctx) => timetableGetByIdController(ctx, timetableService.getTimetableByEmployeeId));
+router.get('/timetables/stable/teacher/:id', (ctx) => getTimetableByIdController(ctx, timetableService.getTimetableByEmployeeId));
 
 /**
  * @openapi
@@ -221,12 +218,9 @@ router.get('/timetables/stable/teacher/:id', (ctx) => timetableGetByIdController
  *       404:
  *         description: Timetable not found
  */
-/*router.get('/timetables/stable/teacher/:id/at/:date', (ctx) =>
-  getCurrentTimetableByIdController(
-    ctx,
-    lessonRecordService.getTimetableByEmployeeId
-  )
-);*/
+router.get('/timetables/stable/teacher/:id/at/:date', (ctx) =>
+  getTimetableByIdAndDateController(ctx, timetableService.getTimetableByEmployeeIdAt)
+);
 
 /**
  * @openapi
@@ -256,7 +250,7 @@ router.get('/timetables/stable/teacher/:id', (ctx) => timetableGetByIdController
  *       404:
  *         description: Timetable not found
  */
-router.get('/timetables/stable/room/:id', (ctx) => timetableGetByIdController(ctx, timetableService.getTimetableByRoomId));
+router.get('/timetables/stable/room/:id', (ctx) => getTimetableByIdController(ctx, timetableService.getTimetableByRoomId));
 
 /**
  * @openapi
@@ -286,6 +280,8 @@ router.get('/timetables/stable/room/:id', (ctx) => timetableGetByIdController(ct
  *       404:
  *         description: Timetable not found
  */
-router.get('/timetables/stable/room/:id/at/:date', (ctx) => timetableGetByIdController(ctx, timetableService.getTimetableByRoomId));
+router.get('/timetables/stable/room/:id/at/:date', (ctx) =>
+  getTimetableByIdAndDateController(ctx, timetableService.getTimetableByRoomIdAt)
+);
 
 export default router;
