@@ -15,6 +15,12 @@ export const timetableSetSchema: Joi.ObjectSchema<TimetableSetDTO> = Joi.object(
   validTo: Joi.date().required()
 });
 
+export const updateTimetableSetSchema: Joi.ObjectSchema<TimetableSetDTO> = Joi.object({
+  name: Joi.string().min(3).max(50),
+  validFrom: Joi.date(),
+  validTo: Joi.date()
+});
+
 /**
  * Schema for creating a timetable entry
  */
@@ -195,12 +201,118 @@ export async function getEntriesBySet(ctx: Context): Promise<void> {
   }
 }
 
+/**
+ * Fetches all sets and sends the result in the response body.
+ *
+ * @param {Context} ctx - The Koa request/response context.
+ * @return {Promise<void>} A promise that resolves when the response has been sent.
+ */
 export async function getAllSets(ctx: Context): Promise<void> {
   try {
     const allSets = await timetableService.getAllSets();
 
     ctx.status = 200;
     ctx.body = allSets;
+  } catch (error) {
+    handleError(ctx, error);
+  }
+}
+
+/**
+ * Deletes a timetable set based on the provided ID in the context parameters.
+ *
+ * @param {Context} ctx - The context object containing the request and response information. The timetable set ID is extracted from `ctx.params.id`.
+ * @return {Promise<void>} A Promise that resolves when the timetable set is successfully deleted. Sets the HTTP response status to 204.
+ */
+export async function deleteTSet(ctx: Context): Promise<void> {
+  try {
+    const timetableSetId = parseInt(ctx.params.id);
+
+    if (isNaN(timetableSetId)) {
+      throw new Error('Invalid timetable set ID');
+    }
+
+    await timetableService.deleteTSetById(timetableSetId);
+
+    ctx.status = 204;
+    ctx.body = { message: 'Timetable set successfully deleted' };
+  } catch (error) {
+    handleError(ctx, error);
+  }
+}
+
+export async function deleteTEntry(ctx: Context): Promise<void> {
+  try {
+    const tentryId = parseInt(ctx.params.id);
+
+    if (isNaN(tentryId)) {
+      throw new Error('Invalid timetable entry ID');
+    }
+
+    await timetableService.deleteTEntryById(tentryId);
+
+    ctx.status = 204;
+  } catch (error) {
+    handleError(ctx, error);
+  }
+}
+
+export async function updateTSet(ctx: Context): Promise<void> {
+  try {
+    const updateId = await getIdFromParam(ctx.params.id as string);
+
+    const { error, value } = updateTimetableSetSchema.validate(ctx.request.body, {
+      allowUnknown: false,
+      stripUnknown: true
+    });
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
+    const updatedSet = await timetableService.updateTSet(updateId, value);
+
+    if (!updatedSet) {
+      throw new Error('Timetable set not found');
+    }
+    ctx.status = 200;
+    ctx.body = updatedSet;
+  } catch (error) {
+    handleError(ctx, error);
+  }
+}
+
+export async function getTimetableSetById(ctx: Context): Promise<void> {
+  try {
+    const setId = await getIdFromParam(ctx.params.id as string);
+
+    const set = await timetableService.getTSetById(setId);
+
+    if (!set) {
+      throw new Error('Timetable set not found');
+    }
+
+    ctx.status = 200;
+    ctx.body = set;
+  } catch (error) {
+    handleError(ctx, error);
+  }
+}
+
+export async function getTimetableEntryById(ctx: Context): Promise<void> {
+  try {
+    const entryId = await getIdFromParam(ctx.params.id as string);
+
+    const entry = await timetableService.getTEntryById(entryId);
+
+    if (!entry) {
+      throw new Error('Timetable entry not found');
+    }
+
+    ctx.status = 200;
+    ctx.body = entry;
   } catch (error) {
     handleError(ctx, error);
   }

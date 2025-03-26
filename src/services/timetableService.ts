@@ -216,6 +216,19 @@ export const getTSetById = async (tsetId: number): Promise<TimetableSet | null> 
 };
 
 /**
+ * Fetches a timetable entry by its unique identifier.
+ *
+ * Retrieves a single instance of the TimetableEntry from the database
+ * using its primary key. If the entry is not found, this method returns null.
+ *
+ * @param {number} tentryId - The unique identifier of the timetable entry to retrieve.
+ * @returns {Promise<TimetableEntry | null>} A promise that resolves to the found TimetableEntry instance, or null if no entry is found.
+ */
+export const getTEntryById = async (tentryId: number): Promise<TimetableEntry | null> => {
+  return await TimetableEntry.findByPk(tentryId);
+};
+
+/**
  * Retrieves a list of entries for a given set.
  *
  * @param {number} tsetId - The unique identifier of the set for which the entries are to be retrieved.
@@ -239,6 +252,49 @@ export async function getEntriesBySet(tsetId: number): Promise<TimetableEntry[]>
   return cleanedEntries;
 }
 
+/**
+ * Retrieves all timetable sets from the database.
+ *
+ * @return {Promise<TimetableSet[]>} A promise that resolves to an array of timetable sets.
+ */
 export async function getAllSets(): Promise<TimetableSet[]> {
   return await TimetableSet.findAll();
+}
+
+/**
+ * Deletes a timetable set identified by the provided ID.
+ *
+ * @param {number} timetableSetId - The unique identifier of the timetable set to be deleted.
+ * @return {Promise<void>} A promise that resolves when the timetable set is successfully deleted.
+ */
+export async function deleteTSetById(timetableSetId: number): Promise<void> {
+  return await timetableRepository.deleteTSetById(timetableSetId);
+}
+
+/**
+ * Deletes a timetable entry specified by its ID.
+ *
+ * @param {number} timetableEntryId - The unique identifier of the timetable entry to delete.
+ * @return {Promise<void>} A promise that resolves when the deletion is completed.
+ */
+export async function deleteTEntryById(timetableEntryId: number): Promise<void> {
+  return await timetableRepository.deleteTEntryById(timetableEntryId);
+}
+
+/**
+ * Updates a timetable set with the provided data and returns the updated timetable set.
+ *
+ * @param {number} updateId - The unique identifier of the timetable set to be updated.
+ * @param {Partial<TimetableSetDTO>} data - The partial data object to update the timetable set with.
+ * @return {Promise<TimetableSetDTO>} A promise that resolves to the updated timetable set.
+ * @throws {Error} If no timetable set is found or no changes are made.
+ */
+export async function updateTSet(updateId: number, data: Partial<TimetableSetDTO>) {
+  const [count] = await timetableRepository.updateTSet(updateId, data);
+
+  if (count === 0) {
+    throw new Error('Timetable set not found or no changes made');
+  }
+
+  return await timetableRepository.getTimetableBySetId(updateId);
 }

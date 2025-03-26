@@ -31,7 +31,7 @@ export const validateUniqueInterval: validator<TimetableSet> = async (
     ...options
   });
 
-  if (existingSet) {
+  if (existingSet && existingSet.timetableSetId !== instance.timetableSetId) {
     throw new Error('Timetable set already exists within the validity period of another timetable set');
   }
 };
@@ -50,7 +50,7 @@ export const validateUniqueName: validator<TimetableSet> = async (instance: Time
     ...options
   });
 
-  if (existingSet) {
+  if (existingSet && existingSet.timetableSetId !== instance.timetableSetId) {
     throw new Error(`A timetable set with the name "${instance.name}" already exists`);
   }
 };
