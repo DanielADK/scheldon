@@ -1,4 +1,4 @@
-import { FindAttributeOptions, Op } from 'sequelize';
+import { FindAttributeOptions, Op, Transaction } from 'sequelize';
 import { Class } from '@models/Class';
 import { StudentGroup } from '@models/StudentGroup';
 
@@ -51,8 +51,9 @@ export const getClasses = async (limit: number, offset: number): Promise<{ rows:
 /**
  * Get a class by ID
  * @param classId
+ * @param transaction
  */
-export const getClassById = async (classId: number): Promise<Class | null> => {
+export const getClassById = async (classId: number, transaction: Transaction | null = null): Promise<Class | null> => {
   return await Class.findOne({
     where: { classId: classId },
     attributes: classAttributes,
@@ -62,7 +63,8 @@ export const getClassById = async (classId: number): Promise<Class | null> => {
         as: 'studentGroups',
         attributes: ['studentGroupId', 'name']
       }
-    ]
+    ],
+    transaction
   });
 };
 
