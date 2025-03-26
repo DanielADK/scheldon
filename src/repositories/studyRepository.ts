@@ -1,5 +1,6 @@
 import { Study } from '@models/Study';
 import { Op } from 'sequelize';
+import { Transaction } from 'sequelize/types';
 
 /**
  * Retrieves a specific assignment for a student in a given class
@@ -39,8 +40,9 @@ export interface StudyDTO {
  * End all ongoing assignments
  * @param studentId
  * @param data
+ * @param transaction
  */
-export const terminateAssignment = async (studentId: number, data: StudyDTO) => {
+export const terminateAssignment = async (studentId: number, data: StudyDTO, transaction: Transaction | null = null) => {
   // End all ongoing assignments
   await Study.update(
     {
@@ -51,12 +53,21 @@ export const terminateAssignment = async (studentId: number, data: StudyDTO) => 
         studentId: studentId,
         classId: data.classId,
         studentGroupId: data.studentGroupId
-      }
+      },
+      transaction
     }
   );
 };
 
-export const terminateAllAssignments = async (studentId: number, data: StudyDTO) => {
+/**
+ * Terminates all ongoing assignments for a given student by updating the `validTo` field for matching records.
+ *
+ * @param {number} studentId - The ID of the student whose assignments need to be terminated.
+ * @param {StudyDTO} data - An object containing necessary details, including `classId` and optional `validTo` timestamp.
+ * @param {Transaction | null} [transaction=null] - An optional database transaction to ensure atomicity.
+ * @returns {Promise<void>} A promise that resolves once the assignments have been updated.
+ */
+export const terminateAllAssignments = async (studentId: number, data: StudyDTO, transaction: Transaction | null = null) => {
   // End all ongoing assignments
   await Study.update(
     {
@@ -66,7 +77,8 @@ export const terminateAllAssignments = async (studentId: number, data: StudyDTO)
       where: {
         studentId: studentId,
         classId: data.classId
-      }
+      },
+      transaction
     }
   );
 };
