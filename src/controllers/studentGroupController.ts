@@ -144,8 +144,8 @@ export const updatestudentGroup = async (ctx: Context) => {
 
     // Validate request
     const { error, value } = updateStudentGroupSchema.validate(ctx.request.body, {
-      allowUnknown: false, // Zakázat neznámá pole
-      stripUnknown: true // Odstranit neznámá pole místo vracení chyby
+      allowUnknown: false,
+      stripUnknown: true
     });
 
     if (error) {

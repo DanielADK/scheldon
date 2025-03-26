@@ -97,7 +97,7 @@ Content-Type: application/json
 ### Create a class for testing
 < {%
   client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split("T")[0])
-  client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split("T")[0])
+  client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 10)).toISOString().split("T")[0])
 %}
 POST http://{{ip}}/classes
 Content-Type: application/json
@@ -1368,7 +1368,7 @@ GET http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
     const json = response.body;
     client.assert(Array.isArray(json), "Response is not an array");
   });
-  client.test("Response contains exactly two entries", function() {
+  client.test("Response contains more than two entries", function() {
     const json = response.body;
     client.assert(json.length >= 2, "Expected more than 2 timetable entries, but got " + json.length);
   });
@@ -1382,5 +1382,178 @@ GET http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
 
     client.assert(foundEntry1, "First created entry not found in response");
     client.assert(foundEntry2, "Second created entry not found in response");
+  });
+%}
+
+### 48. Get TimetableSet
+GET http://{{ip}}/timetables/stable/sets/{{timetableSetId}}
+
+> {%
+  client.test("Get timetable set set succeeds with 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Response contains timetable set attributes", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("timetableSetId"), "Expected timetableSetId atribute");
+    client.assert(json.hasOwnProperty("name"), "Expected name atribute");
+    client.assert(json.hasOwnProperty("validTo"), "Expected validFrom atribute");
+    client.assert(json.hasOwnProperty("validFrom"), "Expected validTo atribute");
+  });
+%}
+
+### 49. Get TimetableEntry
+GET http://{{ip}}/timetables/stable/entries/{{timetableEntryId2}}
+
+> {%
+  client.test("Get timetable entry succeeds with 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Response contains timetable entry attributes", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("timetableEntryId"), "Expected timetableEntryId atribute");
+    client.assert(json.hasOwnProperty("dayInWeek"), "Expected day in week atribute");
+    client.assert(json.hasOwnProperty("hourInDay"), "Expected hour in day atribute");
+    client.assert(json.hasOwnProperty("classId"), "Expected class id atribute");
+    client.assert(json.hasOwnProperty("studentGroupId"), "Expected student group id atribute");
+    client.assert(json.hasOwnProperty("subjectId"), "Expected subject id atribute");
+    client.assert(json.hasOwnProperty("teacherId"), "Expected teacher id atribute");
+    client.assert(json.hasOwnProperty("roomId"), "Expected room id atribute");
+  });
+%}
+
+### 49. Get TimetableEntry - not existing
+GET http://{{ip}}/timetables/stable/entries/99999999
+
+> {%
+  client.test("Get timetable entry with 400 - not found", function() {
+    client.assert(response.status === 400, "Expected status 400, but got " + response.status);
+  });
+  client.test("Response contains not found error message", function() {
+    const json = response.body;
+    client.assert(typeof json === "object", "Response is not a valid object");
+    client.assert(json.hasOwnProperty("error"), "Expected error message");
+    client.assert(json.error.toLowerCase().includes("not found"), "Expected not found message")
+  });
+%}
+
+
+### 50. Delete timetableEntry
+DELETE http://{{ip}}/timetables/stable/entries/{{timetableEntryId2}}
+
+> {%
+  client.test("Timetable entry deletion succeeds with 204", function() {
+    client.assert(response.status === 204, "Expected status 204, but got " + response.status);
+  });
+%}
+
+
+
+### 51. Update TimetableSet - expect success with updated details
+PUT http://{{ip}}/timetables/stable/sets/{{timetableSetId}}
+Content-Type: application/json
+
+{
+  "name": "changed timetable for 2025"
+}
+
+> {%
+  client.test("Timetable set update succeeds with 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+  client.test("Response contains updated timetable set details", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("timetableSetId"), "Response does not contain 'timetableSetId'");
+    client.assert(json.hasOwnProperty("name"), "Response does not contain 'name'");
+    client.assert(json.name === "changed timetable for 2025", "Expected 'name' to be 'changed timetable for 2025'");
+    client.assert(json.hasOwnProperty("validFrom"), "Response does not contain 'validFrom'");
+    client.assert(json.hasOwnProperty("validTo"), "Response does not contain 'validTo'");
+  });
+%}
+
+
+### 52. Delete TimetableSet - fail due to related records
+DELETE http://{{ip}}/timetables/stable/sets/{{timetableSetId}}
+
+> {%
+  client.test("Delete timetable set fails with 400 due to related records", function() {
+    client.assert(response.status === 400, "Expected status 400, but got " + response.status);
+  });
+  client.test("Response contains related records error message", function() {
+    const json = response.body;
+    client.assert(typeof json === "object", "Response is not a valid object");
+    client.assert(json.hasOwnProperty("error"), "Expected error message");
+    client.assert(json.error.toLowerCase().includes("related records"), "Expected error message to contain 'related records'");
+  });
+%}
+
+
+### 53. Create a new timetableSet
+< {%
+  client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() + 5)).toISOString().split("T")[0])
+  client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split("T")[0])
+%}
+POST http://{{ip}}/timetables/stable/sets
+Content-Type: application/json
+
+{
+  "name": "New Timetable Set for 2025",
+  "validFrom": "{{validFrom}}",
+  "validTo": "{{validTo}}"
+}
+
+> {%
+  client.test("Timetable set creation succeeds with 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains timetable set attributes", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("timetableSetId"), "Response does not contain 'timetableSetId'");
+    client.assert(json.hasOwnProperty("name"), "Response does not contain 'name'");
+    client.assert(json.name === "New Timetable Set for 2025", "Expected 'name' to be 'New Timetable Set for 2025'");
+    client.global.set("newTimetableSetId", json.timetableSetId); // Storing new timetableSetId for later use
+  });
+%}
+
+### 54. Create a new timetableEntry in the created timetableSet
+POST http://{{ip}}/timetables/stable/sets/{{newTimetableSetId}}/entries
+Content-Type: application/json
+
+{
+  "dayInWeek": 4,
+  "hourInDay": 4,
+  "classId": {{classId}},
+  "studentGroupId": null,
+  "subjectId": {{subjectId}},
+  "teacherId": {{teacherId}},
+  "roomId": {{roomId}}
+}
+
+> {%
+  client.test("Timetable entry creation succeeds with 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains created timetable entry attributes", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("timetableEntryId"), "Response does not contain 'timetableEntryId'");
+    client.global.set("newTimetableEntryId", json.timetableEntryId); // Storing the new timetableEntryId for future deletion
+  });
+%}
+
+### 55. Remove the created timetableEntry
+DELETE http://{{ip}}/timetables/stable/entries/{{newTimetableEntryId}}
+
+> {%
+  client.test("Timetable entry deletion succeeds with 204", function() {
+    client.assert(response.status === 204, "Expected status 204, but got " + response.status);
+  });
+%}
+
+### 56. Remove Timetable Set
+DELETE http://{{ip}}/timetables/stable/sets/{{newTimetableSetId}}
+
+> {%
+  client.test("Validate timetable set successfully deleted without fetch", function() {
+    const responseStatus = response.status;
+    client.assert(responseStatus === 204, "Expected status 204 for delete operation, but got " + responseStatus);
   });
 %}

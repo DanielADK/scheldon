@@ -1,6 +1,5 @@
 import { TimetableSet } from '@models/TimetableSet';
 import { TimetableEntry } from '@models/TimetableEntry';
-import { Student } from '@models/Student';
 import { Employee } from '@models/Employee';
 import { Class } from '@models/Class';
 import { TimetableEntrySet } from '@models/TimetableEntrySet';
@@ -9,7 +8,7 @@ import { Subject } from '@models/Subject';
 import { Room } from '@models/Room';
 import { StudentGroup } from '@models/StudentGroup';
 import { sequelize } from '../index';
-import { getLessonBulkInTSetPeriod } from '@repositories/classRegisterRepository';
+import { getLessonBulkInTSetPeriod, getLessonWithTimetableEntryId } from '@repositories/classRegisterRepository';
 import { ClassRegister } from '@models/ClassRegister';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
 import { getDayInWeek } from '../lib/timeLib';
@@ -288,14 +287,7 @@ export const createTSet = async (data: TimetableSetDTO): Promise<TimetableSet> =
  * @param setId
  */
 export const getTimetableBySetId = async (setId: number): Promise<TimetableSet | null> => {
-  return await TimetableSet.findByPk(setId, {
-    include: [
-      {
-        model: TimetableEntry,
-        include: [Class, Employee, Student]
-      }
-    ]
-  });
+  return await TimetableSet.findByPk(setId);
 };
 
 /**
@@ -403,4 +395,96 @@ export async function getEntries(tsetId: number): Promise<TimetableEntry[]> {
  */
 export async function getAllSets(): Promise<TimetableSet[]> {
   return await TimetableSet.findAll({});
+}
+
+export async function updateTSet(
+  tsetId: number,
+  data: Partial<TimetableSetDTO>,
+  transaction?: Transaction | null
+): Promise<[affectedRows: number, updatedTSet: TimetableSet[]]> {
+  return await TimetableSet.update(data, {
+    where: { timetableSetId: tsetId },
+    transaction: transaction,
+    returning: true
+  });
+}
+
+/**
+ * Deletes a timetable set by its unique identifier.
+ *
+ * @param {number} timetableSetId - The unique identifier of the timetable set to be deleted.
+ * @return {Promise<void>} Resolves when the deletion is complete. Throws an error if the timetable set does not exist or the transaction fails.
+ */
+export async function deleteTSetById(timetableSetId: number): Promise<void> {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const timetableSet = await TimetableSet.findByPk(timetableSetId, { transaction });
+
+    if (!timetableSet) {
+      throw new Error('Timetable set not found');
+    }
+
+    await TimetableSet.destroy({
+      where: { timetableSetId },
+      transaction,
+      individualHooks: true
+    });
+
+    await transaction.commit();
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+}
+
+/**
+ * Deletes a timetable entry by its ID.
+ *
+ * @param {number} timetableEntryId - the unique identifier of the timetable entry to be deleted.
+ * @return {Promise<void>} a promise that resolves when the timetable entry is successfully deleted.
+ * @throws will throw an error if the timetable entry is not found or the transaction fails.
+ */
+export async function deleteTEntryById(timetableEntryId: number): Promise<void> {
+  // start a database transaction
+  const transaction = await sequelize.transaction();
+
+  try {
+    // find the timetable entry by its ID within the transaction
+    const tentry = await TimetableEntry.findByPk(timetableEntryId, { transaction });
+
+    // if the timetable entry doesn't exist, throw an error
+    if (!tentry) {
+      throw new Error('Timetable entry not found');
+    }
+
+    // fetch all class registers related to the timetable entry
+    const classRegisters = await getLessonWithTimetableEntryId(timetableEntryId, transaction);
+
+    // check if all class registers have a null fillDate
+    const allFillDatesNull = classRegisters.every((register) => register.fillDate === null);
+
+    // if all fillDates are null, bulk delete the related class registers
+    if (allFillDatesNull) {
+      await ClassRegister.destroy({
+        where: { timetableEntryId },
+        transaction,
+        individualHooks: true
+      });
+    }
+
+    // delete the timetable entry
+    await TimetableEntry.destroy({
+      where: { timetableEntryId },
+      transaction,
+      individualHooks: true
+    });
+
+    // commit the transaction if everything is successful
+    await transaction.commit();
+  } catch (error) {
+    // rollback the transaction in case of any errors
+    await transaction.rollback();
+    throw error;
+  }
 }

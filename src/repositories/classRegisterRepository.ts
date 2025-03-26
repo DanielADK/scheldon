@@ -10,6 +10,7 @@ import { col, fn, Op, where, WhereOptions } from 'sequelize';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
 import { TimetableSet } from '@models/TimetableSet';
+import { Transaction } from 'sequelize/types';
 
 export interface classRegisterRecordDTO {
   lessonId: number;
@@ -141,4 +142,20 @@ export const getLessonBulkInTSetPeriod = async (tset: TimetableSet, data: Timeta
   }
 
   return lessons;
+};
+
+/**
+ * Get a lesson with a specified timetableEntryId
+ * @param timetableEntryId number
+ * @param transaction Transaction | null
+ * @returns Promise<ClassRegister[]>
+ */
+export const getLessonWithTimetableEntryId = async (
+  timetableEntryId: number,
+  transaction: Transaction | null = null
+): Promise<ClassRegister[]> => {
+  return await ClassRegister.findAll({
+    where: { timetableEntryId: timetableEntryId },
+    transaction
+  });
 };
