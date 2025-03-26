@@ -29,4 +29,5 @@ export const handleError = (ctx: Context, error: unknown): void => {
     ctx.status = 400;
     ctx.body = { error: 'Unexpected error occured.' };
   }
+  console.error(error);
 };
