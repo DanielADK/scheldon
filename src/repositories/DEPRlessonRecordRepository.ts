@@ -1,6 +1,5 @@
 import { Op, Transaction, WhereOptions } from 'sequelize';
-import { LessonRecord } from '@models/LessonRecord';
-import { TimetableSet } from '@models/TimetableSet';
+import { ClassRegister } from '@models/ClassRegister';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { Employee } from '@models/Employee';
 import { Subject } from '@models/Subject';
@@ -11,7 +10,7 @@ import { timetableEntryInclude } from '@repositories/timetableRepository';
 import { SubstitutionType } from '@models/types/SubstitutionType';
 import { sequelize } from '../index';
 
-import { getWeekRange } from '../lib/timeLib';
+import { getWeekRange } from '@lib/timeLib';
 
 export interface LessonRecordDTO {
   classId: number;

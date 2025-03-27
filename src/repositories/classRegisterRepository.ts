@@ -5,7 +5,7 @@ import { sequelize } from '../index';
 import { Study } from '@models/Study';
 import { Class } from '@models/Class';
 import { StudentGroup } from '@models/StudentGroup';
-import { getCurrentTimetableHour } from '../lib/timeLib';
+import { getCurrentTimetableHour } from '@lib/timeLib';
 import { col, fn, Op, where, WhereOptions } from 'sequelize';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';

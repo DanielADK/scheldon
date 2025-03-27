@@ -11,7 +11,7 @@ import { sequelize } from '../index';
 import { getLessonBulkInTSetPeriod, getLessonWithTimetableEntryId } from '@repositories/classRegisterRepository';
 import { ClassRegister } from '@models/ClassRegister';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
-import { getDayInWeek } from '../lib/timeLib';
+import { getDayInWeek } from '@lib/timeLib';
 
 export interface TimetableSetDTO {
   name: string;
