@@ -11,6 +11,10 @@ import { TimetableEntry } from '@models/TimetableEntry';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
 import { TimetableSet } from '@models/TimetableSet';
 import { Transaction } from 'sequelize/types';
+import { FilterType, validateEntity } from '@validators/substitutionEntryValidators';
+import { Employee } from '@models/Employee';
+import { Subject } from '@models/Subject';
+import { Room } from '@models/Room';
 
 export interface classRegisterRecordDTO {
   lessonId: number;
@@ -157,5 +161,56 @@ export const getLessonWithTimetableEntryId = async (
   return await ClassRegister.findAll({
     where: { timetableEntryId: timetableEntryId },
     transaction
+  });
+};
+
+/**
+ * Gets temporary timetable entries based on specified filters
+ *
+ * @param filterType The entity type to filter by ('class', 'teacher', 'room', etc.)
+ * @param entityId The ID of the entity to filter
+ * @param date The date to filter by
+ * @returns Promise with class register
+ */
+export const getTemporaryTimetable = async (filterType: FilterType, entityId: number, date: Date): Promise<ClassRegister[]> => {
+  // validate that the entity exists based on filterType
+  await validateEntity(filterType, entityId);
+
+  // map filter type to the field names in SubstitutionEntry and TimetableEntry
+  const fieldName = `${filterType}Id`;
+
+  return await ClassRegister.findAll({
+    attributes: [],
+    where: {
+      date: date,
+      [Op.or]: [
+        { substitutionEntryId: { [Op.not]: null }, [`$substitutionEntry.${fieldName}$`]: entityId },
+        { timetableEntryId: { [Op.not]: null }, [`$timetableEntry.${fieldName}$`]: entityId }
+      ]
+    },
+    include: [
+      {
+        model: SubstitutionEntry,
+        attributes: ['dayInWeek', 'hourInDay'],
+        include: [
+          { model: Class, attributes: ['name'] },
+          { model: StudentGroup, attributes: ['name'] },
+          { model: Employee, attributes: ['name', 'surname', 'abbreviation'] },
+          { model: Subject, attributes: ['name', 'abbreviation'] },
+          { model: Room, attributes: ['name'] }
+        ]
+      },
+      {
+        model: TimetableEntry,
+        attributes: ['dayInWeek', 'hourInDay'],
+        include: [
+          { model: Class, attributes: ['name'] },
+          { model: StudentGroup, attributes: ['name'] },
+          { model: Employee, attributes: ['name', 'surname', 'abbreviation'] },
+          { model: Subject, attributes: ['name', `abbreviation`] },
+          { model: Room, attributes: ['name'] }
+        ]
+      }
+    ]
   });
 };

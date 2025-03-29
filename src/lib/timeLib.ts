@@ -56,3 +56,23 @@ export const getCurrentTimetableHour = (currentTime: Date): number | null => {
   const timeString = currentTime.toTimeString().split(' ')[0];
   return binarySearchPeriod(timeString, 0, CLASS_HOURS.length - 1);
 };
+
+// dateUtils.ts
+/**
+ * Parse a date string in format YYYY-MM-DD
+ */
+export const parseDate = (dateString: string): Date | null => {
+  if (!dateString || !/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+    return null;
+  }
+
+  const date = new Date(dateString);
+  return isNaN(date.getTime()) ? null : date;
+};
+
+/**
+ * Format a date as YYYY-MM-DD
+ */
+export const formatDate = (date: Date): string => {
+  return date.toISOString().split('T')[0];
+};

@@ -19,7 +19,7 @@ export interface SimpleLessonEntry {
   studentGroup?: { name: string };
   room?: { name: string };
   // type of
-  substitutionType?: string;
+  substitutionType?: SubstitutionType;
 }
 
 /**
@@ -35,7 +35,7 @@ export interface TimeLessonEntry extends SimpleLessonEntry {
  */
 export interface TimetableExport {
   [day: number]: {
-    [hour: number]: SimpleLessonEntry;
+    [hour: number]: SimpleLessonEntry | SimpleLessonEntry[];
   };
 }
 
@@ -96,6 +96,8 @@ export const roomMask = async (entry: SimpleLessonEntry): Promise<SimpleLessonEn
 export const droppedMask = async (entry: SimpleLessonEntry): Promise<SimpleLessonEntry> => {
   return {
     lessonId: entry.lessonId,
+    class: entry.class,
+    ...(entry.studentGroup !== null && { studentGroup: entry.studentGroup }),
     substitutionType: entry.substitutionType
   } as SimpleLessonEntry;
 };
@@ -143,7 +145,21 @@ export const transformTimetable = async (timetable: TimeLessonEntry[], transform
     // Add the entry to the timetable
     const lesson: SimpleLessonEntry = await transformerFunction(entry);
 
-    timetable2D[day][hour] = lesson.substitutionType === SubstitutionType.DROPPED ? await droppedMask(lesson) : lesson;
+    // check if the hour already contains an array, append to it
+    if (Array.isArray(timetable2D[day][hour])) {
+      timetable2D[day][hour].push(lesson.substitutionType === SubstitutionType.DROPPED ? await droppedMask(lesson) : lesson);
+    }
+    // if the hour has a single entry, convert to array and append the new entry
+    else if (timetable2D[day][hour]) {
+      timetable2D[day][hour] = [
+        timetable2D[day][hour],
+        lesson.substitutionType === SubstitutionType.DROPPED ? await droppedMask(lesson) : lesson
+      ];
+    }
+    // otherwise, simply set the entry
+    else {
+      timetable2D[day][hour] = lesson.substitutionType === SubstitutionType.DROPPED ? await droppedMask(lesson) : lesson;
+    }
   }
 
   return timetable2D;
