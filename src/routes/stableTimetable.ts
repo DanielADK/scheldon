@@ -124,7 +124,7 @@ const router = new Router();
  * /timetables/stable/sets:
  *   post:
  *     tags:
- *       - Timetable
+ *       - Stable Timetable
  *     summary: Create a new timetable set
  *     requestBody:
  *       description: Timetable set details
@@ -146,7 +146,7 @@ router.post('/timetables/stable/sets', timetableController.createTSet);
  * /timetables/stable/sets:
  *   get:
  *     tags:
- *       - Timetable
+ *       - Stable Timetable
  *     summary: Get all timetable sets
  *     responses:
  *       200:
@@ -159,7 +159,7 @@ router.get('/timetables/stable/sets', (ctx) => timetableController.getAllSets(ct
  * /timetables/stable/sets/{id}:
  *   delete:
  *     tags:
- *       - Timetable
+ *       - Stable Timetable
  *     summary: Delete a timetable set by ID
  *     parameters:
  *       - in: path
@@ -184,7 +184,7 @@ router.delete('/timetables/stable/sets/:id', timetableController.deleteTSet);
  * /timetables/stable/sets/{id}/entries:
  *   post:
  *     tags:
- *       - Timetable
+ *       - Stable Timetable
  *     summary: Create a new timetable entry for a specific timetable set
  *     parameters:
  *       - in: path
@@ -216,7 +216,7 @@ router.post('/timetables/stable/sets/:id/entries', timetableController.createTEn
  * /timetables/stable/sets/{id}/entries:
  *   get:
  *     tags:
- *       - Timetable
+ *       - Stable Timetable
  *     summary: Get all timetable entries in a specific timetable set
  *     parameters:
  *       - in: path
@@ -239,7 +239,7 @@ router.get('/timetables/stable/sets/:id/entries', (ctx) => timetableController.g
  * /timetables/stable/sets/{id}:
  *   get:
  *     tags:
- *       - Timetable
+ *       - Stable Timetable
  *     summary: Get a timetable set by ID
  *     parameters:
  *       - in: path
@@ -266,7 +266,7 @@ router.get('/timetables/stable/sets/:id', timetableController.getTimetableSetByI
  * /timetables/stable/sets/{id}:
  *   put:
  *     tags:
- *       - Timetable
+ *       - Stable Timetable
  *     summary: Update a timetable set by ID
  *     parameters:
  *       - in: path
@@ -296,7 +296,7 @@ router.put('/timetables/stable/sets/:id', timetableController.updateTSet);
  * /timetables/stable/entries/{id}:
  *   get:
  *     tags:
- *       - Timetable
+ *       - Stable Timetable
  *     summary: Get a timetable entry by ID
  *     parameters:
  *       - in: path
@@ -323,7 +323,7 @@ router.get('/timetables/stable/entries/:id', timetableController.getTimetableEnt
  * /timetables/stable/entries/{id}:
  *   delete:
  *     tags:
- *       - Timetable
+ *       - Stable Timetable
  *     summary: Delete a timetable entry by ID
  *     parameters:
  *       - in: path
@@ -346,7 +346,7 @@ router.delete('/timetables/stable/entries/:id', timetableController.deleteTEntry
  * /timetables/stable/classes/{id}:
  *   get:
  *     tags:
- *       - Timetable
+ *       - Stable Timetable
  *     summary: Get timetable by class ID
  *     parameters:
  *       - in: path
@@ -359,7 +359,7 @@ router.delete('/timetables/stable/entries/:id', timetableController.deleteTEntry
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
- *       400:
+ *       404:
  *         description: Timetable not found
  */
 router.get('/timetables/stable/classes/:id', (ctx) => getTimetableByIdController(ctx, timetableService.getTimetableByClassId));
@@ -369,7 +369,7 @@ router.get('/timetables/stable/classes/:id', (ctx) => getTimetableByIdController
  * /timetables/stable/classes/{id}/at/{date}:
  *   get:
  *     tags:
- *       - Timetable
+ *       - Stable Timetable
  *     summary: Get timetable by class ID and date
  *     parameters:
  *       - in: path
@@ -403,7 +403,7 @@ router.get('/timetables/stable/classes/:id/at/:date', (ctx) =>
  * /timetables/stable/teachers/{id}:
  *   get:
  *     tags:
- *       - Timetable
+ *       - Stable Timetable
  *     summary: Get timetable by teacher ID
  *     parameters:
  *       - in: path
@@ -416,7 +416,7 @@ router.get('/timetables/stable/classes/:id/at/:date', (ctx) =>
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
- *       400:
+ *       404:
  *         description: Timetable not found
  */
 router.get('/timetables/stable/teachers/:id', (ctx) => getTimetableByIdController(ctx, timetableService.getTimetableByEmployeeId));
@@ -426,7 +426,7 @@ router.get('/timetables/stable/teachers/:id', (ctx) => getTimetableByIdControlle
  * /timetables/stable/teachers/{id}/at/{date}:
  *   get:
  *     tags:
- *       - Timetable
+ *       - Stable Timetable
  *     summary: Get timetable by teacher ID and date
  *     parameters:
  *       - in: path
@@ -460,7 +460,7 @@ router.get('/timetables/stable/teachers/:id/at/:date', (ctx) =>
  * /timetables/stable/rooms/{id}:
  *   get:
  *     tags:
- *       - Timetable
+ *       - Stable Timetable
  *     summary: Get timetable by room ID and date
  *     parameters:
  *       - in: path
@@ -480,7 +480,7 @@ router.get('/timetables/stable/teachers/:id/at/:date', (ctx) =>
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
- *       400:
+ *       404:
  *         description: Timetable not found
  */
 router.get('/timetables/stable/rooms/:id', (ctx) => getTimetableByIdController(ctx, timetableService.getTimetableByRoomId));
@@ -490,7 +490,7 @@ router.get('/timetables/stable/rooms/:id', (ctx) => getTimetableByIdController(c
  * /timetables/stable/rooms/{id}/at/{date}:
  *   get:
  *     tags:
- *       - Timetable
+ *       - Stable Timetable
  *     summary: Get current timetable by room ID and date
  *     parameters:
  *       - in: path
