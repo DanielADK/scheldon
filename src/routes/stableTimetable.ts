@@ -384,13 +384,15 @@ router.get('/timetables/stable/classes/:id', (ctx) => getTimetableByIdController
  *         required: true
  *         schema:
  *           type: string
- *           example: now or 2024-01-01
+ *           example: 2024-01-01
  *         description: date in week of the timetable
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
  *       400:
- *         description: Timetable not found
+ *         description: Invalid date format. Use YYYY-MM-DD format.
+ *       404:
+ *         description: Timetable not found for the given ID and date
  */
 router.get('/timetables/stable/classes/:id/at/:date', (ctx) =>
   getTimetableByIdAndDateController(ctx, timetableService.getTimetableByClassIdAt)
@@ -439,13 +441,15 @@ router.get('/timetables/stable/teachers/:id', (ctx) => getTimetableByIdControlle
  *         required: true
  *         schema:
  *           type: string
- *           example: now or 2024-01-01
+ *           example: 2024-01-01
  *         description: date in week of the timetable
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
  *       400:
  *         description: Timetable not found
+ *       404:
+ *         description: Timetable not found for the given ID and date
  */
 router.get('/timetables/stable/teachers/:id/at/:date', (ctx) =>
   getTimetableByIdAndDateController(ctx, timetableService.getTimetableByEmployeeIdAt)
@@ -471,7 +475,7 @@ router.get('/timetables/stable/teachers/:id/at/:date', (ctx) =>
  *         required: true
  *         schema:
  *           type: string
- *           example: now or 2024-01-01
+ *           example: 2024-01-01
  *         description: date in week of the timetable
  *     responses:
  *       200:
@@ -501,13 +505,15 @@ router.get('/timetables/stable/rooms/:id', (ctx) => getTimetableByIdController(c
  *         required: true
  *         schema:
  *           type: string
- *           example: now or 2024-01-01
+ *           example: 2024-01-01
  *         description: date in week of the timetable
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
  *       400:
  *         description: Timetable not found
+ *       404:
+ *         description: Timetable not found for the given ID and date
  */
 router.get('/timetables/stable/rooms/:id/at/:date', (ctx) =>
   getTimetableByIdAndDateController(ctx, timetableService.getTimetableByRoomIdAt)
