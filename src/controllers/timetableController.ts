@@ -78,28 +78,6 @@ export const createTEntry = async (ctx: Context): Promise<void> => {
 };
 
 /**
- * Create a new substitution entry
- * @param ctx Context
- */
-export const createSEntry = async (ctx: Context): Promise<void> => {
-  try {
-    const { error, value } = substitutionEntrySchema.validate(ctx.request.body);
-
-    if (error) {
-      ctx.status = 400;
-      ctx.body = { error: error.details[0].message };
-      return;
-    }
-
-    const substitutionEntry = await timetableService.createSubstitutionEntry(value);
-    ctx.status = 201;
-    ctx.body = substitutionEntry;
-  } catch (error) {
-    handleError(ctx, error);
-  }
-};
-
-/**
  * Create a new timetable set
  * @param ctx Context
  */
@@ -161,7 +139,7 @@ export const getTimetableByIdAndDateController = async (ctx: Context, idAtGetter
 
     if (error) {
       ctx.status = 400;
-      ctx.body = { error: 'Invalid date format. Use YYY-MM-DD format.' };
+      ctx.body = { error: 'Invalid date format. Use YYYY-MM-DD format.' };
       return;
     }
 

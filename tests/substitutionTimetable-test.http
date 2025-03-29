@@ -1,0 +1,584 @@
+### Create a teacher for testing
+POST http://{{ip}}/employees
+Content-Type: application/json
+
+{
+  "username": "jtimetable",
+  "name": "Jane",
+  "surname": "Smith",
+  "degreePre": "Mgr.",
+  "degreePost": "Ph.D.",
+  "abbreviation": "JS",
+  "isTeacher": true
+}
+
+> {%
+  client.test("Teacher creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'employeeId'", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("employeeId"), "Response does not contain 'employeeId'");
+    client.global.set("teacherId1", json.employeeId);
+  });
+%}
+
+### Create a teacher2 for testing
+POST http://{{ip}}/employees
+Content-Type: application/json
+
+{
+  "username": "dtimetable",
+  "name": "David",
+  "surname": "Smith",
+  "degreePre": "Mgr.",
+  "degreePost": "Ph.D.",
+  "abbreviation": "DS",
+  "isTeacher": true
+}
+
+> {%
+  client.test("Teacher creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'employeeId'", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("employeeId"), "Response does not contain 'employeeId'");
+    client.global.set("teacherId2", json.employeeId);
+  });
+%}
+
+### Create a room1 for testing
+POST http://{{ip}}/rooms
+Content-Type: application/json
+
+{
+  "name": "Room 241",
+  "type": "CLASSROOM",
+  "floor": 2,
+  "studentCapacity": 35,
+  "administratorId": {{teacherId}}
+}
+
+> {%
+  client.test("Room creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'roomId'", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("roomId"), "Response does not contain 'roomId'");
+    client.global.set("roomId1", json.roomId);
+  });
+%}
+
+### Create a room2 for testing
+POST http://{{ip}}/rooms
+Content-Type: application/json
+
+{
+  "name": "Room 012",
+  "type": "CLASSROOM",
+  "floor": 2,
+  "studentCapacity": 35,
+  "administratorId": {{teacherId2}}
+}
+
+> {%
+  client.test("Room creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'roomId'", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("roomId"), "Response does not contain 'roomId'");
+    client.global.set("roomId2", json.roomId);
+  });
+%}
+
+### Create a class for testing
+< {%
+  client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split("T")[0])
+  client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 10)).toISOString().split("T")[0])
+%}
+POST http://{{ip}}/classes
+Content-Type: application/json
+
+{
+  "name": "Timetable Test Class",
+  "validFrom": "{{validFrom}}",
+  "validTo": "{{validTo}}",
+  "roomId": {{roomId1}},
+  "employeeId": {{teacherId}}
+}
+
+> {%
+  client.test("Class creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'classId'", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("classId"), "Response does not contain 'classId'");
+    client.global.set("classId", json.classId);
+  });
+%}
+
+### Create a class2 for testing
+< {%
+  client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split("T")[0])
+  client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split("T")[0])
+%}
+POST http://{{ip}}/classes
+Content-Type: application/json
+
+{
+  "name": "Timetable Test Class2",
+  "validFrom": "{{validFrom}}",
+  "validTo": "{{validTo}}",
+  "roomId": {{roomId2}},
+  "employeeId": {{teacherId2}}
+}
+
+> {%
+  client.test("Class creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'classId'", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("classId"), "Response does not contain 'classId'");
+    client.global.set("classId2", json.classId);
+  });
+%}
+
+### Create a student group for testing
+POST http://{{ip}}/student-groups
+Content-Type: application/json
+
+{
+  "name": "B",
+  "classId": {{classId}}
+}
+
+> {%
+  client.test("StudentGroup creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'studentGroupId'", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("studentGroupId"), "Response does not contain 'studentGroupId'");
+    client.global.set("studentGroupId1", json.studentGroupId);
+  });
+%}
+
+### Create a student group for testing
+POST http://{{ip}}/student-groups
+Content-Type: application/json
+
+{
+  "name": "A",
+  "classId": {{classId}}
+}
+
+> {%
+  client.test("StudentGroup creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'studentGroupId'", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("studentGroupId"), "Response does not contain 'studentGroupId'");
+    client.global.set("studentGroupId2", json.studentGroupId);
+  });
+%}
+
+### Create a subject1 for testing
+POST http://{{ip}}/subjects
+Content-Type: application/json
+
+{
+  "name": "Math",
+  "abbreviation": "M"
+}
+
+> {%
+  client.test("Subject creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'subjectId'", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("subjectId"), "Response does not contain 'subjectId'");
+    client.global.set("subjectId1", json.subjectId);
+  });
+%}
+
+### Create a subject2 for testing
+POST http://{{ip}}/subjects
+Content-Type: application/json
+
+{
+  "name": "Czech",
+  "abbreviation": "CZ"
+}
+
+> {%
+  client.test("Subject creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'subjectId'", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("subjectId"), "Response does not contain 'subjectId'");
+    client.global.set("subjectId2", json.subjectId);
+  });
+%}
+
+### Create a subject3 for testing
+POST http://{{ip}}/subjects
+Content-Type: application/json
+
+{
+  "name": "Advanced JavaScript",
+  "abbreviation": "AJS"
+}
+
+> {%
+  client.test("Subject creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains 'subjectId'", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("subjectId"), "Response does not contain 'subjectId'");
+    client.global.set("subjectId3", json.subjectId);
+  });
+%}
+
+### 1. Create Timetable Set – Valid Request
+
+< {%
+  client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split("T")[0]);
+  client.global.set("validTo", new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split("T")[0]);
+  client.global.set("now", new Date(new Date()).toISOString().split("T")[0]);
+%}
+POST http://{{ip}}/timetables/stable/sets
+Content-Type: application/json
+
+{
+  "name": "Test Semester Timetable",
+  "validFrom": "{{validFrom}}",
+  "validTo": "{{validTo}}"
+}
+
+> {%
+  client.test("Timetable set creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains timetable set ID", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("id") || json.hasOwnProperty("timetableSetId"),
+      "Response does not contain timetable set ID");
+
+    if (json.hasOwnProperty("timetableSetId")) {
+      client.global.set("timetableSetId", json.timetableSetId);
+    }
+  });
+%}
+
+### Create Timetable Entry1
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
+Content-Type: application/json
+
+{
+  "classId": {{classId}},
+  "studentGroupId": null,
+  "dayInWeek": 1,
+  "hourInDay": 1,
+  "subjectId": {{subjectId1}},
+  "teacherId": {{teacherId}},
+  "roomId": {{roomId1}}
+}
+
+> {%
+  client.test("Timetable entry creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains timetable entry ID", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("timetableEntryId"), "Response does not contain entry ID");
+
+    client.global.set("timetableEntryId1", json.timetableEntryId);
+  });
+%}
+
+### Create Timetable Entry2
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
+Content-Type: application/json
+
+{
+  "classId": {{classId}},
+  "studentGroupId": null,
+  "dayInWeek": 1,
+  "hourInDay": 2,
+  "subjectId": {{subjectId1}},
+  "teacherId": {{teacherId}},
+  "roomId": {{roomId1}}
+}
+
+> {%
+  client.test("Timetable entry creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains timetable entry ID", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("timetableEntryId"), "Response does not contain entry ID");
+
+    client.global.set("timetableEntryId2", json.timetableEntryId);
+  });
+%}
+
+### Create Timetable Entry3
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
+Content-Type: application/json
+
+{
+  "classId": {{classId}},
+  "studentGroupId": {{studentGroupId1}},
+  "dayInWeek": 2,
+  "hourInDay": 2,
+  "subjectId": {{subjectId3}},
+  "teacherId": {{teacherId1}},
+  "roomId": {{roomId1}}
+}
+
+> {%
+  client.test("Timetable entry creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains timetable entry ID", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("timetableEntryId"), "Response does not contain entry ID");
+
+    client.global.set("timetableEntryId3", json.timetableEntryId);
+  });
+%}
+
+### Create Timetable Entry4
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
+Content-Type: application/json
+
+{
+  "classId": {{classId}},
+  "studentGroupId": {{studentGroupId2}},
+  "dayInWeek": 2,
+  "hourInDay": 2,
+  "subjectId": {{subjectId1}},
+  "teacherId": {{teacherId2}},
+  "roomId": {{roomId2}}
+}
+
+> {%
+  client.test("Timetable entry creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains timetable entry ID", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("timetableEntryId"), "Response does not contain entry ID");
+
+    client.global.set("timetableEntryId4", json.timetableEntryId);
+  });
+%}
+
+### Create Timetable Entry5
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
+Content-Type: application/json
+
+{
+  "classId": {{classId2}},
+  "studentGroupId": null,
+  "dayInWeek": 3,
+  "hourInDay": 1,
+  "subjectId": {{subjectId1}},
+  "teacherId": {{teacherId1}},
+  "roomId": {{roomId1}}
+}
+
+> {%
+  client.test("Timetable entry creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains timetable entry ID", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("timetableEntryId"), "Response does not contain entry ID");
+
+    client.global.set("timetableEntry1Id", json.timetableEntryId);
+  });
+%}
+
+### Create Timetable Entry6
+POST http://{{ip}}/timetables/stable/sets/{{timetableSetId}}/entries
+Content-Type: application/json
+
+{
+  "classId": {{classId2}},
+  "studentGroupId": null,
+  "dayInWeek": 1,
+  "hourInDay": 1,
+  "subjectId": {{subjectId2}},
+  "teacherId": {{teacherId2}},
+  "roomId": {{roomId2}}
+}
+
+> {%
+  client.test("Timetable entry creation status is 201", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+  });
+  client.test("Response contains timetable entry ID", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("timetableEntryId"), "Response does not contain entry ID");
+
+    client.global.set("timetableEntry1Id", json.timetableEntryId);
+  });
+%}
+
+### 1. Class not found
+GET http://{{ip}}/timetables/temporary/classes/999999/at/2025-03-11
+Content-Type: application/json
+
+> {%
+  client.test("Status code is 400 for non-existent class", function() {
+    client.assert(response.status === 400, "Expected 400 status code, but got " + response.status);
+  });
+
+  client.test("Error message is provided", function() {
+    const json = response.body;
+    client.assert(json.hasOwnProperty("error"), "Response should contain an error message");
+    client.assert(json.error.includes("Class with ID"), "Response should idenfity an error with class");
+    client.assert(json.error.includes("not found"), "Response should idenfity an error as not found");
+  });
+%}
+
+### 5. Get entries with invalid date format
+GET http://{{ip}}/timetables/temporary/classes/{{classId}}/at/invalid-date
+Content-Type: application/json
+
+> {%
+  client.test("Status code is 400 for invalid date format", function() {
+    client.assert(response.status === 400, "Expected 400 status code, but got " + response.status);
+  });
+%}
+
+### 6. Get entries with non-numeric class ID
+GET http://{{ip}}/timetables/temporary/classes/abc/at/2025-01-01
+Content-Type: application/json
+
+> {%
+  client.test("Status code is 400 for non-numeric class ID", function() {
+    client.assert(response.status === 400, "Expected 400 status code, but got " + response.status);
+  });
+%}
+
+### 8. Test with missing date parameter
+GET http://{{ip}}/timetables/temporary/classes/{{classId}}
+Content-Type: application/json
+
+> {%
+  client.test("Missing date parameter returns error", function() {
+    client.assert(response.status !== 200, "Expected non-200 status code");
+  });
+%}
+
+### 9. Test with missing class ID
+GET http://{{ip}}/timetables/temporary/classes//at/{{now}}
+Content-Type: application/json
+
+> {%
+  client.test("Missing class ID returns error", function() {
+    client.assert(response.status !== 200, "Expected non-200 status code");
+  });
+%}
+
+### 10. Test with different date formats
+< {%
+ client.global.set("nowBadFormat", client.global.get("now").split("-").sort().join("-"))
+ %}
+GET http://{{ip}}/timetables/temporary/classes/{{classId}}/at/{{nowBadFormat}}
+Content-Type: application/json
+
+> {%
+  client.test("Incorrect date format returns error", function() {
+    client.assert(response.status !== 200, "Expected non-200 status code");
+  });
+%}
+
+
+### Get Timetable for Tuesday of the Current Week
+< {%
+  const now = new Date();
+  const dayOfWeek = now.getDay() || 7; // Sunday is 0 in JavaScript, treating as 7
+  const tuesdayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 3);
+
+  const formattedTuesday = tuesdayDate.toISOString().split("T")[0];
+  client.global.set("currentTuesday", formattedTuesday);
+%}
+GET http://{{ip}}/timetables/temporary/classes/{{classId}}/at/{{currentTuesday}}
+Content-Type: application/json
+
+> {%
+  client.test("Valid timetable response for Tuesday", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+
+    const json = response.body;
+    client.assert(typeof json === "object", "The response should be a JSON object");
+    client.assert(json["1"] && json["1"]["1"] && json["1"]["2"], "Expected structure for day 1, hours 1 and 2 is missing");
+
+    client.assert(json["1"]["1"].teacher.name === "Jane", "Teacher's name for hour 1 should be 'Jane'");
+    client.assert(json["1"]["1"].teacher.surname === "Smith", "Teacher's surname for hour 1 should be 'Smith'");
+    client.assert(json["1"]["1"].teacher.abbreviation === "JS", "Teacher's abbreviation for hour 1 should be 'JS'");
+    client.assert(json["1"]["1"].subject.name === "Math", "Subject for hour 1 should be 'Math'");
+    client.assert(json["1"]["1"].room.name === "Room 241", "Room for hour 1 should be 'Room 241'");
+
+    client.assert(json["1"]["2"].teacher.name === "Jane", "Teacher's name for hour 2 should be 'Jane'");
+    client.assert(json["1"]["2"].teacher.surname === "Smith", "Teacher's surname for hour 2 should be 'Smith'");
+    client.assert(json["1"]["2"].teacher.abbreviation === "JS", "Teacher's abbreviation for hour 2 should be 'JS'");
+    client.assert(json["1"]["2"].subject.name === "Math", "Subject for hour 2 should be 'Math'");
+    client.assert(json["1"]["2"].room.name === "Room 241", "Room for hour 2 should be 'Room 241'");
+  });
+%}
+
+### Get Timetable for Wednesday of the Current Week
+< {%
+  const now = new Date();
+  const dayOfWeek = now.getDay() || 7; // Sunday is 0 in JavaScript, treating as 7
+  const wednesdayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 4);
+
+  const formattedWednesDay = wednesdayDate.toISOString().split("T")[0];
+  client.global.set("currentTuesday", formattedWednesDay);
+%}
+GET http://{{ip}}/timetables/temporary/classes/{{classId}}/at/{{currentTuesday}}
+Content-Type: application/json
+
+> {%
+  client.test("Valid timetable response for Wednesday", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+
+    const json = response.body;
+    client.assert(typeof json === "object", "The response should be a JSON object");
+    client.assert(
+      json["2"] && json["2"]["2"] && Array.isArray(json["2"]["2"]),
+      "Expected structure for day 2, hour 2 is missing or incorrect."
+    );
+
+    const timetableEntries = json["2"]["2"];
+    const entry1 = timetableEntries[0];
+    const entry2 = timetableEntries[1];
+
+    client.assert(entry1.teacher.name === "Jane", "Teacher's name for entry 1 should be 'Jane'");
+    client.assert(entry1.teacher.surname === "Smith", "Teacher's surname for entry 1 should be 'Smith'");
+    client.assert(entry1.teacher.abbreviation === "JS", "Teacher's abbreviation for entry 1 should be 'JS'");
+    client.assert(entry1.subject.name === "Advanced JavaScript", "Subject for entry 1 should be 'Advanced JavaScript'");
+    client.assert(entry1.studentGroup.name === "B", "StudentGroup for entry 1 should be 'B'");
+    client.assert(entry1.room.name === "Room 241", "Room for entry 1 should be 'Room 241'");
+
+    client.assert(entry2.teacher.name === "David", "Teacher's name for entry 2 should be 'David'");
+    client.assert(entry2.teacher.surname === "Smith", "Teacher's surname for entry 2 should be 'Smith'");
+    client.assert(entry2.teacher.abbreviation === "DS", "Teacher's abbreviation for entry 2 should be 'DS'");
+    client.assert(entry2.subject.name === "Math", "Subject for entry 2 should be 'Math'");
+    client.assert(entry2.studentGroup.name === "A", "StudentGroup for entry 2 should be 'A'");
+    client.assert(entry2.room.name === "Room 012", "Room for entry 2 should be 'Room 012'");
+  });
+%}

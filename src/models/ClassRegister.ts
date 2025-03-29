@@ -1,7 +1,6 @@
 import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { Attendance } from '@models/Attendance';
-import { SubstitutionType } from '@models/types/SubstitutionType';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
 
 @Table({
@@ -54,14 +53,6 @@ export class ClassRegister extends Model<ClassRegister> {
     allowNull: true
   })
   declare fillDate: Date | null;
-
-  // Type only with timetableEntry, other fields are null
-  @Column({
-    type: DataType.ENUM(...Object.values(SubstitutionType)),
-    allowNull: true
-  })
-  declare type: SubstitutionType | null;
-
   @Column({
     type: DataType.STRING(2048),
     allowNull: true
@@ -70,15 +61,11 @@ export class ClassRegister extends Model<ClassRegister> {
 
   // Mapping
   @BelongsTo(() => TimetableEntry, {
-    foreignKey: 'entryId',
-    constraints: false,
     onDelete: 'RESTRICT'
   })
   declare timetableEntry: TimetableEntry | null;
 
   @BelongsTo(() => SubstitutionEntry, {
-    foreignKey: 'entryId',
-    constraints: false,
     onDelete: 'RESTRICT'
   })
   declare substitutionEntry: SubstitutionEntry | null;

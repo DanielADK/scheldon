@@ -2,7 +2,7 @@ import { Context } from 'koa';
 import * as classService from '@services/classService';
 import Joi from 'joi';
 import { ClassDTO } from '@repositories/classRepository';
-import { getIdFromParam, handleError } from '../lib/controllerTools';
+import { getIdFromParam, handleError } from '@lib/controllerTools';
 
 // Schema for creating and updating a class
 const classSchema: Joi.ObjectSchema<ClassDTO> = Joi.object({
