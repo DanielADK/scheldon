@@ -467,7 +467,7 @@ export async function deleteTEntryById(timetableEntryId: number): Promise<void> 
     // if all fillDates are null, bulk delete the related class registers
     if (allFillDatesNull) {
       await ClassRegister.destroy({
-        where: { timetableEntryId },
+        where: { timetableEntryId: timetableEntryId },
         transaction,
         individualHooks: true
       });
@@ -475,7 +475,7 @@ export async function deleteTEntryById(timetableEntryId: number): Promise<void> 
 
     // delete the timetable entry
     await TimetableEntry.destroy({
-      where: { timetableEntryId },
+      where: { timetableEntryId: timetableEntryId },
       transaction,
       individualHooks: true
     });

@@ -1,10 +1,10 @@
 import { Context } from 'koa';
 import * as timetableService from '@services/timetableService';
-import { getIdFromParam, handleError } from '../lib/controllerTools';
+import { getIdFromParam, handleError } from '@lib/controllerTools';
 import { TimetableEntryDTO, TimetableSetDTO } from '@repositories/timetableRepository';
 import Joi from 'joi';
 import { TimetableExport } from '@services/transformers/timetableExport';
-import { SubstitutionType } from '@models/types/SubstitutionType';
+import { DAY_COUNT, HOUR_COUNT } from '../config/timetableConfig';
 
 /**
  * Schema for creating a timetable set
@@ -25,29 +25,21 @@ export const updateTimetableSetSchema: Joi.ObjectSchema<TimetableSetDTO> = Joi.o
  * Schema for creating a timetable entry
  */
 export const timetableEntrySchema: Joi.ObjectSchema<TimetableEntryDTO> = Joi.object({
-  classId: Joi.number().required(),
-  studentGroupId: Joi.number().optional().allow(null),
-  dayInWeek: Joi.number().required().min(0).max(6),
-  hourInDay: Joi.number().required().min(0).max(10),
-  subjectId: Joi.number().required(),
-  teacherId: Joi.number().required(),
-  roomId: Joi.number().required()
-});
-
-/**
- * Schema for creating a substitution entry
- */
-export const substitutionEntrySchema: Joi.ObjectSchema = Joi.object({
-  classId: Joi.number().required(),
-  studentGroupId: Joi.number().optional().allow(null),
-  hourInDay: Joi.number().required(),
-  subjectId: Joi.number().required(),
-  teacherId: Joi.number().required(),
-  roomId: Joi.number().required(),
-  date: Joi.date().iso().required(),
-  type: Joi.string()
-    .valid(...Object.values(SubstitutionType))
+  classId: Joi.number().integer().positive().required(),
+  studentGroupId: Joi.number().integer().positive().optional().allow(null),
+  dayInWeek: Joi.number()
     .required()
+    .min(0)
+    .max(DAY_COUNT - 1)
+    .integer(),
+  hourInDay: Joi.number()
+    .required()
+    .min(0)
+    .max(HOUR_COUNT - 1)
+    .integer(),
+  subjectId: Joi.number().integer().positive().required(),
+  teacherId: Joi.number().integer().positive().required(),
+  roomId: Joi.number().integer().positive().required()
 });
 
 type idGetterService = (id: number) => Promise<TimetableExport | null>;

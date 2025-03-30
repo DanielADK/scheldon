@@ -15,7 +15,6 @@ import { Subject } from '@models/Subject';
 import { Employee } from '@models/Employee';
 import { Room } from '@models/Room';
 import { StudentGroup } from '@models/StudentGroup';
-import { SubstitutionType } from '@models/types/SubstitutionType';
 import { validateDayInWeekRange, validateHourInDayRange } from '@validators/timetableEntryValidators';
 import { validateStudentGroupInClass } from '@validators/substitutionEntryValidators';
 import { QueryOptions } from '@models/types/QueryOptions';
@@ -97,12 +96,6 @@ export class SubstitutionEntry extends Model<SubstitutionEntry> {
     onDelete: 'RESTRICT'
   })
   declare roomId: number;
-
-  @Column({
-    type: DataType.ENUM(...Object.values(SubstitutionType)),
-    allowNull: false
-  })
-  declare type: SubstitutionType;
 
   // Mappings
   @BelongsTo(() => Class, { onDelete: 'RESTRICT' })

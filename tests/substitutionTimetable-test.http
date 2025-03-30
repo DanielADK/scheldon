@@ -582,3 +582,69 @@ Content-Type: application/json
     client.assert(entry2.room.name === "Room 012", "Room for entry 2 should be 'Room 012'");
   });
 %}
+
+### Create new substitution
+POST http://{{ip}}/timetables/temporary/at/{{currentTuesday}}
+Content-Type: application/json
+
+{
+  "classId": {{classId}},
+  "studentGroupId": null,
+  "dayInWeek": 5,
+  "hourInDay": 5,
+  "subjectId": {{subjectId2}},
+  "teacherId": {{teacherId2}},
+  "roomId": {{roomId2}}
+}
+
+
+> {%
+  client.test("Create new substitution returns the correct response", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+
+    const json = response.body;
+    client.assert(typeof json === "object", "The response should be a JSON object");
+    client.assert(json.hasOwnProperty("substitutionEntryId"), "Expected substitutionEntryId to exist");
+    client.assert(json.classId === 1, "Expected classId to be 1");
+    client.assert(json.studentGroupId === null, "Expected studentGroupId to be null");
+    client.assert(json.dayInWeek === 5, "Expected dayInWeek to be 5");
+    client.assert(json.hourInDay === 5, "Expected hourInDay to be 5");
+    client.assert(json.subjectId === 2, "Expected subjectId to be 2");
+    client.assert(json.teacherId === 2, "Expected teacherId to be 2");
+    client.assert(json.roomId === 2, "Expected roomId to be 2");
+    client.global.set("substitutionEntryId1", json.substitutionEntryId)
+  });
+%}
+
+
+### Create new duplicate substitution
+POST http://{{ip}}/timetables/temporary/at/{{currentTuesday}}
+Content-Type: application/json
+
+{
+  "classId": {{classId}},
+  "studentGroupId": null,
+  "dayInWeek": 5,
+  "hourInDay": 5,
+  "subjectId": {{subjectId2}},
+  "teacherId": {{teacherId2}},
+  "roomId": {{roomId2}}
+}
+
+
+> {%
+  client.test("Create new substitution returns the correct response", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+
+    const json = response.body;
+    client.assert(typeof json === "object", "The response should be a JSON object");
+    client.assert(json.substitutionEntryId === client.global.get("substitutionEntryId1"), "Expected same substitutionEntryId as previous");
+    client.assert(json.classId === 1, "Expected classId to be 1");
+    client.assert(json.studentGroupId === null, "Expected studentGroupId to be null");
+    client.assert(json.dayInWeek === 5, "Expected dayInWeek to be 5");
+    client.assert(json.hourInDay === 5, "Expected hourInDay to be 5");
+    client.assert(json.subjectId === 2, "Expected subjectId to be 2");
+    client.assert(json.teacherId === 2, "Expected teacherId to be 2");
+    client.assert(json.roomId === 2, "Expected roomId to be 2");
+  });
+%}

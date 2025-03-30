@@ -1,6 +1,7 @@
 import Router from 'koa-router';
 import { getTimetableByIdAndDateController } from '@controllers/timetableController';
 import * as substitutionEntryService from '@services/substitutionEntryService';
+import { createSubmissionEntryController } from '@controllers/substitutionEntryController';
 
 const router = new Router();
 /**
@@ -105,6 +106,7 @@ const router = new Router();
  */
 
 /**
+ * TODO: edit response schema
  * @openapi
  * /timetables/temporary/classes/{id}/at/{date}:
  *   get:
@@ -147,14 +149,8 @@ router.get('/timetables/temporary/classes/:id/at/:date', (ctx) =>
  *   post:
  *     tags:
  *       - Substitution Timetable
- *     summary: Create a new temporary timetable entry for a class on a specific date
+ *     summary: Create a new substitution timetable entry
  *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *         description: Class ID
  *       - name: date
  *         in: path
  *         required: true
@@ -163,25 +159,30 @@ router.get('/timetables/temporary/classes/:id/at/:date', (ctx) =>
  *           format: date
  *         description: Date in format YYYY-MM-DD
  *     requestBody:
- *       description: Substitution timetable entry details
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/SubstitutionTimetableEntryDTO'
+ *             $ref: '#/components/schemas/SubmissionTimetableEntryDTO'
  *     responses:
- *       201:
- *         description: Substitution timetable entry created
+ *       200:
+ *         description: Submission entry created or found successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/SubstitutionTimetableEntry'
+ *               type: object
+ *               properties:
+ *                 submissionEntry:
+ *                   $ref: '#/components/schemas/SubstitutionTimetableEntry'
+ *                 classRegister:
+ *                   $ref: '#/components/schemas/ClassRegister'
+ *                   nullable: true
+ *                 message:
+ *                   type: string
  *       400:
- *         description: Bad request
- *       404:
- *         description: Class not found
+ *         description: Invalid request data
  */
-//router.post('/timetables/temporary/classes/:id/at/:date', substitutionTimetableController.createSubstitutionTimetableEntryForClass);
+router.post('/timetables/temporary/at/:date', createSubmissionEntryController);
 
 /**
  * @openapi

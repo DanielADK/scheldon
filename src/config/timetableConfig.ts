@@ -11,5 +11,5 @@ export const CLASS_HOURS = [
   { hour: 9, start: '15:50', end: '16:35' }
 ];
 
-export const DAY_COUNT = 5;
+export const DAY_COUNT = 7;
 export const HOUR_COUNT = CLASS_HOURS.length;

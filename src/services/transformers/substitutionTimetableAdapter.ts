@@ -49,7 +49,7 @@ export class SubstitutionTimetableAdapter extends AbstractTimetableAdapter<Class
       class: { name: classData.name },
       ...(studentGroup !== null && { studentGroup: { name: studentGroup.name } }),
       room: { name: room.name },
-      ...(lesson instanceof SubstitutionEntry && lesson.type !== null && { substitutionType: lesson.type })
+      ...(entry.substitutionType !== null && { substitutionType: entry.substitutionType })
     } as TimeLessonEntry;
 
     return { lessonId: entry.lessonId, ...result };

@@ -24,7 +24,7 @@ export const restrictOnDelete = async function <T extends Model>(
    * }
    */
   modelToCheck: { new (): T } & typeof Model,
-  foreignKeyColumn: keyof T,
+  foreignKeyColumn: string,
   recordId: string | number,
   options?: QueryOptions | null
 ): Promise<void> {

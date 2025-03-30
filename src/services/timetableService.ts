@@ -1,10 +1,9 @@
 import { TimetableSet } from '@models/TimetableSet';
 import * as timetableRepository from '@repositories/timetableRepository';
-import { SubstitutionEntryDTO, TimetableEntryDTO, TimetableSetDTO } from '@repositories/timetableRepository';
+import { TimetableEntryDTO, TimetableSetDTO } from '@repositories/timetableRepository';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { TimetableAdapter } from '@services/transformers/timetableAdapter';
 import { classMask, employeeMask, roomMask, TimetableExport, transformAndMask } from '@services/transformers/timetableExport';
-import { SubstitutionEntry } from '@models/SubstitutionEntry';
 import { sequelize } from '../index';
 import { Op, Transaction } from 'sequelize';
 
@@ -110,15 +109,6 @@ export const createTEntry = async (tsetId: number, tentry: TimetableEntryDTO): P
     await transaction.rollback();
     throw error;
   }
-};
-
-/**
- * Create a new substitution entry
- * @param sentry
- */
-
-export const createSubstitutionEntry = async (sentry: SubstitutionEntryDTO): Promise<SubstitutionEntry> => {
-  return await timetableRepository.createSEntry(sentry);
 };
 
 /**

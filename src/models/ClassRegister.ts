@@ -1,7 +1,28 @@
-import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import {
+  AutoIncrement,
+  BeforeCreate,
+  BeforeUpdate,
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  HasMany,
+  Model,
+  PrimaryKey,
+  Table
+} from 'sequelize-typescript';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { Attendance } from '@models/Attendance';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
+import {
+  validateClassAvailability,
+  validateClassStudentGroupConflict,
+  validateRoomAvailability,
+  validateStudentGroupAvailability,
+  validateXORIdentifiers
+} from '@validators/classRegisterValidator';
+import { QueryOptions } from '@models/types/QueryOptions';
+import { SubstitutionType } from '@models/types/SubstitutionType';
 
 @Table({
   createdAt: true,
@@ -59,6 +80,12 @@ export class ClassRegister extends Model<ClassRegister> {
   })
   declare note: string | null;
 
+  @Column({
+    type: DataType.ENUM(...Object.values(SubstitutionType)),
+    allowNull: true
+  })
+  declare substitutionType: SubstitutionType;
+
   // Mapping
   @BelongsTo(() => TimetableEntry, {
     onDelete: 'RESTRICT'
@@ -73,25 +100,27 @@ export class ClassRegister extends Model<ClassRegister> {
   @HasMany(() => Attendance, { onDelete: 'RESTRICT' })
   declare attendances: Attendance[];
 
-  /*
-  @BeforeBulkCreate
-  static async validateBulk(instances: ClassRegister[]): Promise<void> {
-    await Promise.all(
-      instances.map((instance) => ClassRegister.validate(instance))
-    );
-  }*/
-
-  /*
   @BeforeCreate
   @BeforeUpdate
-  static async validate(instance: ClassRegister): Promise<void> {
+  static async validate(instance: ClassRegister, options?: QueryOptions | null): Promise<void> {
     await Promise.all([
-      validateXORIdentifiers(instance),
-      //instance.teacherId ? validateTeacherRole(instance) : null,
-      validateDayInWeekRange(instance),
-      validateHourInDayRange(instance),
-      //instance.studentGroupId ? validatestudentGroupInClass(instance) : null,
-      instance.timetableEntry ? validateType(instance) : null
+      validateXORIdentifiers(instance, options),
+      validateRoomAvailability(instance, options),
+      validateClassAvailability(instance, options),
+      validateStudentGroupAvailability(instance, options),
+      validateClassStudentGroupConflict(instance, options)
+    ]);
+  }
+
+  /*@BeforeDestroy
+  static async tryRemove(instance: ClassRegister, options?: QueryOptions | null) {
+    await Promise.all([
+      await restrictOnDelete(
+        Attendance as { new (): Model } & typeof Model, // No need for complex casting
+        'classRegisterId', // Use the actual column name without casting
+        instance.lessonId,
+        options
+      )
     ]);
   }*/
 
