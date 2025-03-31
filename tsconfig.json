@@ -8,7 +8,12 @@
     "outDir": "./dist",
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "baseUrl": "./",
+    "incremental": true,
+    "strictFunctionTypes": true,
+    "sourceMap": true,
+    "declaration": true,
     "paths": {
       "@controllers/*": ["src/controllers/*"],
       "@repositories/*": ["src/repositories/*"],
@@ -16,8 +21,9 @@
       "@models/*": ["src/models/*"],
       "@validators/*": ["src/validators/*"],
       "@routes/*": ["src/routes/*"],
+      "@lib/*": ["src/lib/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
 }
