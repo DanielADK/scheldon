@@ -3,6 +3,8 @@ import { createSubstitutionEntryAndFindClassRegister } from '@services/substitut
 import { handleError } from '@lib/controllerTools';
 import { Context } from 'koa';
 import Joi from 'joi';
+import { SubstitutionType } from '@models/types/SubstitutionType';
+import * as classRegisterService from '@services/classRegisterService';
 
 export const substitutionTimetableEntrySchema = Joi.object({
   classId: Joi.number().integer().positive().required(),
@@ -22,6 +24,44 @@ export const substitutionTimetableEntrySchema = Joi.object({
   roomId: Joi.number().integer().positive().required()
 });
 
+// Schema for validating assignment of substitution entry to class register
+export const assignSubstitutionSchema = Joi.object({
+  substitutionEntryId: Joi.number().required(),
+  substitutionType: Joi.string()
+    .required()
+    .valid(...Object.values(SubstitutionType)),
+  note: Joi.string().max(2048).optional()
+});
+
+export const assignSubstitutionToClassRegister = async (ctx: Context): Promise<void> => {
+  try {
+    const dateStr = ctx.params.date;
+    const date = new Date(dateStr);
+
+    if (isNaN(date.getTime())) {
+      ctx.status = 400;
+      ctx.body = { error: 'Invalid date format' };
+      return;
+    }
+    const { error, value } = assignSubstitutionSchema.validate(ctx.request.body);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
+    const result = await classRegisterService.assignSubstitutionToClassRegister(date, value);
+
+    ctx.status = 201;
+    ctx.body = {
+      message: 'Substitution entry successfully assigned to class register',
+      lessonId: result.lessonId
+    };
+  } catch (error) {
+    handleError(ctx, error);
+  }
+};
 /**
  * Controller to handle submission entry creation and class register finding
  *
@@ -30,8 +70,6 @@ export const substitutionTimetableEntrySchema = Joi.object({
  */
 export const createSubmissionEntryController = async (ctx: Context): Promise<void> => {
   try {
-    const dateStr = ctx.params.date;
-
     const { error, value } = substitutionTimetableEntrySchema.validate(ctx.request.body);
 
     if (error) {
@@ -41,7 +79,7 @@ export const createSubmissionEntryController = async (ctx: Context): Promise<voi
     }
 
     // Process the submission entry
-    const result = await createSubstitutionEntryAndFindClassRegister(dateStr, value);
+    const result = await createSubstitutionEntryAndFindClassRegister(value);
 
     // Return the results
     ctx.status = 200;

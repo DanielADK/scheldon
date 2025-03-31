@@ -62,6 +62,17 @@ export const findOrCreateSubstitutionEntry = async (
 };
 
 /**
+ * Find a substitution entry by its ID.
+ *
+ * @param {number} id - The ID of the substitution entry to find
+ * @param {Transaction} transaction - The transaction to use for database operations
+ * @returns {Promise<SubstitutionEntry | null>} The found substitution entry or null
+ */
+export const findSubstitutionEntryById = async (id: number, transaction?: Transaction): Promise<SubstitutionEntry | null> => {
+  return SubstitutionEntry.findByPk(id, { transaction });
+};
+
+/**
  * Find class register at a specific date and hour
  *
  * @param {number} classId - The ID of the class

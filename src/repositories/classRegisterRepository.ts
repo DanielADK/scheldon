@@ -15,6 +15,7 @@ import { FilterType, validateEntity } from '@validators/substitutionEntryValidat
 import { Employee } from '@models/Employee';
 import { Subject } from '@models/Subject';
 import { Room } from '@models/Room';
+import { AssignSubstitutionRepositoryDTO } from '@controllers/classRegisterController';
 
 export interface classRegisterRecordDTO {
   lessonId: number;
@@ -180,7 +181,7 @@ export const getTemporaryTimetable = async (filterType: FilterType, entityId: nu
   const fieldName = `${filterType}Id`;
 
   return await ClassRegister.findAll({
-    attributes: [],
+    attributes: ['lessonId', 'substitutionType'],
     where: {
       date: date,
       [Op.or]: [
@@ -213,4 +214,130 @@ export const getTemporaryTimetable = async (filterType: FilterType, entityId: nu
       }
     ]
   });
+};
+
+/**
+ * Find a substitution entry by ID
+ *
+ * @param id - The ID of the substitution entry
+ * @returns Promise<SubstitutionEntry | null> - The found substitution entry or null
+ */
+export const findSubstitutionEntryById = async (id: number): Promise<SubstitutionEntry | null> => {
+  return SubstitutionEntry.findByPk(id);
+};
+
+/**
+ * Create a class register with a substitution entry
+ *
+ * @param substitutionEntry
+ * @param data - The data for creating a class register with substitution
+ * @returns Promise<ClassRegister> - The created class register
+ * @throws Error if there is a conflict or validation fails
+ */
+export const assignSubstitutionEntryToClassRegister = async (
+  substitutionEntry: SubstitutionEntry,
+  data: AssignSubstitutionRepositoryDTO
+): Promise<ClassRegister> => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    // Check if the substitution entry exists
+
+    if (!substitutionEntry) {
+      await transaction.rollback();
+      throw new Error('Substitution entry not found');
+    }
+
+    // Create the class register with the substitution entry
+    const classRegister = await ClassRegister.create(
+      {
+        substitutionEntryId: data.substitutionEntryId,
+        date: data.date,
+        substitutionType: data.substitutionType,
+        topic: null,
+        fillDate: null,
+        note: data.note || null,
+        timetableEntryId: null
+      } as ClassRegister,
+      { transaction }
+    );
+
+    await transaction.commit();
+    return classRegister;
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+};
+
+/**
+ * Find class register by its ID with associated entities
+ */
+export const findClassRegisterById = async (lessonId: number, transaction: Transaction) => {
+  return ClassRegister.findByPk(lessonId, {
+    include: [{ model: SubstitutionEntry, required: false }],
+    transaction
+  });
+};
+
+/**
+ * Reset a class register to use the default timetable entry instead of substitution
+ *
+ * @param classRegister - ClassRegister object
+ * @param timetableEntry - Timetable Entry object
+ * @param transaction - Transaction object
+ * @returns The updated class register
+ */
+export const resetToDefaultTimetable = async (classRegister: ClassRegister, timetableEntry: TimetableEntry, transaction: Transaction) => {
+  await classRegister.update(
+    {
+      substitutionEntryId: null,
+      timetableEntryId: timetableEntry.timetableEntryId,
+      substitutionType: null,
+      topic: null,
+      fillDate: null,
+      note: null
+    },
+    { transaction }
+  );
+
+  return classRegister;
+};
+
+/**
+ * Check if a substitution entry is used by any class registers
+ * If not used, remove it from the database
+ *
+ * @param substitutionEntry - SubstitutionEntry object to check
+ * @param transaction - Transaction object
+ */
+export const checkAndRemoveUnusedSubstitutionEntry = async (substitutionEntry: SubstitutionEntry, transaction: Transaction) => {
+  if (!substitutionEntry.substitutionEntryId) return;
+
+  // Count usages of this substitution entry
+  const usageCount = await ClassRegister.count({
+    where: {
+      substitutionEntryId: substitutionEntry.substitutionEntryId
+    },
+    transaction
+  });
+
+  // If no longer used, delete the substitution entry
+  if (usageCount === 0) {
+    await SubstitutionEntry.destroy({
+      where: { substitutionEntryId: substitutionEntry.substitutionEntryId },
+      transaction
+    });
+  }
+};
+
+/**
+ * Remove a class register within a transaction
+ *
+ * @param classRegister - The class register object to remove
+ * @param transaction - The transaction object to use
+ * @returns Promise<void> - Resolves when the record is deleted
+ */
+export const removeClassRegister = async (classRegister: ClassRegister, transaction: Transaction): Promise<void> => {
+  await classRegister.destroy({ transaction });
 };

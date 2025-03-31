@@ -488,3 +488,73 @@ export async function deleteTEntryById(timetableEntryId: number): Promise<void> 
     throw error;
   }
 }
+
+/**
+ * Find the default timetable entry for a specific date, class, and hour
+ *
+ * @param date - The date for which to find the timetable entry
+ * @param classId - The ID of the class
+ * @param hourInDay - The hour of the day
+ * @param transaction - The database transaction to use
+ * @returns The matching timetable entry or null if not found
+ */
+export const findDefaultTimetableEntry = async (
+  date: Date,
+  classId: number,
+  hourInDay: number,
+  transaction?: Transaction
+): Promise<TimetableEntry | null> => {
+  // Get the day of week from the date (0 = Sunday, 1 = Monday, etc.)
+  const dayOfWeek = date.getDay();
+  // Convert to your system's convention if needed (e.g., if 1 = Monday, 2 = Tuesday, etc.)
+  const adjustedDayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek; // If you use 1-7 instead of 0-6
+
+  // Find all timetable sets that are valid for the given date
+  const validTimetableSets = await TimetableSet.findAll({
+    where: {
+      validFrom: {
+        [Op.lte]: date
+      },
+      validTo: {
+        [Op.gte]: date
+      }
+    },
+    transaction
+  });
+
+  if (!validTimetableSets || validTimetableSets.length === 0) {
+    return null;
+  }
+
+  // Get all the valid timetable set IDs
+  const timetableSetIds = validTimetableSets.map((set) => set.timetableSetId);
+
+  // Find timetable entries that match:
+  // 1. The day of week
+  // 2. The hour of day
+  // 3. The class ID
+  // 4. Are associated with one of the valid timetable sets
+  const timetableEntry = await TimetableEntry.findOne({
+    where: {
+      dayInWeek: adjustedDayOfWeek,
+      hourInDay: hourInDay,
+      classId: classId
+    },
+    include: [
+      {
+        model: TimetableSet,
+        where: {
+          timetableSetId: {
+            [Op.in]: timetableSetIds
+          }
+        },
+        through: {
+          attributes: [] // Ensure this only includes valid options; remove `model`
+        }
+      }
+    ],
+    transaction
+  });
+
+  return timetableEntry;
+};

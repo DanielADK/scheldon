@@ -1,8 +1,9 @@
 import { Context } from 'koa';
 import * as classRegisterService from '@services/classRegisterService';
-import { handleError } from '../lib/controllerTools';
+import { handleError } from '@lib/controllerTools';
 import Joi from 'joi';
 import { AttendanceType } from '@models/types/AttendanceType';
+import { SubstitutionType } from '@models/types/SubstitutionType';
 
 const createClassRegisterSchema = Joi.object({
   lessonId: Joi.string()
@@ -15,6 +16,18 @@ const createClassRegisterSchema = Joi.object({
       present: Joi.string().required().uppercase().valid(AttendanceType.PRESENT, AttendanceType.NOT_PRESENT, AttendanceType.LATE_ARRIVAL)
     })
   )
+});
+
+// Interface for the assignSubstitution DTO in repository
+export interface AssignSubstitutionRepositoryDTO {
+  substitutionEntryId: number;
+  date: Date;
+  substitutionType: SubstitutionType;
+  note?: string;
+}
+
+export const resetClassRegisterSchema = Joi.object({
+  lessonId: Joi.number().required()
 });
 
 /**
@@ -63,28 +76,25 @@ export const getCurrentLessonByTeacherId = async (ctx: Context): Promise<void> =
   }
 };
 
-/**
- * Get the current lesson record by lessonID
- * @param ctx Koa context
- */
-/*export const getCurrentLessonByLessonId = async (
-  ctx: Context
-): Promise<void> => {
-  const lessonId: string = ctx.params.id;
-
+export const resetClassRegisterToDefault = async (ctx: Context): Promise<void> => {
   try {
-    const lessonData =
-      await classRegisterService.getCurrentLessonByLessonId(lessonId);
+    const { error, value } = resetClassRegisterSchema.validate(ctx.query);
 
-    if (!lessonData) {
-      ctx.status = 404;
-      ctx.body = { error: 'No current lesson found for this teacher' };
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
       return;
     }
 
+    const lessonId = Number(value.lessonId);
+    const result = await classRegisterService.resetClassRegisterToDefault(lessonId);
+
     ctx.status = 200;
-    ctx.body = lessonData;
+    ctx.body = {
+      message: 'Class register reset to default timetable',
+      data: result
+    };
   } catch (error) {
     handleError(ctx, error);
   }
-};*/
+};

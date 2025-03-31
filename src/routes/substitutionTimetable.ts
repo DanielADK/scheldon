@@ -1,6 +1,7 @@
 import Router from 'koa-router';
 import { getTimetableByIdAndDateController } from '@controllers/timetableController';
 import * as substitutionEntryService from '@services/substitutionEntryService';
+import * as substitutionEntryController from '@controllers/substitutionEntryController';
 import { createSubmissionEntryController } from '@controllers/substitutionEntryController';
 
 const router = new Router();
@@ -33,13 +34,6 @@ const router = new Router();
  *         roomId:
  *           type: integer
  *           example: 6
- *         type:
- *           type: string
- *           enum:
- *             - APPEND
- *             - DROPPED
- *             - MERGED
- *           example: "SUBSTITUTION"
  *       required:
  *         - classId
  *         - dayInWeek
@@ -77,22 +71,6 @@ const router = new Router();
  *         roomId:
  *           type: integer
  *           example: 6
- *         type:
- *           type: string
- *           enum: [SUBSTITUTION, CANCELLATION, EXTRA_CLASS]
- *           example: "SUBSTITUTION"
- *         date:
- *           type: string
- *           format: date
- *           example: "2024-10-15"
- *         topic:
- *           type: string
- *           example: "Special topic for this class"
- *           nullable: true
- *         note:
- *           type: string
- *           example: "Temporary change due to teacher absence"
- *           nullable: true
  *       required:
  *         - substitutionEntryId
  *         - classId
@@ -101,8 +79,6 @@ const router = new Router();
  *         - subjectId
  *         - teacherId
  *         - roomId
- *         - type
- *         - date
  */
 
 /**
@@ -174,90 +150,10 @@ router.get('/timetables/temporary/classes/:id/at/:date', (ctx) =>
  *               properties:
  *                 submissionEntry:
  *                   $ref: '#/components/schemas/SubstitutionTimetableEntry'
- *                 classRegister:
- *                   $ref: '#/components/schemas/ClassRegister'
- *                   nullable: true
- *                 message:
- *                   type: string
  *       400:
  *         description: Invalid request data
  */
-router.post('/timetables/temporary/at/:date', createSubmissionEntryController);
-
-/**
- * @openapi
- * /timetables/temporary/classes/{id}/at/{date}:
- *   put:
- *     tags:
- *       - Substitution Timetable
- *     summary: Update temporary timetable entries for a class on a specific date
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *         description: Class ID
- *       - name: date
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *           format: date
- *         description: Date in format YYYY-MM-DD
- *     requestBody:
- *       description: Updated temporary timetable entries
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: array
- *             items:
- *               $ref: '#/components/schemas/SubstitutionTimetableEntryDTO'
- *     responses:
- *       200:
- *         description: Substitution timetable entries updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/SubstitutionTimetableEntry'
- *       400:
- *         description: Bad request
- *       404:
- *         description: Class not found
- */
-//router.put('/timetables/temporary/classes/:id/at/:date', substitutionTimetableController.updateSubstitutionTimetableForClass);
-
-/**
- * @openapi
- * /timetables/temporary/classes/{id}/at/{date}:
- *   delete:
- *     tags:
- *       - Substitution Timetable
- *     summary: Delete all temporary timetable entries for a class on a specific date
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *         description: Class ID
- *       - name: date
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *           format: date
- *         description: Date in format YYYY-MM-DD
- *     responses:
- *       204:
- *         description: Substitution timetable entries deleted successfully
- *       404:
- *         description: Class not found or no temporary timetable for this date
- */
-//router.delete('/timetables/temporary/classes/:id/at/:date', substitutionTimetableController.deleteSubstitutionTimetableForClass);
+router.post('/timetables/temporary/entries', createSubmissionEntryController);
 
 /**
  * @openapi
@@ -332,5 +228,68 @@ router.get('/timetables/temporary/teachers/:id/at/:date', (ctx) =>
 router.get('/timetables/temporary/rooms/:id/at/:date', (ctx) =>
   getTimetableByIdAndDateController(ctx, substitutionEntryService.getTimetableByRoomIdAt)
 );
+
+/**
+ * @openapi
+ * /class-register/substitution:
+ *   post:
+ *     tags:
+ *       - Class register
+ *     summary: Assign a substitution entry to a class register
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - substitutionEntryId
+ *               - date
+ *               - substitutionType
+ *             properties:
+ *               substitutionEntryId:
+ *                 type: integer
+ *                 example: 123
+ *               date:
+ *                 type: string
+ *                 format: date
+ *                 example: "2024-10-01"
+ *               substitutionType:
+ *                 type: string
+ *                 enum:
+ *                   - A
+ *                   - D
+ *                   - M
+ *                 example: "A"
+ *               note:
+ *                 type: string
+ *                 maxLength: 2048
+ *                 example: "Teacher substitution for illness."
+ *     responses:
+ *       201:
+ *         description: Substitution entry successfully assigned to class register
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Substitution entry successfully assigned to class register"
+ *                 lessonId:
+ *                   type: integer
+ *                   example: 456
+ *       400:
+ *         description: Bad request, validation failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "substitutionEntryId is required"
+ */
+router.post('/timetables/temporary/at/:date', substitutionEntryController.assignSubstitutionToClassRegister);
 
 export default router;

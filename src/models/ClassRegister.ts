@@ -84,7 +84,7 @@ export class ClassRegister extends Model<ClassRegister> {
     type: DataType.ENUM(...Object.values(SubstitutionType)),
     allowNull: true
   })
-  declare substitutionType: SubstitutionType;
+  declare substitutionType: SubstitutionType | null;
 
   // Mapping
   @BelongsTo(() => TimetableEntry, {

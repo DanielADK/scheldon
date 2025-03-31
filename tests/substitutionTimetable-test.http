@@ -57,7 +57,7 @@ Content-Type: application/json
   "type": "CLASSROOM",
   "floor": 2,
   "studentCapacity": 35,
-  "administratorId": {{teacherId}}
+  "administratorId": {{teacherId1}}
 }
 
 > {%
@@ -107,7 +107,7 @@ Content-Type: application/json
   "validFrom": "{{validFrom}}",
   "validTo": "{{validTo}}",
   "roomId": {{roomId1}},
-  "employeeId": {{teacherId}}
+  "employeeId": {{teacherId1}}
 }
 
 > {%
@@ -289,7 +289,7 @@ Content-Type: application/json
   "dayInWeek": 1,
   "hourInDay": 1,
   "subjectId": {{subjectId1}},
-  "teacherId": {{teacherId}},
+  "teacherId": {{teacherId1}},
   "roomId": {{roomId1}}
 }
 
@@ -315,7 +315,7 @@ Content-Type: application/json
   "dayInWeek": 1,
   "hourInDay": 2,
   "subjectId": {{subjectId1}},
-  "teacherId": {{teacherId}},
+  "teacherId": {{teacherId1}},
   "roomId": {{roomId1}}
 }
 
@@ -584,7 +584,7 @@ Content-Type: application/json
 %}
 
 ### Create new substitution
-POST http://{{ip}}/timetables/temporary/at/{{currentTuesday}}
+POST http://{{ip}}/timetables/temporary/entries
 Content-Type: application/json
 
 {
@@ -618,7 +618,7 @@ Content-Type: application/json
 
 
 ### Create new duplicate substitution
-POST http://{{ip}}/timetables/temporary/at/{{currentTuesday}}
+POST http://{{ip}}/timetables/temporary/entries
 Content-Type: application/json
 
 {
@@ -630,7 +630,6 @@ Content-Type: application/json
   "teacherId": {{teacherId2}},
   "roomId": {{roomId2}}
 }
-
 
 > {%
   client.test("Create new substitution returns the correct response", function() {
@@ -646,5 +645,121 @@ Content-Type: application/json
     client.assert(json.subjectId === 2, "Expected subjectId to be 2");
     client.assert(json.teacherId === 2, "Expected teacherId to be 2");
     client.assert(json.roomId === 2, "Expected roomId to be 2");
+  });
+%}
+
+### Assign substitution to currentTuesday
+POST http://{{ip}}/timetables/temporary/at/{{currentTuesday}}
+Content-Type: application/json
+
+{
+  "substitutionEntryId": {{substitutionEntryId1}},
+  "substitutionType": "A"
+}
+
+### View stable timetable to compare
+GET http://{{ip}}/timetables/stable/classes/1/at/{{currentTuesday}}
+
+> {%
+  client.test("Valid stable timetable response", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+
+    const json = response.body;
+    client.assert(typeof json === "object", "The response should be a JSON object");
+
+    client.assert(
+      json["1"] && json["1"]["1"] && json["1"]["2"],
+      "Expected structure for day 1, hours 1 and 2 is missing"
+    );
+
+    client.assert(json["1"]["1"].teacher.name === "Jane", "Teacher's name for hour 1 should be 'Jane'");
+    client.assert(json["1"]["1"].teacher.surname === "Smith", "Teacher's surname for hour 1 should be 'Smith'");
+    client.assert(json["1"]["1"].teacher.abbreviation === "JS", "Teacher's abbreviation for hour 1 should be 'JS'");
+    client.assert(json["1"]["1"].subject.name === "Math", "Subject for hour 1 should be 'Math'");
+    client.assert(json["1"]["1"].subject.abbreviation === "M", "Subject abbreviation for hour 1 should be 'M'");
+    client.assert(json["1"]["1"].room.name === "Room 241", "Room for hour 1 should be 'Room 241'");
+
+    client.assert(json["1"]["2"].teacher.name === "Jane", "Teacher's name for hour 2 should be 'Jane'");
+    client.assert(json["1"]["2"].teacher.surname === "Smith", "Teacher's surname for hour 2 should be 'Smith'");
+    client.assert(json["1"]["2"].teacher.abbreviation === "JS", "Teacher's abbreviation for hour 2 should be 'JS'");
+    client.assert(json["1"]["2"].subject.name === "Math", "Subject for hour 2 should be 'Math'");
+    client.assert(json["1"]["2"].subject.abbreviation === "M", "Subject abbreviation for hour 2 should be 'M'");
+    client.assert(json["1"]["2"].room.name === "Room 241", "Room for hour 2 should be 'Room 241'");
+
+    client.assert(
+      json["2"] && json["2"]["2"] && Array.isArray(json["2"]["2"]),
+      "Expected structure for day 2, hour 2 is missing or incorrect"
+    );
+
+    const timetableEntries = json["2"]["2"];
+    const entry1 = timetableEntries[0];
+    const entry2 = timetableEntries[1];
+
+    client.assert(entry1.teacher.name === "Jane", "Teacher's name for entry 1 should be 'Jane'");
+    client.assert(entry1.teacher.surname === "Smith", "Teacher's surname for entry 1 should be 'Smith'");
+    client.assert(entry1.teacher.abbreviation === "JS", "Teacher's abbreviation for entry 1 should be 'JS'");
+    client.assert(entry1.subject.name === "Advanced JavaScript", "Subject for entry 1 should be 'Advanced JavaScript'");
+    client.assert(entry1.subject.abbreviation === "AJS", "Subject abbreviation for entry 1 should be 'AJS'");
+    client.assert(entry1.studentGroup === "B", "StudentGroup for entry 1 should be 'B'");
+    client.assert(entry1.room.name === "Room 241", "Room for entry 1 should be 'Room 241'");
+
+    client.assert(entry2.teacher.name === "David", "Teacher's name for entry 2 should be 'David'");
+    client.assert(entry2.teacher.surname === "Smith", "Teacher's surname for entry 2 should be 'Smith'");
+    client.assert(entry2.teacher.abbreviation === "DS", "Teacher's abbreviation for entry 2 should be 'DS'");
+    client.assert(entry2.subject.name === "Math", "Subject for entry 2 should be 'Math'");
+    client.assert(entry2.subject.abbreviation === "M", "Subject abbreviation for entry 2 should be 'M'");
+    client.assert(entry2.studentGroup === "A", "StudentGroup for entry 2 should be 'A'");
+    client.assert(entry2.room.name === "Room 012", "Room for entry 2 should be 'Room 012'");
+  });
+%}
+
+### View temporary timetable to compare
+GET http://{{ip}}/timetables/temporary/classes/1/at/{{currentTuesday}}
+
+> {%
+  client.test("Valid temporary timetable response", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+
+    const json = response.body;
+    client.assert(typeof json === "object", "The response should be a JSON object");
+
+    client.assert(
+      json["2"] && json["2"]["2"] && Array.isArray(json["2"]["2"]),
+      "Expected structure for day 2, hour 2 is missing or incorrect"
+    );
+
+    const timetableEntries = json["2"]["2"];
+    const entry1 = timetableEntries[0];
+    const entry2 = timetableEntries[1];
+
+    client.assert(entry1.teacher.name === "Jane", "Teacher's name for entry 1 should be 'Jane'");
+    client.assert(entry1.teacher.surname === "Smith", "Teacher's surname for entry 1 should be 'Smith'");
+    client.assert(entry1.teacher.abbreviation === "JS", "Teacher's abbreviation for entry 1 should be 'JS'");
+    client.assert(entry1.subject.name === "Advanced JavaScript", "Subject for entry 1 should be 'Advanced JavaScript'");
+    client.assert(entry1.subject.abbreviation === "AJS", "Subject abbreviation for entry 1 should be 'AJS'");
+    client.assert(entry1.studentGroup.name === "B", "StudentGroup for entry 1 should be 'B'");
+    client.assert(entry1.room.name === "Room 241", "Room for entry 1 should be 'Room 241'");
+
+    client.assert(entry2.teacher.name === "David", "Teacher's name for entry 2 should be 'David'");
+    client.assert(entry2.teacher.surname === "Smith", "Teacher's surname for entry 2 should be 'Smith'");
+    client.assert(entry2.teacher.abbreviation === "DS", "Teacher's abbreviation for entry 2 should be 'DS'");
+    client.assert(entry2.subject.name === "Math", "Subject for entry 2 should be 'Math'");
+    client.assert(entry2.subject.abbreviation === "M", "Subject abbreviation for entry 2 should be 'M'");
+    client.assert(entry2.studentGroup.name === "A", "StudentGroup for entry 2 should be 'A'");
+    client.assert(entry2.room.name === "Room 012", "Room for entry 2 should be 'Room 012'");
+
+    client.assert(
+      json["5"] && json["5"]["5"],
+      "Expected structure for day 5, hour 5 is missing"
+    );
+
+    const entry3 = json["5"]["5"];
+    client.assert(entry3.teacher.name === "David", "Teacher's name for entry 3 should be 'David'");
+    client.assert(entry3.teacher.surname === "Smith", "Teacher's surname for entry 3 should be 'Smith'");
+    client.assert(entry3.teacher.abbreviation === "DS", "Teacher's abbreviation for entry 3 should be 'DS'");
+    client.assert(entry3.subject.name === "Czech", "Subject for entry 3 should be 'Czech'");
+    client.assert(entry3.subject.abbreviation === "CZ", "Subject abbreviation for entry 3 should be 'CZ'");
+    client.assert(entry3.room.name === "Room 012", "Room for entry 3 should be 'Room 012'");
+    client.assert(entry3.type === "A", "Type for entry 3 should be 'A'");
   });
 %}

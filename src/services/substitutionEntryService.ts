@@ -6,7 +6,6 @@ import { SubstitutionTimetableAdapter } from '@services/transformers/substitutio
 import { Employee } from '@models/Employee';
 import { Room } from '@models/Room';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
-import { ClassRegister } from '@models/ClassRegister';
 import { sequelize } from '../index';
 import {
   findOrCreateSubstitutionEntry,
@@ -65,21 +64,11 @@ export const getTimetableByRoomIdAt = async (roomId: number, date: Date): Promis
 /**
  * Create a submission entry and find associated class register
  *
- * @param {number} classId - The ID of the class
- * @param {string} dateStr - The date string in format YYYY-MM-DD
- * @param {unknown} data - The submission entry data to validate
- * @returns {Promise<{submissionEntry: SubstitutionEntry, classRegister: ClassRegister | null}>} The created entry and found class register
+ * @param data SubstitutionTimetableEntryDTO
+ * @returns SubstitutionEntry The created entry and found class register
  */
-export const createSubstitutionEntryAndFindClassRegister = async (
-  dateStr: string,
-  data: SubstitutionTimetableEntryDTO
-): Promise<SubstitutionEntry> => {
+export const createSubstitutionEntryAndFindClassRegister = async (data: SubstitutionTimetableEntryDTO): Promise<SubstitutionEntry> => {
   const validatedData = validateSubstitutionTimetableEntry(data);
-
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) {
-    throw new Error('Invalid date format. Expected YYYY-MM-DD');
-  }
 
   const transaction: Transaction = await sequelize.transaction();
   // Check if related entities exist before proceeding
