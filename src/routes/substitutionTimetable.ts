@@ -125,6 +125,25 @@ const router = new Router();
  *         description: Array representing hours in the day (index 0-n for periods/lessons)
  *         items:
  *           $ref: '#/components/schemas/LessonEntry'
+ *     ResetClassRegisterRequest:
+ *       type: object
+ *       required:
+ *        - classId
+ *        - hourInDay
+ *       properties:
+ *         classId:
+ *           type: integer
+ *           minimum: 1
+ *           description: ID of the class
+ *         studentGroupId:
+ *           type: integer
+ *           minimum: 1
+ *           nullable: true
+ *           description: ID of the student group (optional)
+ *         hourInDay:
+ *           type: integer
+ *           minimum: 0
+ *           description: Hour of the day (lesson period)
  */
 
 /**
@@ -333,5 +352,47 @@ router.get('/timetables/temporary/rooms/:id/at/:date', (ctx) =>
  */
 router.post('/timetables/temporary/at/:date', substitutionEntryController.assignSubstitutionToClassRegister);
 
+/**
+ * @openapi
+ * /timetables/temporary/at/{date}:
+ *   delete:
+ *     tags:
+ *       - Timetables
+ *     summary: Reset substitution in class register for a specific date
+ *     description: Resets a substitution entry in the class register to the default state for the given date
+ *     parameters:
+ *       - in: path
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: The date for which to reset the substitution entry (YYYY-MM-DD)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ResetClassRegisterRequest'
+ *     responses:
+ *       200:
+ *         description: Substitution reset successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ClassRegister'
+ *       400:
+ *         description: Bad request, validation failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: Lesson not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.delete('/timetables/temporary/at/:date', substitutionEntryController.resetSubstitutionInClassRegister);
 export default router;

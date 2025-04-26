@@ -41,10 +41,10 @@ const router = new Router();
  *         type:
  *           type: string
  *           enum:
- *             - APPEND
- *             - DROPPED
- *             - MERGED
- *           example: "APPEND"
+ *             - A
+ *             - D
+ *             - M
+ *           example: "A"
  */
 
 /**
