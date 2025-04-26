@@ -125,6 +125,7 @@ const router = new Router();
  *         description: Array representing hours in the day (index 0-n for periods/lessons)
  *         items:
  *           $ref: '#/components/schemas/LessonEntry'
+ *
  *     ResetClassRegisterRequest:
  *       type: object
  *       required:
