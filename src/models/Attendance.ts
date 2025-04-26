@@ -7,7 +7,7 @@ import { AttendanceType } from '@models/types/AttendanceType';
   timestamps: false,
   indexes: [
     {
-      fields: ['lessonRecordId', 'studentId'],
+      fields: ['classRegisterId', 'studentId'],
       unique: true
     }
   ]
@@ -26,21 +26,23 @@ export class Attendance extends Model<Attendance> {
   @ForeignKey(() => ClassRegister)
   @Column({
     type: DataType.BIGINT.UNSIGNED,
-    allowNull: false
+    allowNull: false,
+    onDelete: 'RESTRICT'
   })
-  declare lessonRecordId: string;
+  declare classRegisterId: number;
 
-  @BelongsTo(() => ClassRegister)
-  declare lessonRecord: ClassRegister;
+  @BelongsTo(() => ClassRegister, { onDelete: 'RESTRICT' })
+  declare classRegister: ClassRegister;
 
   @ForeignKey(() => Student)
   @Column({
     type: DataType.INTEGER.UNSIGNED,
-    allowNull: false
+    allowNull: false,
+    onDelete: 'RESTRICT'
   })
   declare studentId: number;
 
-  @BelongsTo(() => Student)
+  @BelongsTo(() => Student, { onDelete: 'RESTRICT' })
   declare student: Student;
 
   @Column({

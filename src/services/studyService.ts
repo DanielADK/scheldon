@@ -33,7 +33,6 @@ export const startStudy = async (studentId: number, data: StudyDTO) => {
  * @param data
  */
 export const stopStudy = async (studentId: number, data: StudyDTO) => {
-  // TODO: transaction
   const transaction = await sequelize.transaction();
   try {
     const classInfo = await classRepository.getClassById(data.classId, transaction);

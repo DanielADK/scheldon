@@ -25,7 +25,7 @@ export const getLessonAttendance = async (lessonId: number, withStudents: boolea
     : {};
   return await Attendance.findAll({
     where: {
-      lessonRecordId: lessonId
+      classRegisterId: lessonId
     },
     ...includeStudents
   });
