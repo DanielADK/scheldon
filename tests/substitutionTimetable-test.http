@@ -509,8 +509,8 @@ Content-Type: application/json
 ### 11. View Timetable for Tuesday of the Current Week
 < {%
   const now = new Date();
-  const dayOfWeek = now.getDay() || 7;
-  const tuesdayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 3);
+  const dayOfWeek = now.getUTCDay() || 7;
+  const tuesdayDate = new Date(now.getFullYear(), now.getMonth(), now.getUTCDate() - dayOfWeek + 3);
 
   const formattedTuesday = tuesdayDate.toISOString().split("T")[0];
   client.global.set("formattedTuesday", formattedTuesday);
@@ -543,14 +543,14 @@ Content-Type: application/json
 ### 12. Get Timetable for Wednesday of the Current Week
 < {%
   const now = new Date();
-  const dow = now.getDay();
+  const dow = now.getUTCDay();
   const fridayDate = new Date(now);
-  fridayDate.setDate(now.getDate() + ((5-dow+7)%7));
+  fridayDate.setUTCDate(now.getUTCDate() + ((5-dow+7)%7));
   const formattedFriday = fridayDate.toISOString().split("T")[0];
   client.global.set("currentFriday", formattedFriday);
 
   const wednesdayDate = new Date(now);
-  wednesdayDate.setDate(now.getDate()+((3-dow+7)%7));
+  wednesdayDate.setUTCDate(now.getUTCDate()+((3-dow+7)%7));
   const formattedWednesday = wednesdayDate.toISOString().split("T")[0];
   client.global.set("currentWednesday", formattedWednesday);
 %}
@@ -707,9 +707,9 @@ Content-Type: application/json
 ### 17. Assign substitution to current thursday - true
 < {%
   const now = new Date();
-  const dow = now.getDay();
+  const dow = now.getUTCDay();
   const thursdayDate = new Date(now);
-  thursdayDate.setDate(now.getDate()+((4-dow+7)%7));
+  thursdayDate.setUTCDate(now.getUTCDate()+((4-dow+7)%7));
   const formattedThursday = thursdayDate.toISOString().split("T")[0];
   client.global.set("currentThursday", formattedThursday);%}
 POST http://{{ip}}/timetables/temporary/at/{{currentThursday}}
