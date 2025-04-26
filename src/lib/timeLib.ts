@@ -15,14 +15,14 @@ export const getWeekRange = (time: Date): { start: Date; end: Date } => {
 };
 
 /**
- * Get dayInWeek from date
- * Starting from Monday = 0, Sunday = 6
- * @param date
- * @returns {number}
+ * Calculates the zero-based index of a day in the week, where Monday is 0 and Sunday is 6.
+ *
+ * @param {Date} date - The date to extract the day of the week from.
+ * @returns {number} The zero-based index of the day in the week (Monday: 0, ..., Sunday: 6).
  */
 export const getDayInWeek = (date: Date): number => {
-  let day = date.getDay();
-  return ++day % 7; // Convert Sunday (0) to 6
+  const day = date.getDay();
+  return day === 0 ? 6 : day - 1;
 };
 
 /**
@@ -55,19 +55,6 @@ const binarySearchPeriod = (timeString: string, start: number, end: number): num
 export const getCurrentTimetableHour = (currentTime: Date): number | null => {
   const timeString = currentTime.toTimeString().split(' ')[0];
   return binarySearchPeriod(timeString, 0, CLASS_HOURS.length - 1);
-};
-
-// dateUtils.ts
-/**
- * Parse a date string in format YYYY-MM-DD
- */
-export const parseDate = (dateString: string): Date | null => {
-  if (!dateString || !/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-    return null;
-  }
-
-  const date = new Date(dateString);
-  return isNaN(date.getTime()) ? null : date;
 };
 
 /**

@@ -133,4 +133,48 @@ export class ClassRegister extends Model<ClassRegister> {
   isFilled(): boolean {
     return this.fillDate !== null;
   }
+
+  /**
+   * Get the entry of the ClassRegister which is either a substitutionEntry or a timetableEntry.
+   * This ensures XOR logic: only one of them is expected to exist.
+   * @returns substitutionEntry or timetableEntry
+   * @throws Error if neither or both entries exist
+   */
+  getEntry(): SubstitutionEntry | TimetableEntry {
+    if (!this.substitutionEntry && !this.timetableEntry) {
+      throw new Error('Neither substitutionEntry nor timetableEntry exists');
+    }
+    if (this.substitutionEntry && this.timetableEntry) {
+      throw new Error('Both substitutionEntry and timetableEntry exist');
+    }
+    return this.substitutionEntry || this.timetableEntry!;
+  }
+
+  /**
+   * Sets the entry to either a SubstitutionEntry or a TimetableEntry.
+   * Updates the corresponding entry and ensures xor.
+   *
+   * @param {SubstitutionEntry | TimetableEntry} entry - The entry to set.
+   * @param options
+   * @return {Promise<void>}
+   */
+  async setEntry(entry: SubstitutionEntry | TimetableEntry, options?: QueryOptions | null) {
+    if (entry instanceof SubstitutionEntry) {
+      this.substitutionEntry = entry;
+      this.timetableEntry = null;
+    } else if (entry instanceof TimetableEntry) {
+      this.timetableEntry = entry;
+      this.substitutionEntry = null;
+    } else {
+      throw new Error('Entry must be either a SubstitutionEntry or a TimetableEntry');
+    }
+    // ORM update - explicitly call the update method to persist the changes to the database.
+    await this.update(
+      {
+        substitutionEntryId: this.substitutionEntry ? this.substitutionEntry.substitutionEntryId : null,
+        timetableEntryId: this.timetableEntry ? this.timetableEntry.timetableEntryId : null
+      },
+      { transaction: options?.transaction }
+    );
+  }
 }

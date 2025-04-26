@@ -86,7 +86,7 @@ const router = new Router();
  *                 error:
  *                   type: string
  */
-router.post('/class-register/finish', classRegisterController.finishLessonRecord);
+router.post('/classregister/finish', classRegisterController.finishLessonRecord);
 
 /**
  * @openapi
@@ -119,6 +119,6 @@ router.post('/class-register/finish', classRegisterController.finishLessonRecord
  *                 error:
  *                   type: string
  */
-router.get('/class-register/teacher/:id/current', classRegisterController.getCurrentLessonByTeacherId);
+router.get('/classregister/teacher/:id/current', classRegisterController.getCurrentLessonByTeacherId);
 
 export default router;

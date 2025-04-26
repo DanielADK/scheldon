@@ -248,7 +248,7 @@ Content-Type: application/json
   });
 %}
 
-### 1. Create Timetable Set – Valid Request
+### Create Timetable Set – Valid Request
 
 < {%
   client.global.set("validFrom", new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split("T")[0]);
@@ -506,16 +506,16 @@ Content-Type: application/json
 %}
 
 
-### Get Timetable for Tuesday of the Current Week
+### 11. View Timetable for Tuesday of the Current Week
 < {%
   const now = new Date();
-  const dayOfWeek = now.getDay() || 7; // Sunday is 0 in JavaScript, treating as 7
+  const dayOfWeek = now.getDay() || 7;
   const tuesdayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 3);
 
   const formattedTuesday = tuesdayDate.toISOString().split("T")[0];
-  client.global.set("currentTuesday", formattedTuesday);
+  client.global.set("formattedTuesday", formattedTuesday);
 %}
-GET http://{{ip}}/timetables/temporary/classes/{{classId}}/at/{{currentTuesday}}
+GET http://{{ip}}/timetables/temporary/classes/{{classId}}/at/{{formattedTuesday}}
 Content-Type: application/json
 
 > {%
@@ -540,20 +540,25 @@ Content-Type: application/json
   });
 %}
 
-### Get Timetable for Wednesday of the Current Week
+### 12. Get Timetable for Wednesday of the Current Week
 < {%
   const now = new Date();
-  const dayOfWeek = now.getDay() || 7; // Sunday is 0 in JavaScript, treating as 7
-  const wednesdayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 4);
+  const dow = now.getDay();
+  const fridayDate = new Date(now);
+  fridayDate.setDate(now.getDate() + ((5-dow+7)%7));
+  const formattedFriday = fridayDate.toISOString().split("T")[0];
+  client.global.set("currentFriday", formattedFriday);
 
-  const formattedWednesDay = wednesdayDate.toISOString().split("T")[0];
-  client.global.set("currentTuesday", formattedWednesDay);
+  const wednesdayDate = new Date(now);
+  wednesdayDate.setDate(now.getDate()+((3-dow+7)%7));
+  const formattedWednesday = wednesdayDate.toISOString().split("T")[0];
+  client.global.set("currentWednesday", formattedWednesday);
 %}
-GET http://{{ip}}/timetables/temporary/classes/{{classId}}/at/{{currentTuesday}}
+GET http://{{ip}}/timetables/temporary/classes/{{classId}}/at/{{currentWednesday}}
 Content-Type: application/json
 
 > {%
-  client.test("Valid timetable response for Wednesday", function() {
+  client.test("Valid timetable response for Thursday", function() {
     client.assert(response.status === 200, "Expected status 200, but got " + response.status);
 
     const json = response.body;
@@ -583,15 +588,15 @@ Content-Type: application/json
   });
 %}
 
-### Create new substitution
+### 13. Create new substitution
 POST http://{{ip}}/timetables/temporary/entries
 Content-Type: application/json
 
 {
   "classId": {{classId}},
   "studentGroupId": null,
-  "dayInWeek": 5,
-  "hourInDay": 5,
+  "dayInWeek": 2,
+  "hourInDay": 2,
   "subjectId": {{subjectId2}},
   "teacherId": {{teacherId2}},
   "roomId": {{roomId2}}
@@ -607,8 +612,8 @@ Content-Type: application/json
     client.assert(json.hasOwnProperty("substitutionEntryId"), "Expected substitutionEntryId to exist");
     client.assert(json.classId === 1, "Expected classId to be 1");
     client.assert(json.studentGroupId === null, "Expected studentGroupId to be null");
-    client.assert(json.dayInWeek === 5, "Expected dayInWeek to be 5");
-    client.assert(json.hourInDay === 5, "Expected hourInDay to be 5");
+    client.assert(json.dayInWeek === 2, "Expected dayInWeek to be 2");
+    client.assert(json.hourInDay === 2, "Expected hourInDay to be 2");
     client.assert(json.subjectId === 2, "Expected subjectId to be 2");
     client.assert(json.teacherId === 2, "Expected teacherId to be 2");
     client.assert(json.roomId === 2, "Expected roomId to be 2");
@@ -616,16 +621,15 @@ Content-Type: application/json
   });
 %}
 
-
-### Create new duplicate substitution
+### 14. Create new duplicate substitution
 POST http://{{ip}}/timetables/temporary/entries
 Content-Type: application/json
 
 {
   "classId": {{classId}},
   "studentGroupId": null,
-  "dayInWeek": 5,
-  "hourInDay": 5,
+  "dayInWeek": 2,
+  "hourInDay": 2,
   "subjectId": {{subjectId2}},
   "teacherId": {{teacherId2}},
   "roomId": {{roomId2}}
@@ -640,16 +644,49 @@ Content-Type: application/json
     client.assert(json.substitutionEntryId === client.global.get("substitutionEntryId1"), "Expected same substitutionEntryId as previous");
     client.assert(json.classId === 1, "Expected classId to be 1");
     client.assert(json.studentGroupId === null, "Expected studentGroupId to be null");
-    client.assert(json.dayInWeek === 5, "Expected dayInWeek to be 5");
-    client.assert(json.hourInDay === 5, "Expected hourInDay to be 5");
+    client.assert(json.dayInWeek === 2, "Expected dayInWeek to be 2");
+    client.assert(json.hourInDay === 2, "Expected hourInDay to be 2");
     client.assert(json.subjectId === 2, "Expected subjectId to be 2");
     client.assert(json.teacherId === 2, "Expected teacherId to be 2");
     client.assert(json.roomId === 2, "Expected roomId to be 2");
   });
 %}
 
-### Assign substitution to currentTuesday
-POST http://{{ip}}/timetables/temporary/at/{{currentTuesday}}
+### 15. Create new substitution
+POST http://{{ip}}/timetables/temporary/entries
+Content-Type: application/json
+
+{
+  "classId": {{classId}},
+  "studentGroupId": null,
+  "dayInWeek": 3,
+  "hourInDay": 3,
+  "subjectId": {{subjectId2}},
+  "teacherId": {{teacherId2}},
+  "roomId": {{roomId2}}
+}
+
+
+> {%
+  client.test("Create new substitution returns the correct response", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+
+    const json = response.body;
+    client.assert(typeof json === "object", "The response should be a JSON object");
+    client.assert(json.hasOwnProperty("substitutionEntryId"), "Expected substitutionEntryId to exist");
+    client.assert(json.classId === 1, "Expected classId to be 1");
+    client.assert(json.studentGroupId === null, "Expected studentGroupId to be null");
+    client.assert(json.dayInWeek === 3, "Expected dayInWeek to be 3");
+    client.assert(json.hourInDay === 3, "Expected hourInDay to be 3");
+    client.assert(json.subjectId === 2, "Expected subjectId to be 2");
+    client.assert(json.teacherId === 2, "Expected teacherId to be 2");
+    client.assert(json.roomId === 2, "Expected roomId to be 2");
+    client.global.set("substitutionEntryId2", json.substitutionEntryId)
+  });
+%}
+
+### 16. Assign substitution to current wednesday - false, time occupied
+POST http://{{ip}}/timetables/temporary/at/{{currentWednesday}}
 Content-Type: application/json
 
 {
@@ -657,8 +694,43 @@ Content-Type: application/json
   "substitutionType": "A"
 }
 
-### View stable timetable to compare
-GET http://{{ip}}/timetables/stable/classes/1/at/{{currentTuesday}}
+> {%
+  client.test("Valid response to assignment", function() {
+    client.assert(response.status === 400, "Expected status 400, but got " + response.status);
+
+    const json = response.body;
+    client.assert(json.hasOwnProperty("error"));
+    client.assert(json["error"] === "Class is already occupied at the provided time.")
+  })
+ %}
+
+### 17. Assign substitution to current thursday - true
+< {%
+  const now = new Date();
+  const dow = now.getDay();
+  const thursdayDate = new Date(now);
+  thursdayDate.setDate(now.getDate()+((4-dow+7)%7));
+  const formattedThursday = thursdayDate.toISOString().split("T")[0];
+  client.global.set("currentThursday", formattedThursday);%}
+POST http://{{ip}}/timetables/temporary/at/{{currentThursday}}
+Content-Type: application/json
+
+{
+  "substitutionEntryId": {{substitutionEntryId2}},
+  "substitutionType": "A"
+}
+
+> {%
+  client.test("Valid response to assignment", function() {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+
+    const json = response.body;
+    client.assert(json.hasOwnProperty("lessonId"));
+  })
+%}
+
+### 18. View stable timetable to compare
+GET http://{{ip}}/timetables/stable/classes/1/at/{{currentWednesday}}
 
 > {%
   client.test("Valid stable timetable response", function() {
@@ -710,11 +782,13 @@ GET http://{{ip}}/timetables/stable/classes/1/at/{{currentTuesday}}
     client.assert(entry2.subject.abbreviation === "M", "Subject abbreviation for entry 2 should be 'M'");
     client.assert(entry2.studentGroup === "A", "StudentGroup for entry 2 should be 'A'");
     client.assert(entry2.room.name === "Room 012", "Room for entry 2 should be 'Room 012'");
+
+    client.assert(!json[5], "Stable timetable have to not show temporary lessons")
   });
 %}
 
-### View temporary timetable to compare
-GET http://{{ip}}/timetables/temporary/classes/1/at/{{currentTuesday}}
+### 19. View temporary timetable at wednesday to compare = stable
+GET http://{{ip}}/timetables/temporary/classes/1/at/{{currentWednesday}}
 
 > {%
   client.test("Valid temporary timetable response", function() {
@@ -747,19 +821,68 @@ GET http://{{ip}}/timetables/temporary/classes/1/at/{{currentTuesday}}
     client.assert(entry2.subject.abbreviation === "M", "Subject abbreviation for entry 2 should be 'M'");
     client.assert(entry2.studentGroup.name === "A", "StudentGroup for entry 2 should be 'A'");
     client.assert(entry2.room.name === "Room 012", "Room for entry 2 should be 'Room 012'");
+  });
+%}
+
+### 20. View temporary timetable at thursday to compare != stable
+GET http://{{ip}}/timetables/temporary/classes/1/at/{{currentThursday}}
+
+> {%
+  client.test("Valid temporary timetable response", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+
+    const json = response.body;
+    client.assert(typeof json === "object", "The response should be a JSON object");
 
     client.assert(
-      json["5"] && json["5"]["5"],
-      "Expected structure for day 5, hour 5 is missing"
+      json["3"] && json["3"]["3"],
+      "Expected structure for day 3, hour 3 is missing or incorrect"
     );
 
-    const entry3 = json["5"]["5"];
-    client.assert(entry3.teacher.name === "David", "Teacher's name for entry 3 should be 'David'");
-    client.assert(entry3.teacher.surname === "Smith", "Teacher's surname for entry 3 should be 'Smith'");
-    client.assert(entry3.teacher.abbreviation === "DS", "Teacher's abbreviation for entry 3 should be 'DS'");
-    client.assert(entry3.subject.name === "Czech", "Subject for entry 3 should be 'Czech'");
-    client.assert(entry3.subject.abbreviation === "CZ", "Subject abbreviation for entry 3 should be 'CZ'");
-    client.assert(entry3.room.name === "Room 012", "Room for entry 3 should be 'Room 012'");
-    client.assert(entry3.type === "A", "Type for entry 3 should be 'A'");
+    const entry1 = json["3"]["3"];
+
+    client.assert(entry1.hasOwnProperty("lessonId"));
+    client.assert(entry1.hasOwnProperty("teacher"));
+    client.assert(entry1.hasOwnProperty("subject"));
+    client.assert(entry1.hasOwnProperty("room"));
+    client.assert(entry1.teacher.name === "David", "Teacher's name for entry should be 'David'");
+    client.assert(entry1.teacher.surname === "Smith", "Teacher's surname for entry should be 'Smith'");
+    client.assert(entry1.teacher.abbreviation === "DS", "Teacher's abbreviation for entry should be 'DS'");
+    client.assert(entry1.subject.name === "Czech", "Subject for entry should be 'Czech'");
+    client.assert(entry1.subject.abbreviation === "CZ", "Subject abbreviation for entry should be 'CZ'");
+    client.assert(entry1.room.name === "Room 012", "Room for entry should be 'Room 012'");
+  });
+%}
+
+### 21. Reset temporary entry with APPEND to default
+
+DELETE http://{{ip}}/timetables/temporary/at/{{currentThursday}}
+Content-Type: application/json
+
+{
+  "classId": {{classId}},
+  "hourInDay": 3
+}
+
+> {%
+  client.test("Status is 200", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+  });
+%}
+
+### 22. Check if reset is valid = delete append
+GET http://{{ip}}/timetables/temporary/classes/1/at/{{currentThursday}}
+
+> {%
+  client.test("Valid temporary timetable response", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+
+    const json = response.body;
+    client.assert(typeof json === "object", "The response should be a JSON object");
+
+    client.assert(
+      !json["3"],
+      "Structure has to be empty."
+    );
   });
 %}

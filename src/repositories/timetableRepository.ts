@@ -495,22 +495,21 @@ export async function deleteTEntryById(timetableEntryId: number): Promise<void> 
  * @param date - The date for which to find the timetable entry
  * @param classId - The ID of the class
  * @param hourInDay - The hour of the day
+ * @param studentGroupId
  * @param transaction - The database transaction to use
  * @returns The matching timetable entry or null if not found
  */
 export const findDefaultTimetableEntry = async (
   date: Date,
-  classId: number,
   hourInDay: number,
+  classId: number,
+  studentGroupId: number | null = null,
   transaction?: Transaction
 ): Promise<TimetableEntry | null> => {
-  // Get the day of week from the date (0 = Sunday, 1 = Monday, etc.)
-  const dayOfWeek = date.getDay();
-  // Convert to your system's convention if needed (e.g., if 1 = Monday, 2 = Tuesday, etc.)
-  const adjustedDayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek; // If you use 1-7 instead of 0-6
+  const dayOfWeek = (date.getDay() + 6) % 7;
 
-  // Find all timetable sets that are valid for the given date
-  const validTimetableSets = await TimetableSet.findAll({
+  // Find timetable set that is valid for the given date
+  const validTimetableSet = await TimetableSet.findOne({
     where: {
       validFrom: {
         [Op.lte]: date
@@ -522,31 +521,27 @@ export const findDefaultTimetableEntry = async (
     transaction
   });
 
-  if (!validTimetableSets || validTimetableSets.length === 0) {
+  if (!validTimetableSet) {
     return null;
   }
-
-  // Get all the valid timetable set IDs
-  const timetableSetIds = validTimetableSets.map((set) => set.timetableSetId);
 
   // Find timetable entries that match:
   // 1. The day of week
   // 2. The hour of day
   // 3. The class ID
   // 4. Are associated with one of the valid timetable sets
-  const timetableEntry = await TimetableEntry.findOne({
+  return await TimetableEntry.findOne({
     where: {
-      dayInWeek: adjustedDayOfWeek,
+      dayInWeek: dayOfWeek,
       hourInDay: hourInDay,
-      classId: classId
+      classId: classId,
+      studentGroupId: studentGroupId
     },
     include: [
       {
         model: TimetableSet,
         where: {
-          timetableSetId: {
-            [Op.in]: timetableSetIds
-          }
+          timetableSetId: validTimetableSet.timetableSetId
         },
         through: {
           attributes: [] // Ensure this only includes valid options; remove `model`
@@ -555,6 +550,4 @@ export const findDefaultTimetableEntry = async (
     ],
     transaction
   });
-
-  return timetableEntry;
 };

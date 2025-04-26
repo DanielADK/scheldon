@@ -1,13 +1,10 @@
 import {
   assignSubstitutionEntryToClassRegister,
-  checkAndRemoveUnusedSubstitutionEntry,
   classRegisterRecordDTO,
-  findClassRegisterById,
+  findClassRegisterByTimeAndClass,
   finishLessonRecord as finishLessonRecordInRepository,
   getCurrentLessonRecord,
-  getStudentsForLesson,
-  removeClassRegister,
-  resetToDefaultTimetable
+  getStudentsForLesson
 } from '@repositories/classRegisterRepository';
 import { AttendanceType } from '@models/types/AttendanceType';
 import { Attendance } from '@models/Attendance';
@@ -15,9 +12,10 @@ import { Student } from '@models/Student';
 import { getLessonAttendance } from '@repositories/attendanceRepository';
 import { ClassRegister } from '@models/ClassRegister';
 import { SubstitutionType } from '@models/types/SubstitutionType';
-import { findDefaultTimetableEntry } from '@repositories/timetableRepository';
 import { findSubstitutionEntryById } from '@repositories/substitutionEntryRepository';
 import { sequelize } from '../index';
+import { findDefaultTimetableEntry } from '@repositories/timetableRepository';
+import { getDayInWeek } from '@lib/timeLib';
 
 interface ClassRegisterExport {
   lesson: {
@@ -121,73 +119,97 @@ export const getCurrentLessonByLesson = async (lesson: ClassRegister): Promise<C
 /**
  * Assigns a substitution entry to a class register at a specific date
  *
+ * @param date
  * @param data - The data for assigning a substitution entry
  * @returns Promise<ClassRegister> - The created class register
  * @throws Error if the substitution entry doesn't exist
  */
 export const assignSubstitutionToClassRegister = async (date: Date, data: AssignSubstitutionDTO): Promise<ClassRegister> => {
-  // Find the substitution entry
-  const substitutionEntry = await findSubstitutionEntryById(data.substitutionEntryId);
+  const transaction = await sequelize.transaction();
 
-  if (!substitutionEntry) {
-    throw new Error('Substitution entry not found');
+  try {
+    // Find the substitution entry
+    const substitutionEntry = await findSubstitutionEntryById(data.substitutionEntryId, transaction);
+
+    if (!substitutionEntry) {
+      throw new Error('Substitution entry not found');
+    }
+
+    // Check if the substitution entry's date matches the provided date and dayInWeek
+    if (substitutionEntry.dayInWeek !== getDayInWeek(date)) {
+      throw new Error('Substitution entry does not match the provided date');
+    }
+
+    // Verify if time slot is not occupied
+    const existingEntry = await findClassRegisterByTimeAndClass(
+      date,
+      substitutionEntry.hourInDay,
+      substitutionEntry.classId,
+      substitutionEntry.studentGroupId,
+      transaction
+    );
+    if (existingEntry) {
+      throw new Error('Class is already occupied at the provided time.');
+    }
+
+    // Create class register with substitution entry
+    const cr = await assignSubstitutionEntryToClassRegister(
+      substitutionEntry,
+      {
+        substitutionEntryId: data.substitutionEntryId,
+        date: date,
+        substitutionType: data.substitutionType,
+        note: data.note
+      },
+      transaction
+    );
+    await transaction.commit();
+    return cr;
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
   }
-
-  // Create class register with substitution entry
-  return await assignSubstitutionEntryToClassRegister(substitutionEntry, {
-    substitutionEntryId: data.substitutionEntryId,
-    date: date,
-    substitutionType: data.substitutionType,
-    note: data.note
-  });
 };
 
 /**
- * Resets a class register to use its default timetable entry
- * by removing the substitution entry and finding the appropriate timetable entry
+ * Reset class register to default timetable entry
  *
- * @param lessonId - ID of the class register to reset
- * @returns The updated class register
+ * @param date The date for the class register
+ * @param data Information about the class register to reset
+ * @returns The updated class register or null if no changes were made
  */
-export const resetClassRegisterToDefault = async (lessonId: number) => {
+export const resetClassRegisterToDefault = async (
+  date: Date,
+  data: {
+    classId: number;
+    studentGroupId: number | null;
+    hourInDay: number;
+  }
+): Promise<ClassRegister | null> => {
   const transaction = await sequelize.transaction();
+
   try {
-    // Find the class register
-    const classRegister = await findClassRegisterById(lessonId, transaction);
+    // Find class register for the given parameters
+    const classRegister = await findClassRegisterByTimeAndClass(date, data.hourInDay, data.classId, data.studentGroupId, transaction);
 
     if (!classRegister) {
-      throw new Error(`Class register with ID ${lessonId} not found`);
+      throw new Error('Class register not found');
+    }
+    const entry = classRegister.getEntry();
+
+    // find default
+    const defaultTimetableEntry = await findDefaultTimetableEntry(date, entry.hourInDay, entry.classId, entry.studentGroupId, transaction);
+
+    // if default exists, reset to default timetable entry
+    if (defaultTimetableEntry) {
+      await classRegister.setEntry(defaultTimetableEntry);
+    } else {
+      // else destroy
+      await classRegister.destroy({ transaction: transaction });
     }
 
-    // If there's no substitution entry, nothing to reset
-    if (!classRegister.substitutionEntryId) {
-      return classRegister;
-    }
-
-    // Save the substitution ID before nulling it
-    const entry = !classRegister.substitutionEntry
-      ? classRegister.substitutionEntry
-      : await findSubstitutionEntryById(classRegister.substitutionEntryId, transaction);
-
-    if (!entry) {
-      throw new Error(`Substitution entry with ID ${classRegister.substitutionEntryId} not found`);
-    }
-
-    // Find the default timetable entry based on date, class, and hour
-    const defaultTimetableEntry = await findDefaultTimetableEntry(classRegister.date, entry.classId, entry.hourInDay, transaction);
-
-    if (!defaultTimetableEntry) {
-      await removeClassRegister(classRegister, transaction);
-      return null;
-    }
-
-    // Reset the class register - either with default timetable or just remove substitution
-    const updatedClassRegister = await resetToDefaultTimetable(classRegister, defaultTimetableEntry, transaction);
-
-    // Check if the substitution entry is used elsewhere, if not, remove it
-    await checkAndRemoveUnusedSubstitutionEntry(entry, transaction);
     await transaction.commit();
-    return updatedClassRegister;
+    return classRegister;
   } catch (error) {
     await transaction.rollback();
     throw error;

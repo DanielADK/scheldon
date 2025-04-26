@@ -231,43 +231,35 @@ export const findSubstitutionEntryById = async (id: number): Promise<Substitutio
  *
  * @param substitutionEntry
  * @param data - The data for creating a class register with substitution
+ * @param transaction
  * @returns Promise<ClassRegister> - The created class register
  * @throws Error if there is a conflict or validation fails
  */
 export const assignSubstitutionEntryToClassRegister = async (
   substitutionEntry: SubstitutionEntry,
-  data: AssignSubstitutionRepositoryDTO
+  data: AssignSubstitutionRepositoryDTO,
+  transaction?: Transaction
 ): Promise<ClassRegister> => {
-  const transaction = await sequelize.transaction();
-
-  try {
-    // Check if the substitution entry exists
-
-    if (!substitutionEntry) {
-      await transaction.rollback();
-      throw new Error('Substitution entry not found');
-    }
-
-    // Create the class register with the substitution entry
-    const classRegister = await ClassRegister.create(
-      {
-        substitutionEntryId: data.substitutionEntryId,
-        date: data.date,
-        substitutionType: data.substitutionType,
-        topic: null,
-        fillDate: null,
-        note: data.note || null,
-        timetableEntryId: null
-      } as ClassRegister,
-      { transaction }
-    );
-
-    await transaction.commit();
-    return classRegister;
-  } catch (error) {
-    await transaction.rollback();
-    throw error;
+  // Check if the substitution entry exists
+  if (!substitutionEntry) {
+    throw new Error('Substitution entry not found');
   }
+
+  // Create the class register with the substitution entry
+  const classRegister = await ClassRegister.create(
+    {
+      substitutionEntryId: data.substitutionEntryId,
+      date: data.date,
+      substitutionType: data.substitutionType,
+      topic: null,
+      fillDate: null,
+      note: data.note || null,
+      timetableEntryId: null
+    } as ClassRegister,
+    { transaction }
+  );
+
+  return classRegister;
 };
 
 /**
@@ -281,57 +273,6 @@ export const findClassRegisterById = async (lessonId: number, transaction: Trans
 };
 
 /**
- * Reset a class register to use the default timetable entry instead of substitution
- *
- * @param classRegister - ClassRegister object
- * @param timetableEntry - Timetable Entry object
- * @param transaction - Transaction object
- * @returns The updated class register
- */
-export const resetToDefaultTimetable = async (classRegister: ClassRegister, timetableEntry: TimetableEntry, transaction: Transaction) => {
-  await classRegister.update(
-    {
-      substitutionEntryId: null,
-      timetableEntryId: timetableEntry.timetableEntryId,
-      substitutionType: null,
-      topic: null,
-      fillDate: null,
-      note: null
-    },
-    { transaction }
-  );
-
-  return classRegister;
-};
-
-/**
- * Check if a substitution entry is used by any class registers
- * If not used, remove it from the database
- *
- * @param substitutionEntry - SubstitutionEntry object to check
- * @param transaction - Transaction object
- */
-export const checkAndRemoveUnusedSubstitutionEntry = async (substitutionEntry: SubstitutionEntry, transaction: Transaction) => {
-  if (!substitutionEntry.substitutionEntryId) return;
-
-  // Count usages of this substitution entry
-  const usageCount = await ClassRegister.count({
-    where: {
-      substitutionEntryId: substitutionEntry.substitutionEntryId
-    },
-    transaction
-  });
-
-  // If no longer used, delete the substitution entry
-  if (usageCount === 0) {
-    await SubstitutionEntry.destroy({
-      where: { substitutionEntryId: substitutionEntry.substitutionEntryId },
-      transaction
-    });
-  }
-};
-
-/**
  * Remove a class register within a transaction
  *
  * @param classRegister - The class register object to remove
@@ -340,4 +281,115 @@ export const checkAndRemoveUnusedSubstitutionEntry = async (substitutionEntry: S
  */
 export const removeClassRegister = async (classRegister: ClassRegister, transaction: Transaction): Promise<void> => {
   await classRegister.destroy({ transaction });
+};
+
+/**
+ * Find class register by time and class information
+ */
+export const findClassRegisterByTimeAndClass = async (
+  date: Date,
+  hourInDay: number,
+  classId: number,
+  studentGroupId: number | null = null,
+  transaction?: Transaction
+): Promise<ClassRegister | null> => {
+  return await ClassRegister.findOne({
+    where: {
+      date: date,
+      [Op.or]: [
+        {
+          '$timetableEntry.hourInDay$': hourInDay,
+          '$timetableEntry.classId$': classId,
+          ...(studentGroupId ? { '$timetableEntry.studentGroupId$': studentGroupId } : {})
+        },
+        {
+          '$substitutionEntry.hourInDay$': hourInDay,
+          '$substitutionEntry.classId$': classId,
+          ...(studentGroupId ? { '$substitutionEntry.studentGroupId$': studentGroupId } : {})
+        }
+      ]
+    },
+    include: [
+      {
+        model: TimetableEntry,
+        required: false
+      },
+      {
+        model: SubstitutionEntry,
+        required: false
+      }
+    ],
+    transaction
+  });
+};
+
+/**
+ * Create class register with a timetable entry
+ */
+export const createClassRegisterWithTimetableEntry = async (
+  date: Date,
+  timetableEntry: TimetableEntry,
+  transaction?: Transaction
+): Promise<ClassRegister> => {
+  return ClassRegister.create(
+    {
+      date: date,
+      timetableEntryId: timetableEntry.timetableEntryId,
+      substitutionEntryId: null,
+      substitutionType: null,
+      topic: null,
+      fillDate: null,
+      note: null
+    } as ClassRegister,
+    { transaction }
+  );
+};
+
+/**
+ * Reset class register to default timetable entry and remove substitution
+ */
+export const resetToDefaultTimetable = async (
+  classRegister: ClassRegister,
+  timetableEntry: TimetableEntry,
+  transaction: Transaction
+): Promise<ClassRegister> => {
+  classRegister.timetableEntryId = timetableEntry.timetableEntryId;
+  classRegister.substitutionEntryId = null;
+  await classRegister.save({ transaction });
+  return classRegister;
+};
+
+/**
+ * Check if a substitution entry is no longer used and remove it if so
+ */
+export const checkAndRemoveUnusedSubstitutionEntry = async (substitutionEntryId: number, transaction: Transaction): Promise<void> => {
+  const otherReferences = await ClassRegister.count({
+    where: { substitutionEntryId },
+    transaction
+  });
+
+  if (otherReferences === 0) {
+    await SubstitutionEntry.destroy({
+      where: { substitutionEntryId },
+      transaction
+    });
+  }
+};
+
+/**
+ * Update class register timetable entry
+ */
+export const updateClassRegisterTimetableEntry = async (
+  lessonId: number,
+  timetableEntryId: number,
+  transaction: Transaction
+): Promise<ClassRegister> => {
+  const classRegister = await ClassRegister.findByPk(lessonId, { transaction });
+  if (!classRegister) {
+    throw new Error(`Class register with ID ${lessonId} not found`);
+  }
+
+  classRegister.timetableEntryId = timetableEntryId;
+  await classRegister.save({ transaction });
+  return classRegister;
 };

@@ -5,6 +5,7 @@ import { Context } from 'koa';
 import Joi from 'joi';
 import { SubstitutionType } from '@models/types/SubstitutionType';
 import * as classRegisterService from '@services/classRegisterService';
+import { resetClassRegisterToDefault } from '@services/classRegisterService';
 
 export const substitutionTimetableEntrySchema = Joi.object({
   classId: Joi.number().integer().positive().required(),
@@ -33,6 +34,16 @@ export const assignSubstitutionSchema = Joi.object({
   note: Joi.string().max(2048).optional()
 });
 
+export const resetClassRegisterSchema = Joi.object({
+  classId: Joi.number().integer().positive().required(),
+  studentGroupId: Joi.number().integer().positive().allow(null),
+  hourInDay: Joi.number()
+    .integer()
+    .min(0)
+    .max(HOUR_COUNT - 1)
+    .required()
+});
+
 export const assignSubstitutionToClassRegister = async (ctx: Context): Promise<void> => {
   try {
     const dateStr = ctx.params.date;
@@ -55,13 +66,44 @@ export const assignSubstitutionToClassRegister = async (ctx: Context): Promise<v
 
     ctx.status = 201;
     ctx.body = {
-      message: 'Substitution entry successfully assigned to class register',
       lessonId: result.lessonId
     };
   } catch (error) {
     handleError(ctx, error);
   }
 };
+
+export const resetSubstitutionInClassRegister = async (ctx: Context): Promise<void> => {
+  try {
+    const dateStr = ctx.params.date;
+    const date = new Date(dateStr);
+
+    if (isNaN(date.getTime())) {
+      ctx.status = 400;
+      ctx.body = { error: 'Invalid date format' };
+      return;
+    }
+
+    const { error, value } = resetClassRegisterSchema.validate(ctx.request.body);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
+    const result = await resetClassRegisterToDefault(date, value);
+    if (!result) {
+      throw new Error('Lesson not found');
+    }
+
+    ctx.status = 200;
+    ctx.body = result;
+  } catch (error) {
+    handleError(ctx, error);
+  }
+};
+
 /**
  * Controller to handle submission entry creation and class register finding
  *

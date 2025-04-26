@@ -276,10 +276,10 @@ export async function deleteTEntryById(timetableEntryId: number): Promise<void> 
  *
  * @param {number} updateId - The unique identifier of the timetable set to be updated.
  * @param {Partial<TimetableSetDTO>} data - The partial data object to update the timetable set with.
- * @return {Promise<TimetableSetDTO>} A promise that resolves to the updated timetable set.
+ * @return {Promise<TimetableSet|null>} A promise that resolves to the updated timetable set.
  * @throws {Error} If no timetable set is found or no changes are made.
  */
-export async function updateTSet(updateId: number, data: Partial<TimetableSetDTO>) {
+export async function updateTSet(updateId: number, data: Partial<TimetableSetDTO>): Promise<TimetableSet | null> {
   const [count] = await timetableRepository.updateTSet(updateId, data);
 
   if (count === 0) {

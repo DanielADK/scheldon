@@ -75,26 +75,3 @@ export const getCurrentLessonByTeacherId = async (ctx: Context): Promise<void> =
     handleError(ctx, error);
   }
 };
-
-export const resetClassRegisterToDefault = async (ctx: Context): Promise<void> => {
-  try {
-    const { error, value } = resetClassRegisterSchema.validate(ctx.query);
-
-    if (error) {
-      ctx.status = 400;
-      ctx.body = { error: error.details[0].message };
-      return;
-    }
-
-    const lessonId = Number(value.lessonId);
-    const result = await classRegisterService.resetClassRegisterToDefault(lessonId);
-
-    ctx.status = 200;
-    ctx.body = {
-      message: 'Class register reset to default timetable',
-      data: result
-    };
-  } catch (error) {
-    handleError(ctx, error);
-  }
-};

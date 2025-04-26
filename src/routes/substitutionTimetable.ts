@@ -79,10 +79,55 @@ const router = new Router();
  *         - subjectId
  *         - teacherId
  *         - roomId
+ *
+ *     LessonEntry:
+ *       type: object
+ *       properties:
+ *         lessonId:
+ *           type: integer
+ *           example: 53
+ *         teacher:
+ *           type: object
+ *           properties:
+ *             name:
+ *               type: string
+ *               example: "David"
+ *             surname:
+ *               type: string
+ *               example: "Smith"
+ *             abbreviation:
+ *               type: string
+ *               example: "DS"
+ *         subject:
+ *           type: object
+ *           properties:
+ *             name:
+ *               type: string
+ *               example: "Czech"
+ *             abbreviation:
+ *               type: string
+ *               example: "CZ"
+ *         room:
+ *           type: object
+ *           properties:
+ *             name:
+ *               type: string
+ *               example: "Room 012"
+ *         type:
+ *           type: string
+ *           example: "A"
+ *
+ *     TimetableResponse:
+ *       type: array
+ *       description: Array representing days of the week (index 0-4 for Monday-Friday)
+ *       items:
+ *         type: array
+ *         description: Array representing hours in the day (index 0-n for periods/lessons)
+ *         items:
+ *           $ref: '#/components/schemas/LessonEntry'
  */
 
 /**
- * TODO: edit response schema
  * @openapi
  * /timetables/temporary/classes/{id}/at/{date}:
  *   get:
@@ -109,9 +154,7 @@ const router = new Router();
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/SubstitutionTimetableEntry'
+ *               $ref: '#/components/schemas/TimetableResponse'
  *       404:
  *         description: Class not found or no temporary timetable for this date
  */
@@ -182,12 +225,11 @@ router.post('/timetables/temporary/entries', createSubmissionEntryController);
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/SubstitutionTimetableEntry'
+ *               $ref: '#/components/schemas/TimetableResponse'
  *       404:
  *         description: Teacher not found or no temporary timetable for this date
  */
+
 router.get('/timetables/temporary/teachers/:id/at/:date', (ctx) =>
   getTimetableByIdAndDateController(ctx, substitutionEntryService.getTimetableByEmployeeIdAt)
 );
@@ -219,22 +261,21 @@ router.get('/timetables/temporary/teachers/:id/at/:date', (ctx) =>
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/SubstitutionTimetableEntry'
+ *               $ref: '#/components/schemas/TimetableResponse'
  *       404:
  *         description: Room not found or no temporary timetable for this date
  */
+
 router.get('/timetables/temporary/rooms/:id/at/:date', (ctx) =>
   getTimetableByIdAndDateController(ctx, substitutionEntryService.getTimetableByRoomIdAt)
 );
 
 /**
  * @openapi
- * /class-register/substitution:
+ * /timetables/temporary/at/{date}:
  *   post:
  *     tags:
- *       - Class register
+ *       - Substitution Timetable
  *     summary: Assign a substitution entry to a class register
  *     requestBody:
  *       required: true
@@ -292,4 +333,5 @@ router.get('/timetables/temporary/rooms/:id/at/:date', (ctx) =>
  */
 router.post('/timetables/temporary/at/:date', substitutionEntryController.assignSubstitutionToClassRegister);
 
+router.delete('/timetables/temporary/at/:date', substitutionEntryController.resetSubstitutionInClassRegister);
 export default router;
