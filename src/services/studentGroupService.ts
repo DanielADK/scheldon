@@ -3,7 +3,7 @@ import { Class } from '@models/Class';
 import { StudentGroup } from '@models/StudentGroup';
 import { Transaction } from 'sequelize';
 import * as studentGroupRepository from '@repositories/studentGroupRepository';
-import { studentGroupDTO } from '@repositories/studentGroupRepository';
+import { StudentGroupDTO } from '@repositories/studentGroupRepository';
 
 /**
  * Transfer studentGroups from existing Class to new Class
@@ -79,7 +79,7 @@ export const transferstudentGroupAssignments = async (
  * Create a new studentGroup
  * @param data
  */
-export const createstudentGroup = async (data: studentGroupDTO) => {
+export const createstudentGroup = async (data: StudentGroupDTO) => {
   return await studentGroupRepository.createstudentGroup(data);
 };
 
@@ -119,7 +119,7 @@ export const getstudentGroupsByCategoryId = async (categoryId: number) => {
  * @param studentGroupId
  * @param data
  */
-export const updatestudentGroup = async (studentGroupId: number, data: Partial<studentGroupDTO>): Promise<StudentGroup | null> => {
+export const updatestudentGroup = async (studentGroupId: number, data: Partial<StudentGroupDTO>): Promise<StudentGroup | null> => {
   const [count] = await studentGroupRepository.updatestudentGroup(studentGroupId, data);
 
   if (count === 0) {

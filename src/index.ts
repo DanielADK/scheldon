@@ -10,7 +10,7 @@ dotenv.config();
 
 const app = new Koa();
 const router = new Router();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT ?? 3000;
 
 // Initialize sequelize
 const sequelize = new Sequelize({
@@ -19,7 +19,7 @@ const sequelize = new Sequelize({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || '5432'),
+  port: parseInt(process.env.DB_PORT ?? '5432'),
   models: [__dirname + '/models']
 });
 

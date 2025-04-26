@@ -86,9 +86,9 @@ export class Room extends Model<Room> {
   @BeforeDestroy
   static async tryRemove(instance: Room) {
     await Promise.all([
-      await restrictOnDelete(Employee as { new (): Model } & typeof Model, 'roomId' as string as keyof Model, instance.roomId),
-      await restrictOnDelete(SubstitutionEntry as { new (): Model } & typeof Model, 'roomId' as string as keyof Model, instance.roomId),
-      await restrictOnDelete(TimetableEntry as { new (): Model } & typeof Model, 'roomId' as string as keyof Model, instance.roomId)
+      await restrictOnDelete(Employee as (new () => Model) & typeof Model, 'roomId' as string as keyof Model, instance.roomId),
+      await restrictOnDelete(SubstitutionEntry as (new () => Model) & typeof Model, 'roomId' as string as keyof Model, instance.roomId),
+      await restrictOnDelete(TimetableEntry as (new () => Model) & typeof Model, 'roomId' as string as keyof Model, instance.roomId)
     ]);
   }
 }

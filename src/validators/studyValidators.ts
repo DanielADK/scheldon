@@ -10,9 +10,7 @@ import { QueryOptions } from '@models/types/QueryOptions';
  * @param options
  */
 export const validatestudentGroupBelongsToClass: validator<Study> = async (instance: Study, options?: QueryOptions | null) => {
-  if (!instance.studentGroup) {
-    instance.studentGroup = await instance.$get('studentGroup', options || undefined);
-  }
+  instance.studentGroup ??= await instance.$get('studentGroup', options || undefined);
 
   if (instance.studentGroup && instance.studentGroup.classId !== instance.classId) {
     throw new Error('studentGroup must belong to the class');

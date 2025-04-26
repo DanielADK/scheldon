@@ -128,9 +128,7 @@ const findOrCreateSubstitutionEntry = async (data: SubstitutionEntryDTO, transac
   });
 
   // If no entry is found, create a new substitution entry
-  if (!sentry) {
-    sentry = await SubstitutionEntry.create(data as unknown as SubstitutionEntry, { transaction: transaction });
-  }
+  sentry ??= await SubstitutionEntry.create(data as unknown as SubstitutionEntry, { transaction: transaction });
 
   return sentry;
 };

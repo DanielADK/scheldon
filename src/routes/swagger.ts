@@ -26,7 +26,6 @@ router.get('/swagger.json', async (ctx) => {
   ctx.body = specs;
 });
 
-//router.get('/docs', koaSwagger(specs));
 router.get('/docs', koaSwagger({ routePrefix: false, swaggerOptions: { url: '/swagger.json' } }));
 
 export default router;

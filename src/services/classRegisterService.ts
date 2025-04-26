@@ -1,6 +1,6 @@
 import {
   assignSubstitutionEntryToClassRegister,
-  classRegisterRecordDTO,
+  ClassRegisterRecordDTO,
   findClassRegisterByTimeAndClass,
   finishLessonRecord as finishLessonRecordInRepository,
   getCurrentLessonRecord,
@@ -33,7 +33,7 @@ interface AssignSubstitutionDTO {
   note?: string;
 }
 
-export const finishLessonRecord = async (data: classRegisterRecordDTO): Promise<void> => {
+export const finishLessonRecord = async (data: ClassRegisterRecordDTO): Promise<void> => {
   return await finishLessonRecordInRepository(data);
 };
 

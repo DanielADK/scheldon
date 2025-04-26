@@ -151,7 +151,7 @@ export class TimetableEntry extends Model<TimetableEntry> {
   static async tryRemove(instance: TimetableEntry, options?: QueryOptions | null) {
     await Promise.all([
       await restrictOnDelete(
-        ClassRegister as { new (): Model } & typeof Model,
+        ClassRegister as (new () => Model) & typeof Model,
         'timetableEntryId' as string as keyof Model,
         instance.timetableEntryId,
         options

@@ -132,34 +132,30 @@ export const transformTimetable = async (timetable: TimeLessonEntry[], transform
   // Transform the results into a 2D object
   const timetable2D: TimetableExport = {};
 
+  // Helper function to process an individual entry
+  const processEntry = async (day: number, hour: number, lesson: SimpleLessonEntry) => {
+    const transformedLesson = lesson.substitutionType === SubstitutionType.DROPPED ? await droppedMask(lesson) : lesson;
+
+    if (Array.isArray(timetable2D[day][hour])) {
+      timetable2D[day][hour].push(transformedLesson);
+    } else if (timetable2D[day][hour]) {
+      timetable2D[day][hour] = [timetable2D[day][hour], transformedLesson];
+    } else {
+      timetable2D[day][hour] = transformedLesson;
+    }
+  };
+
   // Iterate over the timetable entries
   for (const entry of timetable) {
     const day = entry.dayInWeek;
     const hour = entry.hourInDay;
 
-    // If the day is not in the timetable, add it
     if (!(day in timetable2D)) {
       timetable2D[day] = {};
     }
 
-    // Add the entry to the timetable
     const lesson: SimpleLessonEntry = await transformerFunction(entry);
-
-    // check if the hour already contains an array, append to it
-    if (Array.isArray(timetable2D[day][hour])) {
-      timetable2D[day][hour].push(lesson.substitutionType === SubstitutionType.DROPPED ? await droppedMask(lesson) : lesson);
-    }
-    // if the hour has a single entry, convert to array and append the new entry
-    else if (timetable2D[day][hour]) {
-      timetable2D[day][hour] = [
-        timetable2D[day][hour],
-        lesson.substitutionType === SubstitutionType.DROPPED ? await droppedMask(lesson) : lesson
-      ];
-    }
-    // otherwise, simply set the entry
-    else {
-      timetable2D[day][hour] = lesson.substitutionType === SubstitutionType.DROPPED ? await droppedMask(lesson) : lesson;
-    }
+    await processEntry(day, hour, lesson);
   }
 
   return timetable2D;

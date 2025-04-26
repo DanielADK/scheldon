@@ -55,6 +55,6 @@ export class GroupCategory extends Model<GroupCategory> {
 
   @BeforeDestroy
   static async tryRemove(instance: GroupCategory) {
-    await restrictOnDelete(StudentGroup as { new (): Model } & typeof Model, 'categoryId' as string as keyof Model, instance.categoryId);
+    await restrictOnDelete(StudentGroup as (new () => Model) & typeof Model, 'categoryId' as string as keyof Model, instance.categoryId);
   }
 }

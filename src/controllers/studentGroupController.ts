@@ -1,20 +1,20 @@
 // Schema for creating and updating a studentGroup
 import Joi from 'joi';
 import * as studentGroupRepository from '@repositories/studentGroupRepository';
-import { studentGroupDTO, validateCategoryBelongsToSameClass } from '@repositories/studentGroupRepository';
+import { StudentGroupDTO, validateCategoryBelongsToSameClass } from '@repositories/studentGroupRepository';
 import * as groupCategoryService from '@services/groupCategoryService';
 import * as studentGroupService from '@services/studentGroupService';
 import { Context } from 'koa';
 import { getIdFromParam, handleError } from '../lib/controllerTools';
 import { Transaction } from 'sequelize';
 
-const studentGroupSchema: Joi.ObjectSchema<studentGroupDTO> = Joi.object({
+const studentGroupSchema: Joi.ObjectSchema<StudentGroupDTO> = Joi.object({
   name: Joi.string().required().min(1).max(100),
   classId: Joi.number().required(),
   categoryId: Joi.number().allow(null)
 });
 
-const updateStudentGroupSchema: Joi.ObjectSchema<studentGroupDTO> = Joi.object({
+const updateStudentGroupSchema: Joi.ObjectSchema<StudentGroupDTO> = Joi.object({
   name: Joi.string().min(1).max(100),
   categoryId: Joi.number()
 }).min(1);
@@ -189,7 +189,7 @@ export const deletestudentGroup = async (ctx: Context) => {
       return;
     }
 
-    const deleted = await studentGroupService.deletestudentGroup(studentGroupId as number);
+    const deleted = await studentGroupService.deletestudentGroup(studentGroupId);
 
     if (!deleted) {
       ctx.status = 404;

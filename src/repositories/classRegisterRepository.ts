@@ -1,6 +1,6 @@
 import { ClassRegister } from '@models/ClassRegister';
 import { Student } from '@models/Student';
-import { attendanceRecordDTO } from '@repositories/attendanceRepository';
+import { AttendanceRecordDTO } from '@repositories/attendanceRepository';
 import { sequelize } from '../index';
 import { Study } from '@models/Study';
 import { Class } from '@models/Class';
@@ -17,13 +17,13 @@ import { Subject } from '@models/Subject';
 import { Room } from '@models/Room';
 import { AssignSubstitutionRepositoryDTO } from '@controllers/classRegisterController';
 
-export interface classRegisterRecordDTO {
+export interface ClassRegisterRecordDTO {
   lessonId: number;
   topic: string;
-  studentAttendance: attendanceRecordDTO[];
+  studentAttendance: AttendanceRecordDTO[];
 }
 
-export const finishLessonRecord = async (data: classRegisterRecordDTO): Promise<void> => {
+export const finishLessonRecord = async (data: ClassRegisterRecordDTO): Promise<void> => {
   const transaction = await sequelize.transaction();
   // Find the lesson record
   const lessonRecord = await ClassRegister.findByPk(data.lessonId, {
@@ -82,7 +82,7 @@ export const getStudentsForLesson = async (lessonId: number): Promise<Student[]>
 
   // Determine the entry source (either TimetableEntry or ClassRegister itself)
   const entry = lesson.substitutionEntry ?? lesson.timetableEntry;
-  if (!entry || !entry.classId) {
+  if (!entry?.classId) {
     throw new Error('Lesson does not have a class assigned');
   }
 
@@ -253,7 +253,7 @@ export const assignSubstitutionEntryToClassRegister = async (
       substitutionType: data.substitutionType,
       topic: null,
       fillDate: null,
-      note: data.note || null,
+      note: data.note ?? null,
       timetableEntryId: null
     } as ClassRegister,
     { transaction }

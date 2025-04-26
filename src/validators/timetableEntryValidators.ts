@@ -10,11 +10,11 @@ import { Op } from 'sequelize';
  * Throws an error if timetableSets cannot be loaded or are empty
  */
 const ensureTimetableSetsLoaded = async (instance: TimetableEntry, options?: QueryOptions | null): Promise<TimetableSet[]> => {
-  if (!instance.timetableSets || !instance.timetableSets.length) {
+  if (!instance.timetableSets?.length) {
     instance.timetableSets = await instance.$get('timetableSets', options || undefined);
   }
 
-  if (!instance.timetableSets || !instance.timetableSets.length) {
+  if (!instance.timetableSets?.length) {
     throw new Error('Timetable set not found');
   }
 
@@ -46,9 +46,7 @@ export const validateStudentGroupInClass: validator<TimetableEntry> = async (
   instance: TimetableEntry,
   options?: QueryOptions | null
 ): Promise<void> => {
-  if (!instance.studentGroup) {
-    instance.studentGroup = await instance.$get('studentGroup', options || undefined);
-  }
+  instance.studentGroup ??= await instance.$get('studentGroup', options || undefined);
   if (instance.studentGroup && instance.classId !== instance.studentGroup.classId) {
     throw new Error('studentGroup is not in the class');
   }

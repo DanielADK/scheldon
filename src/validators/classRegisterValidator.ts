@@ -52,9 +52,7 @@ const getEntryInfo = async (
 }> => {
   // For TimetableEntry
   if (instance.timetableEntryId) {
-    if (!instance.timetableEntry) {
-      instance.timetableEntry = await instance.$get('timetableEntry', options || undefined);
-    }
+    instance.timetableEntry ??= await instance.$get('timetableEntry', options || undefined);
     if (!instance.timetableEntry) {
       throw new Error('Timetable entry not found');
     }
@@ -71,9 +69,7 @@ const getEntryInfo = async (
 
   // For SubstitutionEntry
   if (instance.substitutionEntryId) {
-    if (!instance.substitutionEntry) {
-      instance.substitutionEntry = await instance.$get('substitutionEntry', options || undefined);
-    }
+    instance.substitutionEntry ??= await instance.$get('substitutionEntry', options || undefined);
     if (!instance.substitutionEntry) {
       throw new Error('Substitution entry not found');
     }
@@ -114,7 +110,7 @@ export const validateTeacherAvailability: validator<ClassRegister> = async (
       where: {
         date: entryInfo.date,
         substitutionEntryId: {
-          [Op.ne]: instance.substitutionEntryId || 0 // Exclude the current entry
+          [Op.ne]: instance.substitutionEntryId ?? 0 // Exclude the current entry
         }
       },
       include: [
@@ -161,7 +157,7 @@ export const validateTeacherAvailability: validator<ClassRegister> = async (
       where: {
         ...whereConditions,
         timetableEntryId: {
-          [Op.ne]: instance.timetableEntryId || 0 // Exclude the current entry
+          [Op.ne]: instance.timetableEntryId ?? 0 // Exclude the current entry
         }
       },
       ...options
@@ -222,7 +218,7 @@ export const validateRoomAvailability: validator<ClassRegister> = async (
       where: {
         ...whereConditions,
         timetableEntryId: {
-          [Op.ne]: instance.timetableEntryId || 0 // Exclude the current entry
+          [Op.ne]: instance.timetableEntryId ?? 0 // Exclude the current entry
         }
       },
       ...options
@@ -290,7 +286,7 @@ export const validateClassAvailability: validator<ClassRegister> = async (
       where: {
         ...whereConditions,
         timetableEntryId: {
-          [Op.ne]: instance.timetableEntryId || 0 // Exclude the current entry
+          [Op.ne]: instance.timetableEntryId ?? 0 // Exclude the current entry
         }
       },
       ...options
@@ -356,7 +352,7 @@ export const validateStudentGroupAvailability: validator<ClassRegister> = async 
       where: {
         ...whereConditions,
         timetableEntryId: {
-          [Op.ne]: instance.timetableEntryId || 0 // Exclude the current entry
+          [Op.ne]: instance.timetableEntryId ?? 0 // Exclude the current entry
         }
       },
       ...options

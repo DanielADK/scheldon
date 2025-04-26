@@ -92,14 +92,14 @@ export class StudentGroup extends Model<StudentGroup> {
   @BeforeDestroy
   static async tryRemove(instance: StudentGroup) {
     await Promise.all([
-      await restrictOnDelete(Study as { new (): Model } & typeof Model, 'studentGroupId' as string as keyof Model, instance.studentGroupId),
+      await restrictOnDelete(Study as (new () => Model) & typeof Model, 'studentGroupId' as string as keyof Model, instance.studentGroupId),
       await restrictOnDelete(
-        TimetableEntry as { new (): Model } & typeof Model,
+        TimetableEntry as (new () => Model) & typeof Model,
         'studentGroupId' as string as keyof Model,
         instance.studentGroupId
       ),
       await restrictOnDelete(
-        SubstitutionEntry as { new (): Model } & typeof Model,
+        SubstitutionEntry as (new () => Model) & typeof Model,
         'studentGroupId' as string as keyof Model,
         instance.studentGroupId
       )

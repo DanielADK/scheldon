@@ -2,7 +2,7 @@ import { Attendance } from '@models/Attendance';
 import { Student } from '@models/Student';
 import { AttendanceType } from '@models/types/AttendanceType';
 
-export interface attendanceRecordDTO {
+export interface AttendanceRecordDTO {
   studentId: number;
   attendance: AttendanceType;
 }

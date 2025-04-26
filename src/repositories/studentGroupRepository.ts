@@ -5,7 +5,7 @@ import * as groupCategoryService from '@services/groupCategoryService';
 /**
  * studentGroupDTO interface
  */
-export interface studentGroupDTO {
+export interface StudentGroupDTO {
   name: string;
   classId: number;
   categoryId?: number;
@@ -15,7 +15,7 @@ export interface studentGroupDTO {
  * Create a new studentGroup
  * @param data
  */
-export const createstudentGroup = async (data: studentGroupDTO): Promise<StudentGroup> => {
+export const createstudentGroup = async (data: StudentGroupDTO): Promise<StudentGroup> => {
   return await StudentGroup.create(data as StudentGroup);
 };
 
@@ -62,7 +62,7 @@ export const getstudentGroupsByCategoryId = async (categoryId: number): Promise<
  */
 export const updatestudentGroup = async (
   studentGroupId: number,
-  data: Partial<studentGroupDTO>,
+  data: Partial<StudentGroupDTO>,
   transaction?: Transaction | null
 ): Promise<[affectedRows: number, updatedStudentGroups: StudentGroup[]]> => {
   return await StudentGroup.update(data, {

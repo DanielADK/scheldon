@@ -116,7 +116,7 @@ export class ClassRegister extends Model<ClassRegister> {
   static async tryRemove(instance: ClassRegister, options?: QueryOptions | null) {
     await Promise.all([
       await restrictOnDelete(
-        Attendance as { new (): Model } & typeof Model, // No need for complex casting
+        Attendance as { new () => Model } & typeof Model, // No need for complex casting
         'classRegisterId', // Use the actual column name without casting
         instance.lessonId,
         options

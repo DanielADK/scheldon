@@ -36,10 +36,10 @@ export const findOrCreateSubstitutionEntry = async (
   data: SubstitutionTimetableEntryDTO,
   transaction: Transaction
 ): Promise<SubstitutionEntry> => {
-  const [entry, created] = await SubstitutionEntry.findOrCreate({
+  const [entry] = await SubstitutionEntry.findOrCreate({
     where: {
       classId: data.classId,
-      studentGroupId: data.studentGroupId || null,
+      studentGroupId: data.studentGroupId ?? null,
       dayInWeek: data.dayInWeek,
       hourInDay: data.hourInDay,
       subjectId: data.subjectId,
@@ -48,7 +48,7 @@ export const findOrCreateSubstitutionEntry = async (
     },
     defaults: {
       classId: data.classId,
-      studentGroupId: data.studentGroupId || null,
+      studentGroupId: data.studentGroupId ?? null,
       dayInWeek: data.dayInWeek,
       hourInDay: data.hourInDay,
       subjectId: data.subjectId,

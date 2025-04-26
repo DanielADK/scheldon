@@ -124,7 +124,7 @@ export class Study extends Model<Study> {
   @BeforeDestroy
   static async tryRemove(instance: StudentGroup) {
     await restrictOnDelete(
-      StudentGroup as { new (): Model } & typeof Model,
+      StudentGroup as (new () => Model) & typeof Model,
       'studentGroupId' as string as keyof Model,
       instance.studentGroupId
     );
