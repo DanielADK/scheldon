@@ -154,9 +154,9 @@ const router = new Router();
  *         error:
  *           type: string
  *           description: Error message
- *           example: "not found"
+ *           example: "Timetable not found"
  *       example:
- *         error: "not found"
+ *         error: "Timetable not found"
  */
 
 /**
