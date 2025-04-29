@@ -8,6 +8,19 @@ const router = new Router();
  * @openapi
  * components:
  *   schemas:
+ *     ErrorResponse:
+ *       type: object
+ *       properties:
+ *         message:
+ *           type: string
+ *           example: "Invalid request parameters"
+ *         status:
+ *           type: integer
+ *           example: 400
+ *       required:
+ *         - message
+ *         - status
+ *
  *     TimetableEntryDTO:
  *       type: object
  *       properties:
@@ -59,6 +72,7 @@ const router = new Router();
  *         - name
  *         - validFrom
  *         - validTo
+ *
  *     TimetableEntry:
  *       type: object
  *       properties:
@@ -95,6 +109,67 @@ const router = new Router();
  *         - hourInDay
  *         - subjectId
  *         - teacherId
+ *
+ *     TTTeacher:
+ *       type: object
+ *       required:
+ *         - name
+ *         - surname
+ *         - abbreviation
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Teacher's first name
+ *           example: Jane
+ *         surname:
+ *           type: string
+ *           description: Teacher's last name
+ *           example: Smith
+ *         abbreviation:
+ *           type: string
+ *           description: Teacher's abbreviation/code
+ *           example: JS
+ *     TTSubject:
+ *       type: object
+ *       required:
+ *         - name
+ *         - abbreviation
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Name of the subject
+ *           example: Math
+ *         abbreviation:
+ *           type: string
+ *           description: Subject abbreviation/code
+ *           example: M
+ *     TTRoom:
+ *       type: object
+ *       required:
+ *         - name
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Room identifier
+ *           example: Room 241
+ *     TTLesson:
+ *       type: object
+ *       properties:
+ *         teacher:
+ *           $ref: '#/components/schemas/TTTeacher'
+ *         subject:
+ *           $ref: '#/components/schemas/TTSubject'
+ *         room:
+ *           $ref: '#/components/schemas/TTRoom'
+ *     TimetableResponse:
+ *       type: array
+ *       description: Array representing days of the week (index 0-6 for Monday-Sunday)
+ *       items:
+ *         type: array
+ *         description: Array representing hours in the day (index 0-n for periods/lessons)
+ *         items:
+ *           $ref: '#/components/schemas/TTLesson'
+ *
  *     TimetableSet:
  *       type: object
  *       properties:
@@ -119,6 +194,20 @@ const router = new Router();
  *         - validTo
  */
 
+// Timetable Sets Endpoints
+/**
+ * @openapi
+ * /timetables/stable/sets:
+ *   get:
+ *     tags:
+ *       - Stable Timetable
+ *     summary: Get all timetable sets
+ *     responses:
+ *       200:
+ *         description: List of all timetable sets retrieved successfully
+ */
+router.get('/timetables/stable/sets', (ctx) => timetableController.getAllSets(ctx));
+
 /**
  * @openapi
  * /timetables/stable/sets:
@@ -138,101 +227,12 @@ const router = new Router();
  *         description: Timetable set created
  *       400:
  *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/timetables/stable/sets', timetableController.createTSet);
-
-/**
- * @openapi
- * /timetables/stable/sets:
- *   get:
- *     tags:
- *       - Stable Timetable
- *     summary: Get all timetable sets
- *     responses:
- *       200:
- *         description: List of all timetable sets retrieved successfully
- */
-router.get('/timetables/stable/sets', (ctx) => timetableController.getAllSets(ctx));
-
-/**
- * @openapi
- * /timetables/stable/sets/{id}:
- *   delete:
- *     tags:
- *       - Stable Timetable
- *     summary: Delete a timetable set by ID
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *           example: 1
- *         description: ID of the timetable set to delete
- *     responses:
- *       204:
- *         description: Timetable set deleted successfully
- *       400:
- *         description: Timetable set not found
- *       409:
- *         description: Cannot delete timetable set because it has entries
- */
-router.delete('/timetables/stable/sets/:id', timetableController.deleteTSet);
-
-/**
- * @openapi
- * /timetables/stable/sets/{id}/entries:
- *   post:
- *     tags:
- *       - Stable Timetable
- *     summary: Create a new timetable entry for a specific timetable set
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *           example: 1
- *         description: ID of the timetable set
- *     requestBody:
- *       description: Timetable entry details
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/TimetableEntryDTO'
- *     responses:
- *       200:
- *         description: Timetable entry found
- *       201:
- *         description: Timetable entry created
- *       400:
- *         description: Bad request or Timetable set not found
- */
-router.post('/timetables/stable/sets/:id/entries', timetableController.createTEntry);
-
-/**
- * @openapi
- * /timetables/stable/sets/{id}/entries:
- *   get:
- *     tags:
- *       - Stable Timetable
- *     summary: Get all timetable entries in a specific timetable set
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *           example: 1
- *         description: ID of the timetable set
- *     responses:
- *       200:
- *         description: List of all timetable entries in the specified set retrieved successfully
- *       400:
- *         description: Timetable set not found or no entries found
- */
-router.get('/timetables/stable/sets/:id/entries', (ctx) => timetableController.getEntriesBySet(ctx));
 
 /**
  * @openapi
@@ -258,6 +258,10 @@ router.get('/timetables/stable/sets/:id/entries', (ctx) => timetableController.g
  *               $ref: '#/components/schemas/TimetableSet'
  *       400:
  *         description: Timetable set not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get('/timetables/stable/sets/:id', timetableController.getTimetableSetById);
 
@@ -288,8 +292,109 @@ router.get('/timetables/stable/sets/:id', timetableController.getTimetableSetByI
  *         description: Timetable set updated successfully
  *       400:
  *         description: Bad request or timetable set not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.put('/timetables/stable/sets/:id', timetableController.updateTSet);
+
+/**
+ * @openapi
+ * /timetables/stable/sets/{id}:
+ *   delete:
+ *     tags:
+ *       - Stable Timetable
+ *     summary: Delete a timetable set by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: ID of the timetable set to delete
+ *     responses:
+ *       204:
+ *         description: Timetable set deleted successfully
+ *       400:
+ *         description: Timetable set not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       409:
+ *         description: Cannot delete timetable set because it has entries
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.delete('/timetables/stable/sets/:id', timetableController.deleteTSet);
+
+// Timetable Entries Endpoints
+/**
+ * @openapi
+ * /timetables/stable/sets/{id}/entries:
+ *   get:
+ *     tags:
+ *       - Stable Timetable
+ *     summary: Get all timetable entries in a specific timetable set
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: ID of the timetable set
+ *     responses:
+ *       200:
+ *         description: List of all timetable entries in the specified set retrieved successfully
+ *       400:
+ *         description: Timetable set not found or no entries found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.get('/timetables/stable/sets/:id/entries', (ctx) => timetableController.getEntriesBySet(ctx));
+
+/**
+ * @openapi
+ * /timetables/stable/sets/{id}/entries:
+ *   post:
+ *     tags:
+ *       - Stable Timetable
+ *     summary: Create a new timetable entry for a specific timetable set
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: ID of the timetable set
+ *     requestBody:
+ *       description: Timetable entry details
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/TimetableEntryDTO'
+ *     responses:
+ *       200:
+ *         description: Timetable entry found
+ *       201:
+ *         description: Timetable entry created
+ *       400:
+ *         description: Bad request or Timetable set not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.post('/timetables/stable/sets/:id/entries', timetableController.createTEntry);
 
 /**
  * @openapi
@@ -315,6 +420,10 @@ router.put('/timetables/stable/sets/:id', timetableController.updateTSet);
  *               $ref: '#/components/schemas/TimetableEntryDTO'
  *       400:
  *         description: Timetable entry not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get('/timetables/stable/entries/:id', timetableController.getTimetableEntryById);
 
@@ -338,9 +447,14 @@ router.get('/timetables/stable/entries/:id', timetableController.getTimetableEnt
  *         description: Timetable entry deleted successfully
  *       400:
  *         description: Timetable set or entry not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.delete('/timetables/stable/entries/:id', timetableController.deleteTEntry);
 
+// Class Timetable Endpoints
 /**
  * @openapi
  * /timetables/stable/classes/{id}:
@@ -359,8 +473,22 @@ router.delete('/timetables/stable/entries/:id', timetableController.deleteTEntry
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TimetableResponse'
+ *       400:
+ *         description: Timetable not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Timetable not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get('/timetables/stable/classes/:id', (ctx) => getTimetableByIdController(ctx, timetableService.getTimetableByClassId));
 
@@ -389,15 +517,28 @@ router.get('/timetables/stable/classes/:id', (ctx) => getTimetableByIdController
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TimetableResponse'
  *       400:
  *         description: Invalid date format. Use YYYY-MM-DD format.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
- *         description: Timetable not found for the given ID and date
+ *         description: Timetable not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get('/timetables/stable/classes/:id/at/:date', (ctx) =>
   getTimetableByIdAndDateController(ctx, timetableService.getTimetableByClassIdAt)
 );
 
+// Teacher Timetable Endpoints
 /**
  * @openapi
  * /timetables/stable/teachers/{id}:
@@ -416,8 +557,22 @@ router.get('/timetables/stable/classes/:id/at/:date', (ctx) =>
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TimetableResponse'
+ *       400:
+ *         description: Timetable not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Timetable not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get('/timetables/stable/teachers/:id', (ctx) => getTimetableByIdController(ctx, timetableService.getTimetableByEmployeeId));
 
@@ -446,18 +601,62 @@ router.get('/timetables/stable/teachers/:id', (ctx) => getTimetableByIdControlle
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TimetableResponse'
  *       400:
- *         description: Timetable not found
+ *         description: Invalid date format
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
- *         description: Timetable not found for the given ID and date
+ *         description: Timetable not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get('/timetables/stable/teachers/:id/at/:date', (ctx) =>
   getTimetableByIdAndDateController(ctx, timetableService.getTimetableByEmployeeIdAt)
 );
 
+// Room Timetable Endpoints
 /**
  * @openapi
  * /timetables/stable/rooms/{id}:
+ *   get:
+ *     tags:
+ *       - Stable Timetable
+ *     summary: Get timetable by room ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: ID of the room
+ *     responses:
+ *       200:
+ *         description: Timetable retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TimetableResponse'
+ *       404:
+ *         description: Timetable not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.get('/timetables/stable/rooms/:id', (ctx) => getTimetableByIdController(ctx, timetableService.getTimetableByRoomId));
+
+/**
+ * @openapi
+ * /timetables/stable/rooms/{id}/at/{date}:
  *   get:
  *     tags:
  *       - Stable Timetable
@@ -480,40 +679,22 @@ router.get('/timetables/stable/teachers/:id/at/:date', (ctx) =>
  *     responses:
  *       200:
  *         description: Timetable retrieved successfully
- *       404:
- *         description: Timetable not found
- */
-router.get('/timetables/stable/rooms/:id', (ctx) => getTimetableByIdController(ctx, timetableService.getTimetableByRoomId));
-
-/**
- * @openapi
- * /timetables/stable/rooms/{id}/at/{date}:
- *   get:
- *     tags:
- *       - Stable Timetable
- *     summary: Get current timetable by room ID and date
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *           example: 1
- *         description: ID of the room
- *       - in: path
- *         name: date
- *         required: true
- *         schema:
- *           type: string
- *           example: 2024-01-01
- *         description: date in week of the timetable
- *     responses:
- *       200:
- *         description: Timetable retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/TimetableResponse'
  *       400:
- *         description: Timetable not found
+ *         description: Invalid date format
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
- *         description: Timetable not found for the given ID and date
+ *         description: Timetable not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get('/timetables/stable/rooms/:id/at/:date', (ctx) =>
   getTimetableByIdAndDateController(ctx, timetableService.getTimetableByRoomIdAt)

@@ -23,11 +23,11 @@ const router = new Router();
  *         validFrom:
  *           type: string
  *           format: date-time
- *           example: "2024-01-01T08:00:00Z"
+ *           example: "2024-01-01"
  *         validTo:
  *           type: string
  *           format: date-time
- *           example: "2024-06-30T15:00:00Z"
+ *           example: "2024-06-30"
  *       required:
  *         - studentId
  *         - classId
@@ -46,13 +46,13 @@ const router = new Router();
  *           type: string
  *           format: date-time
  *           description: (Optional) The start date of the assignment
- *           example: "2024-01-01T08:00:00Z"
+ *           example: "2024-01-01"
  *           default: now
  *         validTo:
  *           type: string
  *           format: date-time
  *           description: (Optional) The end date of the assignment
- *           example: "2024-06-30T15:00:00Z"
+ *           example: "2024-06-30"
  *           default: class default
  *       required:
  *         - classId
@@ -71,7 +71,7 @@ const router = new Router();
  *           type: string
  *           format: date-time
  *           description: (Optional) The end date of the assignment
- *           example: "2024-06-30T15:00:00Z"
+ *           example: "2024-06-30"
  *           default: now
  *       required:
  *         - classId
