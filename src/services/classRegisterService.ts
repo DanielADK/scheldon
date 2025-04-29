@@ -272,7 +272,7 @@ export const mergeSubstitution = async (
   // Destroy all class registers
   await ClassRegister.destroy({
     where: {
-      id: toMerge.map((cr) => cr.id)
+      lessonId: toMerge.map((cr) => cr.lessonId)
     },
     transaction
   });
@@ -281,7 +281,7 @@ export const mergeSubstitution = async (
   const sentry = await findOrCreateSubstitutionEntry(
     {
       classId: entry.classId,
-      studentGroupId: entry.studentGroupId ?? null,
+      studentGroupId: null,
       dayInWeek: entry.dayInWeek,
       hourInDay: entry.hourInDay,
       subjectId: entry.subjectId,

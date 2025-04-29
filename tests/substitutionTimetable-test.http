@@ -890,7 +890,7 @@ GET http://{{ip}}/timetables/temporary/classes/{{classId2}}/at/{{currentThursday
 Content-Type: application/json
 
 > {%
-  client.test("Second class lesson", function () {
+  client.test("Get lessonId to drop", function () {
     client.assert(response.status === 200, "Expected status 200, but got " + response.status);
 
     const json = response.body;
@@ -933,7 +933,7 @@ GET http://{{ip}}/timetables/temporary/classes/{{classId2}}/at/{{currentThursday
 Content-Type: application/json
 
 > {%
-  client.test("Second class lesson - dropped", function() {
+  client.test("Check dropped lesson", function() {
     client.assert(response.status === 200, "Expected status 200, but got " + response.status);
 
     const json = response.body;
@@ -960,7 +960,82 @@ Content-Type: application/json
     client.assert(entry2.subject.abbreviation === "M", "Subject abbreviation for second entry should be 'M'");
     client.assert(entry2.room.name === "Room 241", "Room name for second entry should be 'Room 241'");
     client.assert(entry2.type === "D", "Second entry type should be 'D' (Dropped)");
+  })
+%}
 
-    client.global.set("lessonId", entry1.lessonId);
+### 26. Get lesson to merge
+GET http://{{ip}}/timetables/temporary/classes/{{classId}}/at/{{currentWednesday}}
+Content-Type: application/json
+
+> {%
+  client.test("Get lessonId to merge", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+
+    const json = response.body;
+    client.assert(json["2"] && json["2"]["2"], "Expected structure for day 2, hour 2 is missing or incorrect");
+    const timetableEntries = json["2"]["2"];
+    const entry1 = timetableEntries[0];
+    const entry2 = timetableEntries[1];
+
+    client.assert(entry1.teacher.name === "Jane", "Teacher's name for first entry should be 'Jane'");
+    client.assert(entry1.teacher.surname === "Smith", "Teacher's surname for first entry should be 'Smith'");
+    client.assert(entry1.teacher.abbreviation === "JS", "Teacher's abbreviation for first entry should be 'JS'");
+    client.assert(entry1.subject.name === "Advanced JavaScript", "Subject for first entry should be 'Advanced JavaScript'");
+    client.assert(entry1.subject.abbreviation === "AJS", "Subject abbreviation for first entry should be 'AJS'");
+    client.assert(entry1.studentGroup.name === "B", "StudentGroup for first entry should be 'B'");
+    client.assert(entry1.room.name === "Room 241", "Room name for first entry should be 'Room 241'");
+
+    client.assert(entry2.teacher.name === "David", "Teacher's name for second entry should be 'David'");
+    client.assert(entry2.teacher.surname === "Smith", "Teacher's surname for second entry should be 'Smith'");
+    client.assert(entry2.teacher.abbreviation === "DS", "Teacher's abbreviation for second entry should be 'DS'");
+    client.assert(entry2.subject.name === "Math", "Subject name for second entry should be 'Math'");
+    client.assert(entry2.subject.abbreviation === "M", "Subject abbreviation for second entry should be 'M'");
+    client.assert(entry2.studentGroup.name === "A", "StudentGroup for second entry should be 'A'");
+    client.assert(entry2.room.name === "Room 012", "Room name for second entry should be 'Room 012'");
+
+    client.global.set("lessonId2", entry1.lessonId);
+  })
+%}
+
+### 27. Merge lessons
+PUT http://{{ip}}/timetables/temporary/at/{{currentWednesday}}
+Content-Type: application/json
+
+{
+  "lessonId": {{lessonId2}},
+  "substitutionType": "M"
+}
+
+> {%
+  client.test("Merge groups and lessons", function () {
+    client.assert(response.status === 201, "Expected status 201, but got " + response.status);
+
+    const json = response.body;
+    client.assert(json.hasOwnProperty("lessonId"));
+    client.assert(typeof json.lessonId === "number", "lessonId should be a number");
+    client.global.set("lessonId2", json.lessonId);
+  })
+ %}
+
+### 28. Check if lesson is dropped
+GET http://{{ip}}/timetables/temporary/classes/{{classId}}/at/{{currentWednesday}}
+Content-Type: application/json
+
+> {%
+  client.test("Check dropped lesson", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+
+    const json = response.body;
+    client.assert(json["2"] && json["2"]["2"], "Expected structure for day 2, hour 2 is missing or incorrect");
+
+    const entry = json["2"]["2"];
+    client.assert(entry.lessonId === 57, "LessonId should be 57");
+    client.assert(entry.teacher.name === "Jane", "Teacher's name should be 'Jane'");
+    client.assert(entry.teacher.surname === "Smith", "Teacher's surname should be 'Smith'");
+    client.assert(entry.teacher.abbreviation === "JS", "Teacher's abbreviation should be 'JS'");
+    client.assert(entry.subject.name === "Advanced JavaScript", "Subject name should be 'Advanced JavaScript'");
+    client.assert(entry.subject.abbreviation === "AJS", "Subject abbreviation should be 'AJS'");
+    client.assert(entry.room.name === "Room 241", "Room name should be 'Room 241'");
+    client.assert(entry.type === "M", "Entry type should be 'M' (Merged)");
   })
 %}

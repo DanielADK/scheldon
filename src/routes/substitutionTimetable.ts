@@ -117,7 +117,7 @@ const router = new Router();
  *           type: string
  *           example: "A"
  *
- *     TimetableResponse:
+ *     SubstitutionTimetableResponse:
  *       type: array
  *       description: Array representing days of the week (index 0-4 for Monday-Friday)
  *       items:
@@ -186,7 +186,7 @@ const router = new Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/TimetableResponse'
+ *               $ref: '#/components/schemas/SubstitutionTimetableResponse'
  *       400:
  *         description: Class not found or no temporary timetable for this date
  *         content:
@@ -265,7 +265,7 @@ router.post('/timetables/temporary/entries', createSubmissionEntryController);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/TimetableResponse'
+ *               $ref: '#/components/schemas/SubstitutionTimetableResponse'
  *       400:
  *         description: Invalid request parameters
  *         content:
@@ -305,7 +305,7 @@ router.get('/timetables/temporary/teachers/:id/at/:date', (ctx) =>
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/TimetableResponse'
+ *               $ref: '#/components/schemas/SubstitutionTimetableResponse'
  *       400:
  *         description: Invalid request parameters
  *         content:
@@ -324,7 +324,7 @@ router.get('/timetables/temporary/rooms/:id/at/:date', (ctx) =>
  *   post:
  *     tags:
  *       - Substitution Timetable
- *     summary: Assign a substitution entry to a class register
+ *     summary: Appends a substitution to a class register
  *     parameters:
  *       - in: path
  *         name: date
@@ -380,7 +380,7 @@ router.post('/timetables/temporary/at/:date', substitutionEntryController.append
  *   put:
  *     tags:
  *       - Substitution Timetable
- *     summary: Update a substitution entry for a class register
+ *     summary: Update a substitution for a class register
  *     parameters:
  *       - in: path
  *         name: date
@@ -416,7 +416,7 @@ router.post('/timetables/temporary/at/:date', substitutionEntryController.append
  *                 example: "Teachers illness"
  *     responses:
  *       200:
- *         description: Substitution entry successfully updated
+ *         description: Substitution successfully updated
  *         content:
  *           application/json:
  *             schema:
@@ -424,7 +424,7 @@ router.post('/timetables/temporary/at/:date', substitutionEntryController.append
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Substitution entry successfully updated"
+ *                   example: "Substitution successfully updated"
  *                 lessonId:
  *                   type: integer
  *                   example: 456
