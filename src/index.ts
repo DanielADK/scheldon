@@ -23,13 +23,36 @@ const sequelize = new Sequelize({
   models: [__dirname + '/models']
 });
 
-app.use(bodyParser());
+// init bodyparser
+app.use(
+  bodyParser({
+    enableTypes: ['json'],
+    jsonLimit: '5mb',
+    strict: false,
+    onerror: (err, ctx) => {
+      ctx.status = 422;
+      ctx.body = { error: 'Invalid JSON format in body' };
+    }
+  })
+);
+
+// validate JSON only content-type with POST/PUT
+app.use(async (ctx, next) => {
+  if (ctx.method === 'POST' || ctx.method === 'PUT') {
+    const contentType = ctx.request.header['content-type'];
+    if (!contentType?.includes('application/json')) {
+      ctx.status = 415;
+      ctx.body = { error: 'Content-Type must be application/json' };
+    }
+  }
+  await next();
+});
 
 router.use('', apiRouter.routes());
 
 // App routes
 app.use(router.routes());
-console.log(router.stack.map((i) => i.path));
+console.log(router.stack.map((i) => `${i.methods.join(',').padStart(10)} -> ${i.path.padEnd(50)}`));
 app.use(router.allowedMethods());
 
 export { sequelize };
