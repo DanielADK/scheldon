@@ -158,4 +158,8 @@ export class TimetableEntry extends Model<TimetableEntry> {
       )
     ]);
   }
+
+  getId() {
+    return this.timetableEntryId;
+  }
 }

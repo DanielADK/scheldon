@@ -25,12 +25,16 @@ export const substitutionTimetableEntrySchema = Joi.object({
   roomId: Joi.number().integer().positive().required()
 });
 
-// Schema for validating assignment of substitution entry to class register
-export const assignSubstitutionSchema = Joi.object({
+// Schema for validating append of substitution entry to class register (=append)
+export const appendSubstitutionSchema = Joi.object({
   substitutionEntryId: Joi.number().required(),
-  substitutionType: Joi.string()
-    .required()
-    .valid(...Object.values(SubstitutionType)),
+  note: Joi.string().max(2048).optional()
+});
+
+// Schema for validating assignment of substitution entry to class register (=merge/drop)
+export const assignSubstitutionSchema = Joi.object({
+  lessonId: Joi.number().required(),
+  substitutionType: Joi.string().required().valid(SubstitutionType.MERGED, SubstitutionType.DROPPED),
   note: Joi.string().max(2048).optional()
 });
 
@@ -43,6 +47,35 @@ export const resetClassRegisterSchema = Joi.object({
     .max(HOUR_COUNT - 1)
     .required()
 });
+
+export const appendSubstitutionToClassRegister = async (ctx: Context): Promise<void> => {
+  try {
+    const dateStr = ctx.params.date;
+    const date = new Date(dateStr);
+
+    if (isNaN(date.getTime())) {
+      ctx.status = 400;
+      ctx.body = { error: 'Invalid date format' };
+      return;
+    }
+    const { error, value } = appendSubstitutionSchema.validate(ctx.request.body);
+
+    if (error) {
+      ctx.status = 400;
+      ctx.body = { error: error.details[0].message };
+      return;
+    }
+
+    const result = await classRegisterService.appendSubstitutionToClassRegister(date, value);
+
+    ctx.status = 201;
+    ctx.body = {
+      lessonId: result.lessonId
+    };
+  } catch (error) {
+    handleError(ctx, error);
+  }
+};
 
 export const assignSubstitutionToClassRegister = async (ctx: Context): Promise<void> => {
   try {

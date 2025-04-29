@@ -122,4 +122,8 @@ export class SubstitutionEntry extends Model<SubstitutionEntry> {
       instance.studentGroupId ? validateStudentGroupInClass(instance, options) : null
     ]);
   }
+
+  getId() {
+    return this.substitutionEntryId;
+  }
 }

@@ -246,7 +246,7 @@ export const assignSubstitutionEntryToClassRegister = async (
   }
 
   // Create the class register with the substitution entry
-  const classRegister = await ClassRegister.create(
+  return await ClassRegister.create(
     {
       substitutionEntryId: data.substitutionEntryId,
       date: data.date,
@@ -258,8 +258,6 @@ export const assignSubstitutionEntryToClassRegister = async (
     } as ClassRegister,
     { transaction }
   );
-
-  return classRegister;
 };
 
 /**
@@ -377,19 +375,44 @@ export const checkAndRemoveUnusedSubstitutionEntry = async (substitutionEntryId:
 };
 
 /**
- * Update class register timetable entry
+ * Find all class registers by time and class information
+ *
+ * @param date - The date of the class register
+ * @param hourInDay - The hour in the day to filter by
+ * @param classId - The ID of the class to filter by
+ * @param transaction - The transaction object to use
+ * @returns Promise<ClassRegister[]> - A list of matching class registers
  */
-export const updateClassRegisterTimetableEntry = async (
-  lessonId: number,
-  timetableEntryId: number,
-  transaction: Transaction
-): Promise<ClassRegister> => {
-  const classRegister = await ClassRegister.findByPk(lessonId, { transaction });
-  if (!classRegister) {
-    throw new Error(`Class register with ID ${lessonId} not found`);
-  }
-
-  classRegister.timetableEntryId = timetableEntryId;
-  await classRegister.save({ transaction });
-  return classRegister;
+export const findAllClassRegistersByTimeAndClass = async (
+  date: Date,
+  hourInDay: number,
+  classId: number,
+  transaction?: Transaction
+): Promise<ClassRegister[]> => {
+  return await ClassRegister.findAll({
+    where: {
+      date: date,
+      [Op.or]: [
+        {
+          '$timetableEntry.hourInDay$': hourInDay,
+          '$timetableEntry.classId$': classId
+        },
+        {
+          '$substitutionEntry.hourInDay$': hourInDay,
+          '$substitutionEntry.classId$': classId
+        }
+      ]
+    },
+    include: [
+      {
+        model: TimetableEntry,
+        required: false
+      },
+      {
+        model: SubstitutionEntry,
+        required: false
+      }
+    ],
+    transaction
+  });
 };

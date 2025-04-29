@@ -10,7 +10,7 @@ export const validateXORIdentifiers: validator<ClassRegister> = async (instance:
   const schema = Joi.object({
     timetableEntryId: Joi.string().optional(),
     substitutionEntryId: Joi.string().optional()
-  }).xor('timetableEntryId', 'substitutionEntryId'); // Enforces XOR rule
+  }).nand('timetableEntryId', 'substitutionEntryId'); // Enforces NAND rule
 
   const { error } = schema.validate({
     timetableEntryId: instance.timetableEntryId,
