@@ -1,10 +1,10 @@
 import { TimeLessonEntry } from '@services/transformers/timetableExport';
 import { ClassRegister } from '@models/ClassRegister';
-import { AbstractTimetableAdapter } from '@services/transformers/AbstractTimetableAdapter';
+import { AbstractAdapter } from '@services/transformers/AbstractAdapter';
 import { TimetableEntry } from '@models/TimetableEntry';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
 
-export class SubstitutionTimetableAdapter extends AbstractTimetableAdapter<ClassRegister> {
+export class SubstitutionTimetableAdapter extends AbstractAdapter<ClassRegister, TimeLessonEntry> {
   /**
    * Transforms a ClassRegister entry into a TimeLessonEntry object.
    *
@@ -14,7 +14,7 @@ export class SubstitutionTimetableAdapter extends AbstractTimetableAdapter<Class
    *                           such as teacher, subject, room, and schedule details.
    * @throws {Error} If the input entry lacks required fields or contains invalid data.
    */
-  transform(entry: ClassRegister): TimeLessonEntry {
+  transform(entry: ClassRegister): Promise<TimeLessonEntry> {
     const lesson: TimetableEntry | SubstitutionEntry | null =
       (entry.timetableEntry ? 1 : 0) ^ (entry.substitutionEntry ? 1 : 0) ? entry.timetableEntry || entry.substitutionEntry : null;
 
@@ -52,6 +52,6 @@ export class SubstitutionTimetableAdapter extends AbstractTimetableAdapter<Class
       ...(entry.substitutionType !== null && { substitutionType: entry.substitutionType })
     } as TimeLessonEntry;
 
-    return { lessonId: entry.lessonId, ...result };
+    return Promise.resolve({ lessonId: entry.lessonId, ...result });
   }
 }

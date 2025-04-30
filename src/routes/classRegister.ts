@@ -1,5 +1,5 @@
 import Router from 'koa-router';
-import * as classRegisterController from '@controllers/classRegisterController';
+import { getLesson } from '@controllers/classRegisterController';
 
 const router = new Router();
 
@@ -7,118 +7,88 @@ const router = new Router();
  * @openapi
  * components:
  *   schemas:
- *     ClassRegister:
+ *     ClassRegisterEntry:
  *       type: object
+ *       required:
+ *         - lessonId
+ *         - date
+ *         - teacher
+ *         - subject
+ *         - class
+ *         - room
  *       properties:
- *         classId:
+ *         lessonId:
  *           type: integer
- *           example: 1
- *         studentGroupId:
- *           type: integer
- *           example: 2
- *         dayInWeek:
- *           type: integer
- *           example: 3
- *         hourInDay:
- *           type: integer
- *           example: 2
- *         subjectId:
- *           type: integer
- *           example: 5
- *         teacherId:
- *           type: integer
- *           example: 7
- *         roomId:
- *           type: integer
- *           example: 101
+ *           description: Unique identifier of the lesson
+ *           example: 123
  *         topic:
  *           type: string
- *           example: "Introduction to Jara Cimrman's work"
+ *           description: Topic of the lesson
+ *           example: "Philosophy of Externalism"
  *         date:
  *           type: string
  *           format: date
- *           example: "2024-09-15"
- *         type:
+ *           description: Date when the lesson took place
+ *           example: "2024-05-15"
+ *         fillDate:
  *           type: string
- *           enum:
- *             - A
- *             - D
- *             - M
+ *           format: date
+ *           nullable: true
+ *           description: Date when the lesson record was filled
+ *           example: "2024-05-15"
+ *         note:
+ *           type: string
+ *           description: Additional notes for the lesson
+ *           example: "The students were familiarized with the rules of using laboratory."
+ *         teacher:
+ *           $ref: '#/components/schemas/EmployeeInfo'
+ *         subject:
+ *           $ref: '#/components/schemas/SubjectInfo'
+ *         class:
+ *           $ref: '#/components/schemas/ClassInfo'
+ *         studentGroup:
+ *           type: string
+ *           description: Student group name, if applicable
  *           example: "A"
+ *         room:
+ *           $ref: '#/components/schemas/RoomInfo'
  */
 
 /**
  * @openapi
- * /classregister:
- *   post:
- *     tags:
- *       - Class register
- *     summary: Create a new lesson record
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/ClassRegister'
- *     responses:
- *       201:
- *         description: ClassRegister created successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ClassRegister'
- *       400:
- *         description: Bad request, validation failed
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *       404:
- *         description: TimetableEntry or other referenced entity not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- */
-router.post('/classregister/finish', classRegisterController.finishLessonRecord);
-
-/**
- * @openapi
- * /classregister/current/teacher/{id}:
+ * /class-registers/{lessonId}:
  *   get:
  *     tags:
  *       - Class register
- *     summary: Get the current lesson by teacher ID
+ *     summary: Get class register entry by lesson ID
+ *     description: Retrieves a specific class register entry with detailed information about the lesson
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: lessonId
  *         required: true
  *         schema:
  *           type: integer
- *         description: The ID of the teacher
+ *         description: The unique identifier of the lesson
  *     responses:
  *       200:
- *         description: Current lesson data
+ *         description: Class register entry retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ClassRegister'
- *       404:
+ *               $ref: '#/components/schemas/ClassRegisterEntry'
+ *       400:
  *         description: Lesson not found
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.get('/classregister/teacher/:id/current', classRegisterController.getCurrentLessonByTeacherId);
+router.get('/class-registers/:lessonId', getLesson);
+
+router.put('/class-registers/:lessonId');
+
+router.get('/class-registers/:lessonId/attendances');
+
+router.put('/class-registers/:lessonId/attendances');
 
 export default router;

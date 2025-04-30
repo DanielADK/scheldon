@@ -1,76 +1,40 @@
 import { Context } from 'koa';
-import * as classRegisterService from '@services/classRegisterService';
 import { handleError } from '@lib/controllerTools';
-import Joi from 'joi';
-import { AttendanceType } from '@models/types/AttendanceType';
-import { SubstitutionType } from '@models/types/SubstitutionType';
+import * as classRegisterService from '@services/classRegisterService';
 
-const createClassRegisterSchema = Joi.object({
-  lessonId: Joi.string()
-    .required()
-    .regex(/^[0-9a-zA-Z]{8}$/),
-  topic: Joi.string().required().min(5).max(255),
-  studentAttendance: Joi.array().items(
-    Joi.object({
-      studentId: Joi.number().required(),
-      present: Joi.string().required().uppercase().valid(AttendanceType.PRESENT, AttendanceType.NOT_PRESENT, AttendanceType.LATE_ARRIVAL)
-    })
-  )
-});
-
-// Interface for the assignSubstitution DTO in repository
-export interface AssignSubstitutionRepositoryDTO {
-  substitutionEntryId: number;
-  date: Date;
-  substitutionType: SubstitutionType;
-  note?: string;
-}
-
-export const resetClassRegisterSchema = Joi.object({
-  lessonId: Joi.number().required()
-});
-
-/**
- * Finish the lesson record with topic and student attendance
- */
-export const finishLessonRecord = async (ctx: Context): Promise<void> => {
-  console.log(ctx.request.body);
-  const { error, value } = createClassRegisterSchema.validate(ctx.request.body);
-
-  if (error) {
-    ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
-    return;
-  }
-
+export const getLesson = async (ctx: Context): Promise<void> => {
   try {
-    await classRegisterService.finishLessonRecord(value);
+    const lessonId = ctx.params.lessonId;
+    if (isNaN(lessonId)) {
+      throw new Error('Invalid lesson ID');
+    }
 
-    ctx.status = 201;
-    ctx.body = { message: 'Lesson finished and locked successfully' };
+    const lesson = await classRegisterService.getLesson(lessonId);
+    if (!lesson) {
+      throw new Error('Lesson not found');
+    }
+
+    ctx.status = 200;
+    ctx.body = lesson;
   } catch (error) {
     handleError(ctx, error);
   }
 };
 
-/**
- * Get the current lesson record by teacher ID
- * @param ctx Koa context
- */
-export const getCurrentLessonByTeacherId = async (ctx: Context): Promise<void> => {
-  const teacherId: number = parseInt(ctx.params.id);
-
+export const getLessonAttendance = async (ctx: Context): Promise<void> => {
   try {
-    const lessonData = await classRegisterService.getCurrentLessonForTeacher(teacherId);
+    const lessonId = ctx.params.lessonId;
+    if (isNaN(lessonId)) {
+      throw new Error('Invalid lesson ID');
+    }
 
-    if (!lessonData) {
-      ctx.status = 404;
-      ctx.body = { error: 'No current lesson found for this teacher' };
-      return;
+    const lesson = await classRegisterService.getLessonsAttendance(lessonId);
+    if (!lesson) {
+      throw new Error('Lesson not found');
     }
 
     ctx.status = 200;
-    ctx.body = lessonData;
+    ctx.body = lesson;
   } catch (error) {
     handleError(ctx, error);
   }

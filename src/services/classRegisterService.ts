@@ -1,17 +1,10 @@
 import {
   assignSubstitutionEntryToClassRegister,
   checkAndRemoveUnusedSubstitutionEntry,
-  ClassRegisterRecordDTO,
   findAllClassRegistersByTimeAndClass,
   findClassRegisterById,
-  findClassRegisterByTimeAndClass,
-  finishLessonRecord as finishLessonRecordInRepository,
-  getCurrentLessonRecord,
-  getStudentsForLesson
+  findClassRegisterByTimeAndClass
 } from '@repositories/classRegisterRepository';
-import { AttendanceType } from '@models/types/AttendanceType';
-import { Attendance } from '@models/Attendance';
-import { Student } from '@models/Student';
 import { getLessonAttendance } from '@repositories/attendanceRepository';
 import { ClassRegister } from '@models/ClassRegister';
 import { SubstitutionType } from '@models/types/SubstitutionType';
@@ -25,109 +18,23 @@ import { findDefaultTimetableEntry } from '@repositories/timetableRepository';
 import { getDayInWeek } from '@lib/timeLib';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
 import { Transaction } from 'sequelize/types';
-
-interface ClassRegisterExport {
-  lesson: {
-    lessonId: number;
-    topic?: string;
-  };
-  students: StudentWithAttendance[];
-}
+import { ClassRegisterEntry, StudentAttendance, transformClassRegister } from '@services/transformers/classRegisterExport';
+import { ClassRegisterAdapter } from '@services/transformers/classRegisterAdapter';
+import { transformAttendance } from '@services/transformers/attendanceExport';
+import { AttendanceAdapter } from '@services/transformers/attendanceAdapter';
 
 // Interface for the assignSubstitution DTO
 interface AppendSubstitutionDTO {
   substitutionEntryId: number;
   note?: string;
 }
+
 // Interface for the assignSubstitution DTO
 interface AssignSubstitutionDTO {
   lessonId: number;
   substitutionType: SubstitutionType.DROPPED | SubstitutionType.MERGED;
   note?: string;
 }
-
-export const finishLessonRecord = async (data: ClassRegisterRecordDTO): Promise<void> => {
-  return await finishLessonRecordInRepository(data);
-};
-
-/**
- * Get the current lesson data for a specific teacher
- * @param teacherId number
- * @returns Promise<object | null>
- */
-export const getCurrentLessonForTeacher = async (teacherId: number): Promise<ClassRegisterExport | null> => {
-  const lesson = await getCurrentLessonRecord(teacherId);
-  if (!lesson) {
-    return null;
-  }
-
-  return getCurrentLessonByLesson(lesson);
-};
-
-interface StudentWithAttendance {
-  student: Student;
-  attendance: AttendanceType;
-}
-
-/**
- * Group students by attendance
- * If attendance record is not found, default to PRESENT
- * @param students Student[]
- * @param attendance Attendance[]
- * @returns StudentWithAttendance[]
- */
-export const groupStudentsByAttendance = (students: Student[], attendance: Attendance[] | null): StudentWithAttendance[] => {
-  // Array of StudentWithAttendance
-  const studentsWithAttendance: StudentWithAttendance[] = [];
-
-  // If attendance record is not found, default to PRESENT
-  if (!attendance) {
-    students.forEach((student: Student) => {
-      studentsWithAttendance.push({
-        student: student,
-        attendance: AttendanceType.PRESENT
-      });
-    });
-    return studentsWithAttendance;
-  }
-
-  // Map - key: studentId, value: Attendance
-  const attendanceMap = new Map<number, Attendance>();
-  attendance.forEach((a: Attendance) => {
-    attendanceMap.set(a.studentId, a);
-  });
-
-  // Group students by attendance
-  students.forEach((student: Student) => {
-    const studentAttendance = attendanceMap.get(student.studentId);
-    studentsWithAttendance.push({
-      student: student,
-      attendance: studentAttendance ? studentAttendance.attendance : AttendanceType.PRESENT
-    });
-  });
-
-  return studentsWithAttendance;
-};
-
-/**
- * Get the current lesson data for a specific teacher
- * @param lesson ClassRegister
- * @returns Promise<ClassRegisterExport | null>
- */
-export const getCurrentLessonByLesson = async (lesson: ClassRegister): Promise<ClassRegisterExport | null> => {
-  const students = await getStudentsForLesson(lesson.lessonId);
-  const attendance = await getLessonAttendance(lesson.lessonId, true);
-
-  const studentsWithAttendance = groupStudentsByAttendance(students, attendance);
-
-  return {
-    lesson: {
-      lessonId: lesson.lessonId,
-      ...(lesson.topic !== null && { topic: lesson.topic })
-    },
-    students: studentsWithAttendance
-  } as ClassRegisterExport;
-};
 
 export const appendSubstitutionToClassRegister = async (date: Date, data: AppendSubstitutionDTO): Promise<ClassRegister> => {
   const transaction = await sequelize.transaction();
@@ -304,6 +211,16 @@ export const mergeSubstitution = async (
   );
 };
 
+/**
+ * Appends a substitution entry to a class register if the specified time slot is not already occupied.
+ *
+ * @param {Date} date - The date of the substitution.
+ * @param {SubstitutionEntry} se - The substitution entry details including hour in day, class ID, and student group ID.
+ * @param {AppendSubstitutionDTO} data - Data transfer object containing substitution details like substitution entry ID and note.
+ * @param {Transaction} transaction - Database transaction instance for handling the operation.
+ * @returns {Promise<ClassRegister>} A promise resolving to the created class register with the appended substitution entry.
+ * @throws {Error} If the time slot is already occupied.
+ */
 export const appendSubstitution = async (
   date: Date,
   se: SubstitutionEntry,
@@ -375,4 +292,18 @@ export const resetClassRegisterToDefault = async (
     await transaction.rollback();
     throw error;
   }
+};
+
+export const getLesson = async (lessonId: number): Promise<ClassRegisterEntry | null> => {
+  const lesson = await findClassRegisterById(lessonId);
+  return transformClassRegister(lesson, new ClassRegisterAdapter());
+};
+
+export const getLessonsAttendance = async (lessonId: number): Promise<StudentAttendance[] | null> => {
+  const lesson = await findClassRegisterById(lessonId);
+  if (!lesson) {
+    throw new Error(`Lesson with ID ${lessonId} not found`);
+  }
+  const attendance = await getLessonAttendance(lesson.lessonId, true);
+  return transformAttendance(attendance, new AttendanceAdapter());
 };

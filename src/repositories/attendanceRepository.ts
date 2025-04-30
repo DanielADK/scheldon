@@ -18,7 +18,7 @@ export const getLessonAttendance = async (lessonId: number, withStudents: boolea
         include: [
           {
             model: Student,
-            attributes: ['studentId', 'username', 'name', 'surname']
+            attributes: ['studentId', 'name', 'surname']
           }
         ]
       }

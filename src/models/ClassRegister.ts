@@ -112,18 +112,6 @@ export class ClassRegister extends Model<ClassRegister> {
     ]);
   }
 
-  /*@BeforeDestroy
-  static async tryRemove(instance: ClassRegister, options?: QueryOptions | null) {
-    await Promise.all([
-      await restrictOnDelete(
-        Attendance as { new () => Model } & typeof Model, // No need for complex casting
-        'classRegisterId', // Use the actual column name without casting
-        instance.lessonId,
-        options
-      )
-    ]);
-  }*/
-
   // Other methods
   /**
    * Check if the lesson record is filled
@@ -143,10 +131,10 @@ export class ClassRegister extends Model<ClassRegister> {
   async getEntry(): Promise<SubstitutionEntry | TimetableEntry> {
     // fetch if not
     if (this.substitutionEntryId && !this.substitutionEntry) {
-      this.substitutionEntry = await SubstitutionEntry.findByPk(this.substitutionEntryId);
+      await this.$get('substitutionEntry');
     }
     if (this.timetableEntryId && !this.timetableEntry) {
-      this.timetableEntry = await TimetableEntry.findByPk(this.timetableEntryId);
+      await this.$get('timetableEntry');
     }
 
     if (!this.substitutionEntry && !this.timetableEntry) {

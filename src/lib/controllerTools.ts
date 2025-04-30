@@ -22,12 +22,7 @@ export const getDateFromParam = async (param: string): Promise<Date> => {
 };
 
 export const handleError = (ctx: Context, error: unknown): void => {
-  if (error instanceof Error) {
-    ctx.status = 400;
-    ctx.body = { error: error.message };
-  } else {
-    ctx.status = 400;
-    ctx.body = { error: 'Unexpected error occured.' };
-  }
+  ctx.status = 400;
+  ctx.body = { error: error instanceof Error ? error.message : 'Unexpected error occured' };
   console.error(error);
 };

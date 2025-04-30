@@ -110,7 +110,7 @@ const router = new Router();
  *         - subjectId
  *         - teacherId
  *
- *     TTTeacher:
+ *     EmployeeInfo:
  *       type: object
  *       required:
  *         - name
@@ -129,7 +129,7 @@ const router = new Router();
  *           type: string
  *           description: Teacher's abbreviation/code
  *           example: JS
- *     TTSubject:
+ *     SubjectInfo:
  *       type: object
  *       required:
  *         - name
@@ -143,7 +143,7 @@ const router = new Router();
  *           type: string
  *           description: Subject abbreviation/code
  *           example: M
- *     TTRoom:
+ *     RoomInfo:
  *       type: object
  *       required:
  *         - name
@@ -152,15 +152,26 @@ const router = new Router();
  *           type: string
  *           description: Room identifier
  *           example: Room 241
- *     TTLesson:
+ *     ClassInfo:
+ *       type: object
+ *       required:
+ *         - name
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Class name
+ *           example: "3.C"
+ *     LessonInfo:
  *       type: object
  *       properties:
  *         teacher:
- *           $ref: '#/components/schemas/TTTeacher'
+ *           $ref: '#/components/schemas/EmployeeInfo'
  *         subject:
- *           $ref: '#/components/schemas/TTSubject'
+ *           $ref: '#/components/schemas/SubjectInfo'
  *         room:
- *           $ref: '#/components/schemas/TTRoom'
+ *           $ref: '#/components/schemas/RoomInfo'
+ *         class:
+ *           $ref: '#/components/schemas/ClassInfo'
  *     TimetableResponse:
  *       type: array
  *       description: Array representing days of the week (index 0-6 for Monday-Sunday)
@@ -168,7 +179,7 @@ const router = new Router();
  *         type: array
  *         description: Array representing hours in the day (index 0-n for periods/lessons)
  *         items:
- *           $ref: '#/components/schemas/TTLesson'
+ *           $ref: '#/components/schemas/LessonInfo'
  *
  *     TimetableSet:
  *       type: object

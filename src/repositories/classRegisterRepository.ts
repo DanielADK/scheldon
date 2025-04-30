@@ -15,7 +15,8 @@ import { FilterType, validateEntity } from '@validators/substitutionEntryValidat
 import { Employee } from '@models/Employee';
 import { Subject } from '@models/Subject';
 import { Room } from '@models/Room';
-import { AssignSubstitutionRepositoryDTO } from '@controllers/classRegisterController';
+
+import { AssignSubstitutionRepositoryDTO } from '@controllers/substitutionEntryController';
 
 export interface ClassRegisterRecordDTO {
   lessonId: number;
@@ -217,16 +218,6 @@ export const getTemporaryTimetable = async (filterType: FilterType, entityId: nu
 };
 
 /**
- * Find a substitution entry by ID
- *
- * @param id - The ID of the substitution entry
- * @returns Promise<SubstitutionEntry | null> - The found substitution entry or null
- */
-export const findSubstitutionEntryById = async (id: number): Promise<SubstitutionEntry | null> => {
-  return SubstitutionEntry.findByPk(id);
-};
-
-/**
  * Create a class register with a substitution entry
  *
  * @param substitutionEntry
@@ -263,9 +254,30 @@ export const assignSubstitutionEntryToClassRegister = async (
 /**
  * Find class register by its ID with associated entities
  */
-export const findClassRegisterById = async (lessonId: number, transaction: Transaction) => {
-  return ClassRegister.findByPk(lessonId, {
-    include: [{ model: SubstitutionEntry, required: false }],
+export const findClassRegisterById = async (lessonId: number, transaction?: Transaction) => {
+  return await ClassRegister.findByPk(lessonId, {
+    include: [
+      {
+        model: SubstitutionEntry,
+        include: [
+          { model: Class, attributes: ['name'] },
+          { model: StudentGroup, attributes: ['name'] },
+          { model: Employee, attributes: ['name', 'surname', 'abbreviation'] },
+          { model: Subject, attributes: ['name', 'abbreviation'] },
+          { model: Room, attributes: ['name'] }
+        ]
+      },
+      {
+        model: TimetableEntry,
+        include: [
+          { model: Class, attributes: ['name'] },
+          { model: StudentGroup, attributes: ['name'] },
+          { model: Employee, attributes: ['name', 'surname', 'abbreviation'] },
+          { model: Subject, attributes: ['name', `abbreviation`] },
+          { model: Room, attributes: ['name'] }
+        ]
+      }
+    ],
     transaction
   });
 };
@@ -341,20 +353,6 @@ export const createClassRegisterWithTimetableEntry = async (
     } as ClassRegister,
     { transaction }
   );
-};
-
-/**
- * Reset class register to default timetable entry and remove substitution
- */
-export const resetToDefaultTimetable = async (
-  classRegister: ClassRegister,
-  timetableEntry: TimetableEntry,
-  transaction: Transaction
-): Promise<ClassRegister> => {
-  classRegister.timetableEntryId = timetableEntry.timetableEntryId;
-  classRegister.substitutionEntryId = null;
-  await classRegister.save({ transaction });
-  return classRegister;
 };
 
 /**

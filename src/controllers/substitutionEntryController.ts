@@ -48,22 +48,26 @@ export const resetClassRegisterSchema = Joi.object({
     .required()
 });
 
+// Interface for the assignSubstitution DTO in repository
+export interface AssignSubstitutionRepositoryDTO {
+  substitutionEntryId: number;
+  date: Date;
+  substitutionType: SubstitutionType;
+  note?: string;
+}
+
 export const appendSubstitutionToClassRegister = async (ctx: Context): Promise<void> => {
   try {
     const dateStr = ctx.params.date;
     const date = new Date(dateStr);
 
     if (isNaN(date.getTime())) {
-      ctx.status = 400;
-      ctx.body = { error: 'Invalid date format' };
-      return;
+      throw new Error('Invalid date format');
     }
     const { error, value } = appendSubstitutionSchema.validate(ctx.request.body);
 
     if (error) {
-      ctx.status = 400;
-      ctx.body = { error: error.details[0].message };
-      return;
+      throw new Error(error.details[0].message);
     }
 
     const result = await classRegisterService.appendSubstitutionToClassRegister(date, value);
@@ -83,16 +87,12 @@ export const assignSubstitutionToClassRegister = async (ctx: Context): Promise<v
     const date = new Date(dateStr);
 
     if (isNaN(date.getTime())) {
-      ctx.status = 400;
-      ctx.body = { error: 'Invalid date format' };
-      return;
+      throw new Error('Invalid date format');
     }
     const { error, value } = assignSubstitutionSchema.validate(ctx.request.body);
 
     if (error) {
-      ctx.status = 400;
-      ctx.body = { error: error.details[0].message };
-      return;
+      throw new Error(error.details[0].message);
     }
 
     const result = await classRegisterService.assignSubstitutionToClassRegister(date, value);
