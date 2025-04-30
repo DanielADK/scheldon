@@ -21,9 +21,7 @@ export const createClass = async (ctx: Context) => {
     const { error, value } = classSchema.validate(ctx.request.body);
 
     if (error) {
-      ctx.status = 400;
-      ctx.body = { error: error.details[0].message };
-      return;
+      throw new Error(error.details[0].message);
     }
 
     const classObj = await classService.createClass(value);
@@ -87,9 +85,7 @@ export const getClassesAtTime = async (ctx: Context) => {
   try {
     const { time } = ctx.params;
     if (!time) {
-      ctx.status = 400;
-      ctx.body = { error: 'Time is required' };
-      return;
+      throw new Error('Time is required');
     }
 
     const classes = await classService.getClassesAtTime(time);
@@ -114,9 +110,7 @@ export const updateClass = async (ctx: Context) => {
     const { error, value } = classSchema.validate(ctx.request.body);
 
     if (error) {
-      ctx.status = 400;
-      ctx.body = { error: error.details[0].message };
-      return;
+      throw new Error(error.details[0].message);
     }
 
     const updatedClass = await classService.updateClass(classId, value);

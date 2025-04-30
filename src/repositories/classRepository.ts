@@ -73,10 +73,12 @@ export const getClassById = async (classId: number, transaction: Transaction | n
  * @param time
  */
 export const getClassesAtTime = async (time: string): Promise<Class[] | null> => {
+  const date = new Date(time);
+
   return await Class.findAll({
     where: {
-      validFrom: { [Op.lte]: time },
-      validTo: { [Op.gte]: time }
+      validFrom: { [Op.lte]: date },
+      validTo: { [Op.gte]: date }
     },
     attributes: classAttributes,
     include: [
