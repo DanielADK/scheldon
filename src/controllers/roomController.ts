@@ -93,7 +93,6 @@ export const updateRoom = async (ctx: Context): Promise<void> => {
 
   if (error) {
     throw new Error(error.details[0].message);
-    return;
   }
 
   try {
