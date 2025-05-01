@@ -5,7 +5,7 @@ import { StudentGroupDTO, validateCategoryBelongsToSameClass } from '@repositori
 import * as groupCategoryService from '@services/groupCategoryService';
 import * as studentGroupService from '@services/studentGroupService';
 import { Context } from 'koa';
-import { getIdFromParam, handleError } from '../lib/controllerTools';
+import { getIdFromParam, handleError } from '@lib/controllerTools';
 import { Transaction } from 'sequelize';
 
 const studentGroupSchema: Joi.ObjectSchema<StudentGroupDTO> = Joi.object({
@@ -28,24 +28,18 @@ export const createstudentGroup = async (ctx: Context) => {
     const { error, value } = studentGroupSchema.validate(ctx.request.body);
 
     if (error) {
-      ctx.status = 400;
-      ctx.body = { error: error.details[0].message };
-      return;
+      throw new Error(error.details[0].message);
     }
 
     // check if category belongs to the same class as the group
     if (value.categoryId) {
       const category = await groupCategoryService.getGroupCategoryById(value.categoryId);
       if (!category) {
-        ctx.status = 400;
-        ctx.body = { error: 'Category not found' };
-        return;
+        throw new Error('Category not found');
       }
 
       if (category.classId !== value.classId) {
-        ctx.status = 400;
-        ctx.body = { error: 'Group must be in same class as its category' };
-        return;
+        throw new Error('Group must be in same class as its category');
       }
     }
 
@@ -149,9 +143,7 @@ export const updatestudentGroup = async (ctx: Context) => {
     });
 
     if (error) {
-      ctx.status = 400;
-      ctx.body = { error: error.details[0].message };
-      return;
+      throw new Error(error.details[0].message);
     }
     // Check if updated category belongs to the same class as the group
     if (value.categoryId !== undefined && value.categoryId !== null) {

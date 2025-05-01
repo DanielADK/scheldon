@@ -92,8 +92,7 @@ export const updateRoom = async (ctx: Context): Promise<void> => {
   const { error, value } = roomSchema.validate(ctx.request.body);
 
   if (error) {
-    ctx.status = 400;
-    ctx.body = { error: error.details[0].message };
+    throw new Error(error.details[0].message);
     return;
   }
 
@@ -101,8 +100,7 @@ export const updateRoom = async (ctx: Context): Promise<void> => {
     const [affectedCount] = await roomService.updateRoom(id, value);
 
     if (affectedCount > 0) {
-      ctx.status = 200;
-      ctx.body = { message: 'Room updated' };
+      ctx.status = 204;
     } else {
       ctx.status = 404;
       ctx.body = { error: 'Room not found' };

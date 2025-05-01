@@ -168,8 +168,8 @@ Content-Type: application/json
 }
 
 > {%
-  client.test("Status is 200", function() {
-    client.assert(response.status === 200, "Expected status 200, but received " + response.status);
+  client.test("Status is 204", function() {
+    client.assert(response.status === 204, "Expected status 204, but received " + response.status);
   });
 %}
 

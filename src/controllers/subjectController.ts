@@ -2,7 +2,7 @@ import * as subjectService from '@services/subjectService';
 import { Context } from 'koa';
 import Joi from 'joi';
 import { SubjectDTO } from '@repositories/subjectRepository';
-import { getIdFromParam, handleError } from '../lib/controllerTools';
+import { getIdFromParam, handleError } from '@lib/controllerTools';
 
 // Schema for creating a subject
 const subjectSchema: Joi.ObjectSchema<SubjectDTO> = Joi.object({
@@ -20,9 +20,7 @@ export const createSubject = async (ctx: Context) => {
     const { error, value } = subjectSchema.validate(ctx.request.body);
 
     if (error) {
-      ctx.status = 400;
-      ctx.body = { error: error.details[0].message };
-      return;
+      throw new Error(error.details[0].message);
     }
 
     const subject = await subjectService.createSubject(value);
@@ -102,15 +100,13 @@ export const updateSubject = async (ctx: Context) => {
     const { error, value } = subjectSchema.validate(ctx.request.body);
 
     if (error) {
-      ctx.status = 400;
-      ctx.body = { error: error.details[0].message };
-      return;
+      throw new Error(error.details[0].message);
     }
 
     const [affectedCount] = await subjectService.updateSubject(subjectId, value);
 
     if (affectedCount > 0) {
-      ctx.status = 200;
+      ctx.status = 204;
       ctx.body = { message: 'Subject updated' };
     } else {
       ctx.status = 404;
@@ -125,9 +121,7 @@ export const deleteSubject = async (ctx: Context) => {
   try {
     const subjectId = await getIdFromParam(ctx.params.id as string);
     if (isNaN(subjectId)) {
-      ctx.status = 400;
-      ctx.body = { error: 'Invalid subject ID' };
-      return;
+      throw new Error('Invalid subject ID');
     }
 
     const deletedCount = await subjectService.deleteSubject(subjectId);

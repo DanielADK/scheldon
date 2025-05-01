@@ -38,7 +38,23 @@ const router = new Router();
  *       required:
  *         - name
  *         - abbreviation
- * /subjects:
+ *
+ *     PaginatedSubjectsResponse:
+ *       type: object
+ *       required:
+ *         - data
+ *         - meta
+ *       properties:
+ *         data:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Subject'
+ *         meta:
+ *           $ref: '#/components/schemas/PaginationMeta'
+ */
+
+/**
+ *  /subjects:
  *   post:
  *     tags:
  *        - Subject
@@ -53,7 +69,11 @@ const router = new Router();
  *       201:
  *         description: Subject created
  *       400:
- *         description: Bad request
+ *         description: Error while processing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/subjects', subjectController.createSubject);
 /**
@@ -78,7 +98,11 @@ router.post('/subjects', subjectController.createSubject);
  *         description: Page size
  *     responses:
  *       200:
- *         description: List of subjects
+ *         description: List of classes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedSubjectsResponse'
  */
 router.get('/subjects', subjectController.getAllSubjects);
 /**
@@ -133,6 +157,12 @@ router.get('/subjects/:id', subjectController.getSubjectById);
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Subject'
+ *       400:
+ *         description: Error while processing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Subject not found
  */
@@ -159,10 +189,14 @@ router.get('/subjects/abbreviation/:abbreviation', subjectController.getSubjectB
  *           schema:
  *             $ref: '#/components/schemas/SubjectDTO'
  *     responses:
- *       200:
+ *       204:
  *         description: Subject updated
  *       400:
- *         description: Bad request
+ *         description: Error while processing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Subject not found
  */

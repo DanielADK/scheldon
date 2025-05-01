@@ -61,10 +61,7 @@ const router = new Router();
  *         student:
  *           $ref: '#/components/schemas/Student'
  *         attendance:
- *           type: string
- *           description: Attendance status code
- *           enum: [P, NP, ENP, UNP, LA, ELA, ULA]
- *           example: P
+ *           $ref: '#/components/schemas/AttendanceType'
  *     Student:
  *       type: object
  *       required:
@@ -98,10 +95,19 @@ const router = new Router();
  *           minimum: 1
  *           example: 1
  *         attendance:
- *           type: string
- *           description: Attendance status code
- *           enum: [P, NP, ENP, UNP, LA, ELA, ULA]
- *           example: P
+ *           $ref: '#/components/schemas/AttendanceType'
+ *     AttendanceType:
+ *       type: string
+ *       description: Type of attendance
+ *       enum:
+ *         - P    # Present
+ *         - NP   # Not Present
+ *         - ENP  # Excused Not Present
+ *         - UNP  # Unexcused Not Present
+ *         - LA   # Late Arrival
+ *         - ELA  # Excused Late Arrival
+ *         - ULA  # Unexcused Late Arrival
+ *       example: "P"
  */
 
 /**
@@ -135,6 +141,45 @@ const router = new Router();
  */
 router.get('/class-registers/:lessonId', getLesson);
 
+/**
+ * @openapi
+ * /class-registers/{lessonId}:
+ *   put:
+ *     summary: Update lesson information
+ *     description: Updates attendance information for the specified lesson
+ *     tags:
+ *       - Class Register
+ *     parameters:
+ *       - name: lessonId
+ *         in: path
+ *         required: true
+ *         description: Unique identifier of the lesson
+ *         schema:
+ *           type: integer
+ *           format: int
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: array
+ *             items:
+ *               $ref: '#/components/schemas/AttendanceUpdate'
+ *           example:
+ *             - studentId: 1
+ *               attendance: "P"
+ *             - studentId: 2
+ *               attendance: "A"
+ *     responses:
+ *       204:
+ *         description: Lesson information successfully updated (no content returned)
+ *       400:
+ *         description: Invalid request parameters or body format
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.put('/class-registers/:lessonId', updateLesson);
 
 /**
@@ -145,6 +190,7 @@ router.put('/class-registers/:lessonId', updateLesson);
  *     description: Returns a list of student attendance records for the specified lesson ID
  *     tags:
  *       - Class Register
+ *       - Attendance
  *     parameters:
  *       - name: lessonId
  *         in: path
@@ -179,6 +225,7 @@ router.get('/class-registers/:lessonId/attendances', getLessonAttendance);
  *     description: Updates student attendance records for the specified lesson ID
  *     tags:
  *       - Class Register
+ *       - Attendance
  *     parameters:
  *       - name: lessonId
  *         in: path

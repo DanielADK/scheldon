@@ -46,6 +46,9 @@ const router = new Router();
  *         - username
  *         - name
  *         - surname
+ */
+
+/**
  * /students:
  *   post:
  *     tags:

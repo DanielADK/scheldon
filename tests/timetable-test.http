@@ -1457,16 +1457,8 @@ Content-Type: application/json
 }
 
 > {%
-  client.test("Timetable set update succeeds with 200", function() {
-    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
-  });
-  client.test("Response contains updated timetable set details", function() {
-    const json = response.body;
-    client.assert(json.hasOwnProperty("timetableSetId"), "Response does not contain 'timetableSetId'");
-    client.assert(json.hasOwnProperty("name"), "Response does not contain 'name'");
-    client.assert(json.name === "changed timetable for 2025", "Expected 'name' to be 'changed timetable for 2025'");
-    client.assert(json.hasOwnProperty("validFrom"), "Response does not contain 'validFrom'");
-    client.assert(json.hasOwnProperty("validTo"), "Response does not contain 'validTo'");
+  client.test("Timetable set update succeeds with 204", function() {
+    client.assert(response.status === 204, "Expected status 204, but got " + response.status);
   });
 %}
 

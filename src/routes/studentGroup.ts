@@ -67,8 +67,16 @@ const router = new Router();
  *     responses:
  *       201:
  *         description: studentGroup created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/StudentGroup'
  *       400:
- *         description: Invalid input
+ *         description: Error while processing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/student-groups', studentGroupController.createstudentGroup);
 
@@ -90,6 +98,16 @@ router.post('/student-groups', studentGroupController.createstudentGroup);
  *     responses:
  *       200:
  *         description: studentGroup data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/StudentGroup'
+ *       400:
+ *         description: Error while processing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: studentGroup not found
  */
@@ -119,6 +137,12 @@ router.get('/student-groups/:id', studentGroupController.getstudentGroupById);
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/StudentGroup'
+ *       400:
+ *         description: Error while processing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Class not found
  */
@@ -148,6 +172,12 @@ router.get('/student-groups/class/:classId', studentGroupController.getstudentGr
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/StudentGroup'
+ *       400:
+ *         description: Error while processing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Category not found
  */
@@ -177,8 +207,16 @@ router.get('/student-groups/category/:categoryId', studentGroupController.getstu
  *     responses:
  *       200:
  *         description: studentGroup updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/StudentGroup'
  *       400:
- *         description: Invalid input
+ *         description: Error while processing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: studentGroup not found
  */
@@ -200,8 +238,14 @@ router.put('/student-groups/:id', studentGroupController.updatestudentGroup);
  *         schema:
  *           type: integer
  *     responses:
- *       200:
+ *       204:
  *         description: studentGroup deleted successfully
+ *       400:
+ *         description: Error while processing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: studentGroup not found
  */

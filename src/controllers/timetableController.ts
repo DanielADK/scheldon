@@ -247,8 +247,7 @@ export async function updateTSet(ctx: Context): Promise<void> {
     if (!updatedSet) {
       throw new Error('Timetable set not found');
     }
-    ctx.status = 200;
-    ctx.body = updatedSet;
+    ctx.status = 204;
   } catch (error) {
     handleError(ctx, error);
   }

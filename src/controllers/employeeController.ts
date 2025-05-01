@@ -131,9 +131,7 @@ export const updateEmployee = async (ctx: Context): Promise<void> => {
     const { error, value } = employeeSchema.validate(ctx.request.body);
 
     if (error) {
-      ctx.status = 400;
-      ctx.body = { error: error.details[0].message };
-      return;
+      throw new Error(error.details[0].message);
     }
 
     const updatedEmployee = await employeeService.updateEmployee(id, value);
@@ -145,8 +143,7 @@ export const updateEmployee = async (ctx: Context): Promise<void> => {
       return;
     }
 
-    ctx.status = 200;
-    ctx.body = updatedEmployee;
+    ctx.status = 204;
   } catch (error) {
     handleError(ctx, error);
   }

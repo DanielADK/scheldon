@@ -29,6 +29,12 @@ export const updateLessonSchema = Joi.object({
   note: Joi.string().max(2048).optional()
 });
 
+/**
+ * Updates an existing lesson.
+ *
+ * @param {Context} ctx - Koa context with request/response.
+ * @returns {Promise<void>}
+ */
 export const updateLesson = async (ctx: Context): Promise<void> => {
   try {
     const id = await getIdFromParam(ctx.params.lessonId as string);

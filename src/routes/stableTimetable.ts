@@ -299,7 +299,7 @@ router.get('/timetables/stable/sets/:id', timetableController.getTimetableSetByI
  *           schema:
  *             $ref: '#/components/schemas/TimetableSet'
  *     responses:
- *       200:
+ *       204:
  *         description: Timetable set updated successfully
  *       400:
  *         description: Bad request or timetable set not found

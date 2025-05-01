@@ -68,6 +68,19 @@ const router = new Router();
  *         - type
  *         - floor
  *         - administratorId
+ *
+ *     PaginatedRoomsResponse:
+ *       type: object
+ *       required:
+ *         - data
+ *         - meta
+ *       properties:
+ *         data:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Room'
+ *         meta:
+ *           $ref: '#/components/schemas/PaginationMeta'
  * /rooms:
  *   post:
  *     tags:
@@ -97,6 +110,10 @@ router.post('/rooms', roomController.createRoom);
  *     responses:
  *       200:
  *         description: Returns all rooms
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedRoomsResponse'
  */
 router.get('/rooms', roomController.getAllRooms);
 
@@ -147,7 +164,7 @@ router.get('/rooms/:id', roomController.getRoomById);
  *           schema:
  *             $ref: '#/components/schemas/RoomDTO'
  *     responses:
- *       200:
+ *       204:
  *         description: Room updated
  *       400:
  *         description: Bad request

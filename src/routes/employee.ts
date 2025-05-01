@@ -87,7 +87,11 @@ const router = new Router();
  *       201:
  *         description: Employee created
  *       400:
- *         description: Bad request
+ *         description: Error while processing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/employees', employeeController.createEmployee);
 
@@ -114,6 +118,16 @@ router.post('/employees', employeeController.createEmployee);
  *     responses:
  *       200:
  *         description: List of employees
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Employee'
+ *       400:
+ *         description: Error while processing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get('/employees', employeeController.getAllEmployees);
 
@@ -139,6 +153,12 @@ router.get('/employees', employeeController.getAllEmployees);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Employee'
+ *       400:
+ *         description: Error while processing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Employee not found
  */
@@ -162,6 +182,10 @@ router.get('/employees/:id', employeeController.getEmployeeById);
  *     responses:
  *       200:
  *         description: Employee data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Employee'
  *       404:
  *         description: Employee not found
  */
@@ -185,6 +209,10 @@ router.get('/employees/username/:username', employeeController.getEmployeeByUser
  *     responses:
  *       200:
  *         description: Employee data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Employee'
  *       404:
  *         description: Employee not found
  */
@@ -212,10 +240,14 @@ router.get('/employees/abbreviation/:abbreviation', employeeController.getEmploy
  *           schema:
  *             $ref: '#/components/schemas/Employee'
  *     responses:
- *       200:
+ *       204:
  *         description: Employee updated
  *       400:
- *         description: Bad request
+ *         description: Error while processing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Employee not found
  */
