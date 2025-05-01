@@ -19,7 +19,7 @@ const sequelize = new Sequelize({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT ?? '5432'),
+  port: parseInt(process.env.DB_PORT ?? '3306'),
   models: [__dirname + '/models']
 });
 
