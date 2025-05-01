@@ -3,7 +3,8 @@ import {
   checkAndRemoveUnusedSubstitutionEntry,
   findAllClassRegistersByTimeAndClass,
   findClassRegisterById,
-  findClassRegisterByTimeAndClass
+  findClassRegisterByTimeAndClass,
+  getStudentsAtLesson
 } from '@repositories/classRegisterRepository';
 import { getLessonAttendance } from '@repositories/attendanceRepository';
 import { ClassRegister } from '@models/ClassRegister';
@@ -22,6 +23,8 @@ import { ClassRegisterEntry, StudentAttendance, transformClassRegister } from '@
 import { ClassRegisterAdapter } from '@services/transformers/classRegisterAdapter';
 import { transformAttendance } from '@services/transformers/attendanceExport';
 import { AttendanceAdapter } from '@services/transformers/attendanceAdapter';
+import { Attendance } from '@models/Attendance';
+import { AttendanceType } from '@models/types/AttendanceType';
 
 // Interface for the assignSubstitution DTO
 interface AppendSubstitutionDTO {
@@ -304,6 +307,29 @@ export const getLessonsAttendance = async (lessonId: number): Promise<StudentAtt
   if (!lesson) {
     throw new Error(`Lesson with ID ${lessonId} not found`);
   }
-  const attendance = await getLessonAttendance(lesson.lessonId, true);
+
+  // Parallel fetch
+  // eslint-disable-next-line prefer-const
+  let [attendance, studentsAtLesson] = await Promise.all([
+    getLessonAttendance(lesson.lessonId, true),
+    getStudentsAtLesson(lesson.lessonId)
+  ]);
+
+  // Initialize attendance as empty array if it's null
+  attendance ??= [];
+
+  // processed students attendance
+  const attendanceStudentIds = new Set<number>((attendance || []).map((item) => item.studentId));
+
+  // Iterate through studentsAtLesson and ensure every student has a default attendance entry
+  for (const student of studentsAtLesson) {
+    if (!attendanceStudentIds.has(student.studentId)) {
+      attendance.push({
+        student: student,
+        attendance: AttendanceType.PRESENT
+      } as Attendance);
+    }
+  }
+
   return transformAttendance(attendance, new AttendanceAdapter());
 };

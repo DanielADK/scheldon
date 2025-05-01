@@ -73,7 +73,7 @@ export const getCurrentLessonRecord = async (teacherId: number): Promise<ClassRe
  * @param lessonId string
  * @returns Promise<Student[]>
  */
-export const getStudentsForLesson = async (lessonId: number): Promise<Student[]> => {
+export const getStudentsAtLesson = async (lessonId: number): Promise<Student[]> => {
   // Find the lesson and include the timetable entry
   const lesson = await ClassRegister.findByPk(lessonId, {
     include: ['timetableEntry', 'substitutionEntry']
@@ -82,33 +82,34 @@ export const getStudentsForLesson = async (lessonId: number): Promise<Student[]>
   if (!lesson) throw new Error('Lesson not found');
 
   // Determine the entry source (either TimetableEntry or ClassRegister itself)
-  const entry = lesson.substitutionEntry ?? lesson.timetableEntry;
-  if (!entry?.classId) {
-    throw new Error('Lesson does not have a class assigned');
-  }
+  const entry = await lesson.getEntry();
 
-  const now = new Date();
+  const date = new Date(lesson.date);
   const dateWhere: WhereOptions = {
-    validFrom: { [Op.lte]: now },
-    validTo: { [Op.gte]: now }
+    validFrom: { [Op.lte]: date },
+    validTo: { [Op.gte]: date }
   };
 
   // Find the students based on class and studentGroup
   const study = entry.studentGroupId
-    ? await StudentGroup.findByPk(entry.id, {
+    ? await StudentGroup.findByPk(entry.studentGroupId, {
+        attributes: ['studentGroupId'],
         include: [
           {
             model: Study,
-            include: ['student'],
+            attributes: ['studentId'],
+            include: [{ model: Student, attributes: ['studentId', 'name', 'surname'] }],
             where: dateWhere
           }
         ]
       })
-    : await Class.findByPk(entry.id, {
+    : await Class.findByPk(entry.classId, {
+        attributes: ['classId'],
         include: [
           {
             model: Study,
-            include: ['student'],
+            attributes: ['studentId'],
+            include: [{ model: Student, attributes: ['studentId', 'name', 'surname'] }],
             where: dateWhere
           }
         ]

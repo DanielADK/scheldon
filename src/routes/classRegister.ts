@@ -1,5 +1,5 @@
 import Router from 'koa-router';
-import { getLesson } from '@controllers/classRegisterController';
+import { getLesson, getLessonAttendance } from '@controllers/classRegisterController';
 
 const router = new Router();
 
@@ -52,6 +52,39 @@ const router = new Router();
  *           example: "A"
  *         room:
  *           $ref: '#/components/schemas/RoomInfo'
+ *     StudentAttendance:
+ *       type: object
+ *       required:
+ *         - student
+ *         - attendance
+ *       properties:
+ *         student:
+ *           $ref: '#/components/schemas/Student'
+ *         attendance:
+ *           type: string
+ *           description: Attendance status code
+ *           enum: [P, NP, ENP, UNP, LA, ELA, ULA]
+ *           example: P
+ *     Student:
+ *       type: object
+ *       required:
+ *         - studentId
+ *         - name
+ *         - surname
+ *       properties:
+ *         studentId:
+ *           type: integer
+ *           format: int64
+ *           description: Unique identifier of the student
+ *           example: 1
+ *         name:
+ *           type: string
+ *           description: First name of the student
+ *           example: John
+ *         surname:
+ *           type: string
+ *           description: Last name of the student
+ *           example: Doe
  */
 
 /**
@@ -59,7 +92,7 @@ const router = new Router();
  * /class-registers/{lessonId}:
  *   get:
  *     tags:
- *       - Class register
+ *       - Class Register
  *     summary: Get class register entry by lesson ID
  *     description: Retrieves a specific class register entry with detailed information about the lesson
  *     parameters:
@@ -87,7 +120,39 @@ router.get('/class-registers/:lessonId', getLesson);
 
 router.put('/class-registers/:lessonId');
 
-router.get('/class-registers/:lessonId/attendances');
+/**
+ * @openapi
+ * /class-registers/{lessonId}/attendances:
+ *   get:
+ *     summary: Retrieve attendance records for a specific lesson
+ *     description: Returns a list of student attendance records for the specified lesson ID
+ *     tags:
+ *       - Class Register
+ *     parameters:
+ *       - name: lessonId
+ *         in: path
+ *         required: true
+ *         description: Unique identifier of the lesson
+ *         schema:
+ *           type: integer
+ *           format: int
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved attendance records
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/StudentAttendance'
+ *       400:
+ *         description: Lesson not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.get('/class-registers/:lessonId/attendances', getLessonAttendance);
 
 router.put('/class-registers/:lessonId/attendances');
 
