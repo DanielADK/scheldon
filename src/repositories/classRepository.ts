@@ -92,17 +92,6 @@ export const getClassesAtTime = async (time: string): Promise<Class[] | null> =>
 };
 
 /**
- * Update a class
- * @param classId
- * @param data
- */
-export const updateClass = async (classId: number, data: ClassDTO): Promise<[number]> => {
-  return await Class.update(data, {
-    where: { classId: classId }
-  });
-};
-
-/**
  * Delete a class
  * @param classId
  */
