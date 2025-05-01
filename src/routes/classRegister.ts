@@ -1,5 +1,5 @@
 import Router from 'koa-router';
-import { getLesson, getLessonAttendance } from '@controllers/classRegisterController';
+import { getLesson, getLessonAttendance, updateAttendance, updateLesson } from '@controllers/classRegisterController';
 
 const router = new Router();
 
@@ -74,7 +74,7 @@ const router = new Router();
  *       properties:
  *         studentId:
  *           type: integer
- *           format: int64
+ *           format: int
  *           description: Unique identifier of the student
  *           example: 1
  *         name:
@@ -85,6 +85,23 @@ const router = new Router();
  *           type: string
  *           description: Last name of the student
  *           example: Doe
+ *     AttendanceUpdate:
+ *       type: object
+ *       required:
+ *         - studentId
+ *         - attendance
+ *       properties:
+ *         studentId:
+ *           type: integer
+ *           format: int
+ *           description: Unique identifier of the student
+ *           minimum: 1
+ *           example: 1
+ *         attendance:
+ *           type: string
+ *           description: Attendance status code
+ *           enum: [P, NP, ENP, UNP, LA, ELA, ULA]
+ *           example: P
  */
 
 /**
@@ -118,7 +135,7 @@ const router = new Router();
  */
 router.get('/class-registers/:lessonId', getLesson);
 
-router.put('/class-registers/:lessonId');
+router.put('/class-registers/:lessonId', updateLesson);
 
 /**
  * @openapi
@@ -154,6 +171,45 @@ router.put('/class-registers/:lessonId');
  */
 router.get('/class-registers/:lessonId/attendances', getLessonAttendance);
 
-router.put('/class-registers/:lessonId/attendances');
+/**
+ * @openapi
+ * /class-registers/{lessonId}/attendances:
+ *   put:
+ *     summary: Update attendance records for a specific lesson
+ *     description: Updates student attendance records for the specified lesson ID
+ *     tags:
+ *       - Class Register
+ *     parameters:
+ *       - name: lessonId
+ *         in: path
+ *         required: true
+ *         description: Unique identifier of the lesson
+ *         schema:
+ *           type: integer
+ *           format: int
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: array
+ *             items:
+ *               $ref: '#/components/schemas/AttendanceUpdate'
+ *           example:
+ *             - studentId: 1
+ *               attendance: "P"
+ *             - studentId: 2
+ *               attendance: "A"
+ *     responses:
+ *       204:
+ *         description: Successfully updated attendance records
+ *       400:
+ *         description: Invalid request body or parameters
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.put('/class-registers/:lessonId/attendances', updateAttendance);
 
 export default router;

@@ -23,6 +23,7 @@ import {
 } from '@validators/classRegisterValidator';
 import { QueryOptions } from '@models/types/QueryOptions';
 import { SubstitutionType } from '@models/types/SubstitutionType';
+import { Transaction } from 'sequelize';
 
 @Table({
   createdAt: true,
@@ -128,13 +129,13 @@ export class ClassRegister extends Model<ClassRegister> {
    * @returns substitutionEntry, timetableEntry, or null
    * @throws Error if both entries exist or neither exists
    */
-  async getEntry(): Promise<SubstitutionEntry | TimetableEntry> {
+  async getEntry(transaction?: Transaction): Promise<SubstitutionEntry | TimetableEntry> {
     // fetch if not
     if (this.substitutionEntryId && !this.substitutionEntry) {
-      await this.$get('substitutionEntry');
+      await this.$get('substitutionEntry', { transaction: transaction });
     }
     if (this.timetableEntryId && !this.timetableEntry) {
-      await this.$get('timetableEntry');
+      await this.$get('timetableEntry', { transaction: transaction });
     }
 
     if (!this.substitutionEntry && !this.timetableEntry) {

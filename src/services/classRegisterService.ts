@@ -1,5 +1,6 @@
 import {
   assignSubstitutionEntryToClassRegister,
+  bulkUpdateAttendanceRecords,
   checkAndRemoveUnusedSubstitutionEntry,
   findAllClassRegistersByTimeAndClass,
   findClassRegisterById,
@@ -25,6 +26,7 @@ import { transformAttendance } from '@services/transformers/attendanceExport';
 import { AttendanceAdapter } from '@services/transformers/attendanceAdapter';
 import { Attendance } from '@models/Attendance';
 import { AttendanceType } from '@models/types/AttendanceType';
+import { AttendanceSchema, UpdateLessonSchema } from '@controllers/classRegisterController';
 
 // Interface for the assignSubstitution DTO
 interface AppendSubstitutionDTO {
@@ -297,13 +299,31 @@ export const resetClassRegisterToDefault = async (
   }
 };
 
+/**
+ * Retrieves a lesson by its ID, transforms it into a standardized format,
+ * and returns the resulting `ClassRegisterEntry`. If the lesson is not found, returns `null`.
+ *
+ * @param {number} lessonId - The unique identifier of the lesson to be retrieved.
+ * @returns {Promise<ClassRegisterEntry | null>} A promise resolving to the transformed lesson data
+ *                                              as a `ClassRegisterEntry` object or `null` if not found.
+ */
 export const getLesson = async (lessonId: number): Promise<ClassRegisterEntry | null> => {
   const lesson = await findClassRegisterById(lessonId);
   return transformClassRegister(lesson, new ClassRegisterAdapter());
 };
 
-export const getLessonsAttendance = async (lessonId: number): Promise<StudentAttendance[] | null> => {
-  const lesson = await findClassRegisterById(lessonId);
+/**
+ *  * Retrieves and processes attendance for a specific lesson.
+ * Combines attendance data and student list, applying necessary transformations.
+ *
+ * @param {number} lessonId - The ID of the lesson for which to retrieve the attendance.
+ * @param transaction
+ * @returns {Promise<StudentAttendance[] | null>} A promise that resolves to an array of student attendance objects or null
+ * if the attendance cannot be determined.
+ * @throws {Error} If the lesson with the provided ID is not found.
+ */
+export const getLessonsAttendance = async (lessonId: number, transaction?: Transaction): Promise<StudentAttendance[] | null> => {
+  const lesson = await findClassRegisterById(lessonId, transaction);
   if (!lesson) {
     throw new Error(`Lesson with ID ${lessonId} not found`);
   }
@@ -311,8 +331,8 @@ export const getLessonsAttendance = async (lessonId: number): Promise<StudentAtt
   // Parallel fetch
   // eslint-disable-next-line prefer-const
   let [attendance, studentsAtLesson] = await Promise.all([
-    getLessonAttendance(lesson.lessonId, true),
-    getStudentsAtLesson(lesson.lessonId)
+    getLessonAttendance(lesson.lessonId, true, transaction),
+    getStudentsAtLesson(lesson.lessonId, transaction)
   ]);
 
   // Initialize attendance as empty array if it's null
@@ -332,4 +352,50 @@ export const getLessonsAttendance = async (lessonId: number): Promise<StudentAtt
   }
 
   return transformAttendance(attendance, new AttendanceAdapter());
+};
+
+/**
+ * Updates the attendance records for a lesson.
+ *
+ * @param {number} lessonId - The lesson ID.
+ * @param {AttendanceSchema[]} toUpdate - Attendance records to update.
+ * @throws {Error} If the lesson is not found or the update fails.
+ * @returns {Promise<void>} Resolves when the update is completed.
+ */
+export const updateAttendance = async (lessonId: number, toUpdate: AttendanceSchema[]): Promise<void> => {
+  const lesson = await findClassRegisterById(lessonId);
+  if (!lesson) throw new Error(`Lesson with ID ${lessonId} not found`);
+
+  const transaction = await sequelize.transaction();
+  try {
+    const currentAttendance: StudentAttendance[] | null = await getLessonsAttendance(lessonId, transaction);
+
+    const currentAttendanceMap = new Map<number, AttendanceType>(
+      (currentAttendance ?? []).map((record) => [record.student.studentId, record.attendance])
+    );
+
+    const updates: Attendance[] = toUpdate
+      .filter((record) => currentAttendanceMap.get(record.studentId) !== record.attendance)
+      .map((record) => ({ studentId: record.studentId, attendance: record.attendance, classRegisterId: lesson.lessonId }) as Attendance);
+
+    await bulkUpdateAttendanceRecords(updates, transaction);
+
+    await transaction.commit();
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+};
+
+export const updateLesson = async (lessonId: number, data: UpdateLessonSchema): Promise<void> => {
+  const lesson = await findClassRegisterById(lessonId);
+  if (!lesson) throw new Error(`Lesson with ID ${lessonId} not found`);
+  const transaction = await sequelize.transaction();
+  try {
+    await lesson.update({ ...data, fillDate: new Date() }, { transaction: transaction });
+    await transaction.commit();
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
 };

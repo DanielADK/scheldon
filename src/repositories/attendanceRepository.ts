@@ -1,6 +1,7 @@
 import { Attendance } from '@models/Attendance';
 import { Student } from '@models/Student';
 import { AttendanceType } from '@models/types/AttendanceType';
+import { Transaction } from 'sequelize/types';
 
 export interface AttendanceRecordDTO {
   studentId: number;
@@ -10,9 +11,14 @@ export interface AttendanceRecordDTO {
  * Get the attendance record for a specific lesson
  * @param lessonId number
  * @param withStudents boolean - Include students in the response
+ * @param transaction
  * @returns Promise<Attendance | null>
  */
-export const getLessonAttendance = async (lessonId: number, withStudents: boolean = false): Promise<Attendance[] | null> => {
+export const getLessonAttendance = async (
+  lessonId: number,
+  withStudents: boolean = false,
+  transaction?: Transaction
+): Promise<Attendance[] | null> => {
   const includeStudents = withStudents
     ? {
         include: [
@@ -27,32 +33,7 @@ export const getLessonAttendance = async (lessonId: number, withStudents: boolea
     where: {
       classRegisterId: lessonId
     },
-    ...includeStudents
-  });
-};
-
-/**
- * Update the attendance record for a specific lesson with upsert
- * @param lesson ClassRegister - The lesson record
- * @param attendance attendanceRecordDTO[] - The attendance records to upsert
- * @param transaction Transaction - The transaction to use
- */
-/*export const updateAttendance = async (
-  lesson: ClassRegister,
-  attendance: attendanceRecordDTO[],
-  transaction: Transaction
-) => {
-  const attendanceRecords = attendance.map(
-    (record) =>
-      ({
-        lessonRecordId: lesson.lessonId,
-        studentId: record.studentId,
-        attendance: record.attendance
-      }) as Attendance
-  );
-
-  await Attendance.bulkCreate(attendanceRecords, {
-    updateOnDuplicate: ['attendance'],
+    ...includeStudents,
     transaction
   });
-};*/
+};

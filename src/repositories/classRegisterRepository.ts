@@ -17,6 +17,7 @@ import { Subject } from '@models/Subject';
 import { Room } from '@models/Room';
 
 import { AssignSubstitutionRepositoryDTO } from '@controllers/substitutionEntryController';
+import { Attendance } from '@models/Attendance';
 
 export interface ClassRegisterRecordDTO {
   lessonId: number;
@@ -73,16 +74,17 @@ export const getCurrentLessonRecord = async (teacherId: number): Promise<ClassRe
  * @param lessonId string
  * @returns Promise<Student[]>
  */
-export const getStudentsAtLesson = async (lessonId: number): Promise<Student[]> => {
+export const getStudentsAtLesson = async (lessonId: number, transaction?: Transaction): Promise<Student[]> => {
   // Find the lesson and include the timetable entry
   const lesson = await ClassRegister.findByPk(lessonId, {
-    include: ['timetableEntry', 'substitutionEntry']
+    include: ['timetableEntry', 'substitutionEntry'],
+    transaction
   });
 
   if (!lesson) throw new Error('Lesson not found');
 
   // Determine the entry source (either TimetableEntry or ClassRegister itself)
-  const entry = await lesson.getEntry();
+  const entry = await lesson.getEntry(transaction);
 
   const date = new Date(lesson.date);
   const dateWhere: WhereOptions = {
@@ -101,7 +103,8 @@ export const getStudentsAtLesson = async (lessonId: number): Promise<Student[]> 
             include: [{ model: Student, attributes: ['studentId', 'name', 'surname'] }],
             where: dateWhere
           }
-        ]
+        ],
+        transaction
       })
     : await Class.findByPk(entry.classId, {
         attributes: ['classId'],
@@ -112,7 +115,8 @@ export const getStudentsAtLesson = async (lessonId: number): Promise<Student[]> 
             include: [{ model: Student, attributes: ['studentId', 'name', 'surname'] }],
             where: dateWhere
           }
-        ]
+        ],
+        transaction
       });
 
   if (!study) throw new Error('No students found for the lesson');
@@ -413,5 +417,20 @@ export const findAllClassRegistersByTimeAndClass = async (
       }
     ],
     transaction
+  });
+};
+
+/**
+ * Upserts multiple attendance records.
+ *
+ * @param {Attendance[]} updates - Attendance records to update or create.
+ * @param {Transaction} transaction - Database transaction for the operation.
+ * @returns {Promise<void>} Resolves when the operation is complete.
+ */
+export const bulkUpdateAttendanceRecords = async (updates: Attendance[], transaction: Transaction) => {
+  await Attendance.bulkCreate(updates, {
+    updateOnDuplicate: ['attendance'],
+    transaction,
+    returning: true
   });
 };

@@ -819,9 +819,8 @@ GET http://{{ip}}/class-registers/{{lessonIdAppend}}
   });
 %}
 
-### 8. Get lesson2 attendance
+### 8. Get appended lesson attendance
 GET http://{{ip}}/class-registers/{{lessonIdAppend}}/attendances
-
 
 > {%
   client.test("Validate lesson2 attendance response", function() {
@@ -849,5 +848,98 @@ GET http://{{ip}}/class-registers/{{lessonIdAppend}}/attendances
     client.assert(secondStudent.name === "Thomas", "Expected the second student name to be 'Thomas'");
     client.assert(secondStudent.surname === "Anderson", "Expected the second student surname to be 'Anderson'");
     client.assert(secondEntry.attendance === "P", "Expected the second attendance to be 'P'");
+  });
+%}
+
+### 9. Update attendance
+PUT http://{{ip}}/class-registers/{{lessonIdAppend}}/attendances
+Content-Type: application/json
+
+[
+  {
+    "studentId": 1,
+    "attendance": "NP"
+  },
+  {
+    "studentId": 2,
+    "attendance": "P"
+  }
+]
+
+> {%
+    client.test("Update attendance", function() {
+      client.assert(response.status === 204, "Expected status 204, but got " + response.status);
+    })
+ %}
+
+### 10. Get updated attendance
+GET http://{{ip}}/class-registers/{{lessonIdAppend}}/attendances
+
+> {%
+  client.test("Validate lesson2 attendance response", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+    const json = response.body;
+    client.assert(Array.isArray(json), "Expected response to be an array");
+    client.assert(json.length === 2, "Expected response array to contain two entries");
+    // Validate first entry
+    const firstEntry = json[0];
+    client.assert(firstEntry.hasOwnProperty("student"), "Expected the first entry to have a 'student' property");
+    client.assert(firstEntry.hasOwnProperty("attendance"), "Expected the first entry to have an 'attendance' property");
+
+    const firstStudent = firstEntry.student;
+    client.assert(firstStudent.studentId === 1, "Expected the first studentId to be 1");
+    client.assert(firstStudent.name === "John", "Expected the first student name to be 'John'");
+    client.assert(firstStudent.surname === "Doe", "Expected the first student surname to be 'Doe'");
+    client.assert(firstEntry.attendance === "NP", "Expected the first attendance to be 'P'");
+    // Validate second entry
+    const secondEntry = json[1];
+    client.assert(secondEntry.hasOwnProperty("student"), "Expected the second entry to have a 'student' property");
+    client.assert(secondEntry.hasOwnProperty("attendance"), "Expected the second entry to have an 'attendance' property");
+
+    const secondStudent = secondEntry.student;
+    client.assert(secondStudent.studentId === 2, "Expected the second studentId to be 2");
+    client.assert(secondStudent.name === "Thomas", "Expected the second student name to be 'Thomas'");
+    client.assert(secondStudent.surname === "Anderson", "Expected the second student surname to be 'Anderson'");
+    client.assert(secondEntry.attendance === "P", "Expected the second attendance to be 'P'");
+  });
+%}
+
+### 11. Update lesson
+PUT http://{{ip}}/class-registers/{{lessonIdAppend}}
+Content-Type: application/json
+
+{
+  "topic": "C++ STL - maps",
+  "note": "Mr. Doe chatted during lesson."
+}
+
+> {%
+    client.test("Check changed lesson", function() {
+      client.assert(response.status === 204, "Expected status 204, but got " + response.status)
+    })
+ %}
+
+### 12. Check updated lesson
+GET http://{{ip}}/class-registers/{{lessonIdAppend}}
+
+
+> {%
+  client.test("Validate updated lesson information payload", function() {
+    client.assert(response.status === 200, "Expected status 200, but got " + response.status);
+    const json = response.body;
+    client.assert(typeof json === "object", "The response should be a JSON object");
+    client.assert(json.lessonId === 55, "Expected lessonId to be '55'");
+    client.assert(json.topic === "C++ STL - maps", "Expected topic to be 'C++ STL - maps'");
+    client.assert(json.date === "2025-05-01", "Expected date to be '2025-05-01'");
+    client.assert(json.hasOwnProperty("fillDate"), "Expected fillDate");
+    client.assert(new Date(json.fillDate).toDateString() === new Date().toDateString(), "Expected fillDate to be today's date");
+    client.assert(json.note === "Mr. Doe chatted during lesson.", "Expected note to be 'Mr. Doe chatted during lesson.'");
+    client.assert(json.teacher.name === "David", "Expected teacher name to be 'David'");
+    client.assert(json.teacher.surname === "Smith", "Expected teacher surname to be 'Smith'");
+    client.assert(json.teacher.abbreviation === "DS", "Expected teacher abbreviation to be 'DS'");
+    client.assert(json.subject.name === "Czech", "Expected subject name to be 'Czech'");
+    client.assert(json.subject.abbreviation === "CZ", "Expected subject abbreviation to be 'CZ'");
+    client.assert(json.class.name === "Timetable Test Class", "Expected class name to be 'Timetable Test Class'");
+    client.assert(json.room.name === "Room 012", "Expected room name to be 'Room 012'");
   });
 %}
