@@ -118,9 +118,7 @@ export const updateGroupCategory = async (ctx: Context) => {
     const { error, value } = Joi.object({ name: Joi.string().required().min(3).max(50) }).validate(ctx.request.body);
 
     if (error) {
-      ctx.status = 400;
-      ctx.body = { error: error.details[0].message };
-      return;
+      throw new Error(error.details[0].message);
     }
 
     const existingCategory = await groupCategoryService.getGroupCategoryById(categoryId);
@@ -134,8 +132,7 @@ export const updateGroupCategory = async (ctx: Context) => {
     const [affectedCount] = await groupCategoryService.updateGroupCategory(categoryId, { name: value.name, classId: value.classId });
 
     if (affectedCount > 0) {
-      ctx.status = 200;
-      ctx.body = { message: 'Category updated' };
+      ctx.status = 204;
     } else {
       ctx.status = 404;
       ctx.body = { error: 'Category not found' };

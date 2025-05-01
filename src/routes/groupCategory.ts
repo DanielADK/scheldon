@@ -77,6 +77,10 @@ router.post('/group-categories', groupCategoryController.createGroupCategory);
  *     responses:
  *       200:
  *         description: List of group categories
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/GroupCategory'
  */
 router.get('/group-categories', groupCategoryController.getAllGroupCategories);
 /**
@@ -151,10 +155,14 @@ router.get('/group-categories/:id/student-groups', groupCategoryController.getGr
  *           schema:
  *             $ref: '#/components/schemas/GroupCategoryDTO'
  *     responses:
- *       200:
+ *       204:
  *         description: Group category updated
  *       400:
- *         description: Bad request
+ *         description: Error while processing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
  *         description: Group category not found
  */
