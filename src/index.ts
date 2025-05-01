@@ -58,7 +58,7 @@ app.use(router.allowedMethods());
 export { sequelize };
 
 sequelize
-  .sync({ force: true })
+  .sync({ alter: true })
   .then(() => {
     app.listen(port, () => {
       console.log(`Server running on port ${port}`);
