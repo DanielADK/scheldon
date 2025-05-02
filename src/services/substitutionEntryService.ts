@@ -6,7 +6,7 @@ import { SubstitutionTimetableAdapter } from '@services/transformers/substitutio
 import { Employee } from '@models/Employee';
 import { Room } from '@models/Room';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';
-import { sequelize } from '../index';
+import { sequelize } from '@configs/database';
 import {
   findOrCreateSubstitutionEntry,
   SubstitutionTimetableEntryDTO,

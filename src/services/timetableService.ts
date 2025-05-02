@@ -4,7 +4,7 @@ import { TimetableEntryDTO, TimetableSetDTO } from '@repositories/timetableRepos
 import { TimetableEntry } from '@models/TimetableEntry';
 import { TimetableAdapter } from '@services/transformers/timetableAdapter';
 import { classMask, employeeMask, roomMask, TimetableExport, transformAndMask } from '@services/transformers/timetableExport';
-import { sequelize } from '../index';
+import { sequelize } from '@configs/database';
 import { Op, Transaction } from 'sequelize';
 
 /**

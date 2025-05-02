@@ -7,7 +7,7 @@ import { Op, Transaction, WhereOptions } from 'sequelize';
 import { Subject } from '@models/Subject';
 import { Room } from '@models/Room';
 import { StudentGroup } from '@models/StudentGroup';
-import { sequelize } from '../index';
+import { sequelize } from '@configs/database';
 import { getLessonBulkInTSetPeriod, getLessonWithTimetableEntryId } from '@repositories/classRegisterRepository';
 import { ClassRegister } from '@models/ClassRegister';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';

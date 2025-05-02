@@ -15,7 +15,7 @@ import {
   findSubstitutionEntryById,
   SubstitutionTimetableEntryDTO
 } from '@repositories/substitutionEntryRepository';
-import { sequelize } from '../index';
+import { sequelize } from '@configs/database';
 import { findDefaultTimetableEntry } from '@repositories/timetableRepository';
 import { getDayInWeek } from '@lib/timeLib';
 import { SubstitutionEntry } from '@models/SubstitutionEntry';

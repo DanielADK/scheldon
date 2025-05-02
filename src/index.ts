@@ -1,67 +1,46 @@
 import Koa from 'koa';
 import Router from 'koa-router';
-import bodyParser from 'koa-bodyparser';
-import { Sequelize } from 'sequelize-typescript';
 import dotenv from 'dotenv-flow';
-import apiRouter from './routes';
+import routes from './routes';
+import { buildRouteMethodsMap, optionsHandler } from './middleware/optionsHandler';
+import { bodyParserMiddleware } from './middleware/bodyParserMiddleware';
+import { contentTypeValidator } from './middleware/contentTypeValidator';
+import { setupDatabase } from '@configs/database';
+import { environment } from '@configs/environment';
+import * as console from 'node:console';
+import * as process from 'node:process';
 
 // configure dotenv
 dotenv.config();
 
 const app = new Koa();
 const router = new Router();
-const port = process.env.PORT ?? 3000;
 
-// Initialize sequelize
-const sequelize = new Sequelize({
-  database: process.env.DB_NAME,
-  dialect: 'mysql',
-  username: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT ?? '3306'),
-  models: [__dirname + '/models']
-});
+// load routes to router
+router.use(routes.routes());
 
-// init bodyparser
-app.use(
-  bodyParser({
-    enableTypes: ['json'],
-    jsonLimit: '5mb',
-    strict: false,
-    onerror: (err, ctx) => {
-      ctx.status = 422;
-      ctx.body = { error: 'Invalid JSON format in body' };
-    }
-  })
-);
+// build route methods for OPTIONS
+buildRouteMethodsMap(router);
+app.use(optionsHandler); // options method middleware
+app.use(bodyParserMiddleware); // body parser middleware
+app.use(contentTypeValidator); // content type validator middleware
 
-// validate JSON only content-type with POST/PUT
-app.use(async (ctx, next) => {
-  if (ctx.method === 'POST' || ctx.method === 'PUT') {
-    const contentType = ctx.request.header['content-type'];
-    if (!contentType?.includes('application/json')) {
-      ctx.status = 415;
-      ctx.body = { error: 'Content-Type must be application/json' };
-    }
-  }
-  await next();
-});
-
-router.use('', apiRouter.routes());
-
-// App routes
+// load router to app
 app.use(router.routes());
 console.log(router.stack.map((i) => `${i.methods.join(',').padStart(10)} -> ${i.path.padEnd(50)}`));
 app.use(router.allowedMethods());
 
-export { sequelize };
+async function startServer() {
+  try {
+    await setupDatabase();
 
-sequelize
-  .sync({ alter: true })
-  .then(() => {
-    app.listen(port, () => {
-      console.log(`Server running on port ${port}`);
+    app.listen(environment.port, () => {
+      console.log(`Server running on port ${environment.port}`);
     });
-  })
-  .catch((err) => console.error(err));
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+startServer();

@@ -15,9 +15,11 @@
     "sourceMap": true,
     "declaration": true,
     "paths": {
+      "@configs/*": ["src/config/*"],
       "@controllers/*": ["src/controllers/*"],
       "@repositories/*": ["src/repositories/*"],
       "@services/*": ["src/services/*"],
+      "@middleware/*": ["src/middleware/*"],
       "@models/*": ["src/models/*"],
       "@validators/*": ["src/validators/*"],
       "@routes/*": ["src/routes/*"],

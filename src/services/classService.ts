@@ -2,7 +2,7 @@ import * as classRepository from '@repositories/classRepository';
 import { ClassDTO } from '@repositories/classRepository';
 import * as studentGroupService from './studentGroupService';
 import { Class } from '@models/Class';
-import { sequelize } from '../index';
+import { sequelize } from '@configs/database';
 import { Transaction } from 'sequelize';
 import { getEmployeeById } from '@services/employeeService';
 
@@ -13,7 +13,9 @@ import { getEmployeeById } from '@services/employeeService';
 export const createClass = async (data: ClassDTO) => {
   // check existing teacher
   const teacher = await getEmployeeById(data.employeeId);
-  if (!teacher) {throw new Error('Administrator/Employee not found.');}
+  if (!teacher) {
+    throw new Error('Administrator/Employee not found.');
+  }
 
   return await classRepository.createClass(data);
 };

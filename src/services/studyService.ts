@@ -1,7 +1,7 @@
 import * as studentAssignmentRepository from '@repositories/studyRepository';
 import { StudyDTO } from '@repositories/studyRepository';
 import * as classRepository from '@repositories/classRepository';
-import { sequelize } from '../index';
+import { sequelize } from '@configs/database';
 import { getstudentGroupById } from '@services/studentGroupService';
 
 /**
@@ -17,7 +17,9 @@ export const startStudy = async (studentId: number, data: StudyDTO) => {
   // check studentGroup
   if (data.studentGroupId) {
     const studentGroup = await getstudentGroupById(data.studentGroupId);
-    if (!studentGroup) {throw new Error("Student group not found")}
+    if (!studentGroup) {
+      throw new Error('Student group not found');
+    }
   }
 
   // If validFrom is not provided, set now
@@ -48,7 +50,9 @@ export const stopStudy = async (studentId: number, data: StudyDTO) => {
     // check studentGroup
     if (data.studentGroupId) {
       const studentGroup = await getstudentGroupById(data.studentGroupId);
-      if (!studentGroup) {throw new Error("Student group not found")}
+      if (!studentGroup) {
+        throw new Error('Student group not found');
+      }
     }
     // If validTo is not provided, set it to the classes default validTo
     const validTo = data.validTo ? new Date(data.validTo) : new Date();

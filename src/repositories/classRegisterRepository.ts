@@ -1,7 +1,7 @@
 import { ClassRegister } from '@models/ClassRegister';
 import { Student } from '@models/Student';
 import { AttendanceRecordDTO } from '@repositories/attendanceRepository';
-import { sequelize } from '../index';
+import { sequelize } from '@configs/database';
 import { Study } from '@models/Study';
 import { Class } from '@models/Class';
 import { StudentGroup } from '@models/StudentGroup';
