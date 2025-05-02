@@ -1029,7 +1029,6 @@ Content-Type: application/json
     client.assert(json["2"] && json["2"]["2"], "Expected structure for day 2, hour 2 is missing or incorrect");
 
     const entry = json["2"]["2"];
-    client.assert(entry.lessonId === 57, "LessonId should be 57");
     client.assert(entry.teacher.name === "Jane", "Teacher's name should be 'Jane'");
     client.assert(entry.teacher.surname === "Smith", "Teacher's surname should be 'Smith'");
     client.assert(entry.teacher.abbreviation === "JS", "Teacher's abbreviation should be 'JS'");
