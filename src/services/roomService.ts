@@ -1,12 +1,17 @@
 import { Room } from '@models/Room';
 import * as roomRepository from '@repositories/roomRepository';
 import { RoomDTO } from '@repositories/roomRepository';
+import { getEmployeeById } from '@services/employeeService';
 
 /**
  * Create a new room
  * @param data Room data
  */
 export const createRoom = async (data: RoomDTO): Promise<Room> => {
+  // check existing administrator
+  const admin = await getEmployeeById(data.administratorId);
+  if (!admin) {throw new Error('Administrator/Employee not found.');}
+
   return await roomRepository.createRoom(data);
 };
 

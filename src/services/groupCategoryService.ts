@@ -1,11 +1,15 @@
 import * as groupCategoryRepository from '@repositories/groupCategoryRepository';
 import { GroupCategoryDTO } from '@repositories/groupCategoryRepository';
+import { getClassById } from '@services/classService';
 
 /**
  * Create a new group category
  * @param data
  */
 export const createGroupCategory = async (data: GroupCategoryDTO) => {
+  const classEntity = await getClassById(data.classId);
+  if (!classEntity) {throw new Error("Class not found")}
+
   return await groupCategoryRepository.createGroupCategory(data);
 };
 

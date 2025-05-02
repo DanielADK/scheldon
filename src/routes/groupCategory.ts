@@ -4,6 +4,35 @@ import * as groupCategoryController from '@controllers/groupCategoryController';
 const router = new Router();
 
 /**
+ * Get all group categories
+ * GET /group-categories
+ * @openapi
+ * /group-categories:
+ *   get:
+ *     tags:
+ *        - GroupCategory
+ *     summary: Get all group categories
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Page size
+ *     responses:
+ *       200:
+ *         description: List of group categories
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/GroupCategory'
+ */
+router.get('/group-categories', groupCategoryController.getAllGroupCategories);
+/**
  * Create a new group category
  * POST /group-categories
  * @openapi
@@ -54,35 +83,6 @@ const router = new Router();
  *         description: Bad request
  */
 router.post('/group-categories', groupCategoryController.createGroupCategory);
-/**
- * Get all group categories
- * GET /group-categories
- * @openapi
- * /group-categories:
- *   get:
- *     tags:
- *        - GroupCategory
- *     summary: Get all group categories
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *         description: Page number
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *         description: Page size
- *     responses:
- *       200:
- *         description: List of group categories
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/GroupCategory'
- */
-router.get('/group-categories', groupCategoryController.getAllGroupCategories);
 /**
  * Get a group category by ID
  * GET /group-categories/{id}

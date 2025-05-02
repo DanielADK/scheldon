@@ -49,6 +49,7 @@ const router = new Router();
  */
 
 /**
+ * @openapi
  * /students:
  *   post:
  *     tags:

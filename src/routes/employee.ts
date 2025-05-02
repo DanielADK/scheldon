@@ -72,28 +72,7 @@ const router = new Router();
  *         - name
  *         - surname
  *         - isTeacher
- * /employees:
- *   post:
- *     tags:
- *        - Employee
- *     summary: Create a new employee
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/EmployeeDTO'
- *     responses:
- *       201:
- *         description: Employee created
- *       400:
- *         description: Error while processing
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post('/employees', employeeController.createEmployee);
 
 /**
  * Get all employees
@@ -130,6 +109,31 @@ router.post('/employees', employeeController.createEmployee);
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.get('/employees', employeeController.getAllEmployees);
+
+ /**
+ * @openapi
+ * /employees:
+ *   post:
+ *     tags:
+ *        - Employee
+ *     summary: Create a new employee
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/EmployeeDTO'
+ *     responses:
+ *       201:
+ *         description: Employee created
+ *       400:
+ *         description: Error while processing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.post('/employees', employeeController.createEmployee);
 
 /**
  * Get an employee by ID
@@ -238,7 +242,7 @@ router.get('/employees/abbreviation/:abbreviation', employeeController.getEmploy
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Employee'
+ *             $ref: '#/components/schemas/EmployeeDTO'
  *     responses:
  *       204:
  *         description: Employee updated

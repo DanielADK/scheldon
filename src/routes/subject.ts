@@ -54,29 +54,6 @@ const router = new Router();
  */
 
 /**
- *  /subjects:
- *   post:
- *     tags:
- *        - Subject
- *     summary: Create a new subject
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/SubjectDTO'
- *     responses:
- *       201:
- *         description: Subject created
- *       400:
- *         description: Error while processing
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
-router.post('/subjects', subjectController.createSubject);
-/**
  * Get all subjects
  * GET /subjects
  * @openapi
@@ -105,6 +82,30 @@ router.post('/subjects', subjectController.createSubject);
  *               $ref: '#/components/schemas/PaginatedSubjectsResponse'
  */
 router.get('/subjects', subjectController.getAllSubjects);
+/**
+ *  @openapi
+ *  /subjects:
+ *   post:
+ *     tags:
+ *        - Subject
+ *     summary: Create a new subject
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/SubjectDTO'
+ *     responses:
+ *       201:
+ *         description: Subject created
+ *       400:
+ *         description: Error while processing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.post('/subjects', subjectController.createSubject);
 /**
  * Get a subject by ID
  * GET /subjects/{id}

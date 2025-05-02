@@ -21,23 +21,21 @@
     "@types/eslint__js": "^8.42.3",
     "@types/joi": "^17.2.2",
     "@types/koa": "^2.15.0",
-    "@types/koa-bodyparser": "^4.3.12",
-    "@types/koa-router": "^7.4.8",
     "@types/module-alias": "^2.0.4",
     "@types/node": "^20.14.2",
-    "@types/swagger-jsdoc": "^6.0.4",
     "eslint": "^9.8.0",
     "globals": "^15.8.0",
     "module-alias": "^2.2.3",
     "prettier": "^3.3.2",
     "sequelize-cli": "^6.6.2",
     "sequelize-test-helpers": "^1.4.3",
-    "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "8.0.0-alpha.54"
   },
   "dependencies": {
+    "@types/koa-bodyparser": "^4.3.12",
+    "@types/koa-router": "^7.4.8",
+    "@types/swagger-jsdoc": "^6.0.4",
     "dotenv": "^16.4.5",
     "dotenv-flow": "^4.1.0",
     "joi": "^17.13.3",
@@ -54,6 +52,8 @@
     "sequelize-typescript": "^2.1.6",
     "sqlite3": "^5.1.7",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-koa": "^0.0.1"
+    "swagger-ui-koa": "^0.0.1",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0"
   }
 }

@@ -4,12 +4,17 @@ import * as studentGroupService from './studentGroupService';
 import { Class } from '@models/Class';
 import { sequelize } from '../index';
 import { Transaction } from 'sequelize';
+import { getEmployeeById } from '@services/employeeService';
 
 /**
  * Create a new class
  * @param data
  */
 export const createClass = async (data: ClassDTO) => {
+  // check existing teacher
+  const teacher = await getEmployeeById(data.employeeId);
+  if (!teacher) {throw new Error('Administrator/Employee not found.');}
+
   return await classRepository.createClass(data);
 };
 

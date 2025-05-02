@@ -50,10 +50,14 @@ export const getEmployeeByAbbreviation = async (abbreviation: string): Promise<E
  * @param data
  */
 export const updateEmployee = async (id: number, data: Partial<Employee>): Promise<Employee | null> => {
+  // check existing administrator
+  const employee = await getEmployeeById(data.id);
+  if (!employee) {throw new Error('Employee not found.');}
+
   const [count] = await employeeRepository.updateEmployee(id, data);
 
   if (count === 0) {
-    throw new Error('Employee not found');
+    throw new Error('Nothing changed.');
   }
 
   return await employeeRepository.getEmployeeById(id);

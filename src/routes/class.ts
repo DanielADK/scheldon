@@ -160,6 +160,7 @@ const router = new Router();
  */
 
 /**
+ * @openapi
  * /classes:
  *   post:
  *     tags:
@@ -228,7 +229,7 @@ router.get('/classes', classController.getAllClasses);
  * GET /classes/{id}
  * @openapi
  * /classes/{id}:
- *   gettt:
+ *   get:
  *     tags:
  *        - Class
  *     summary: Get a class by ID
@@ -261,7 +262,7 @@ router.get('/classes/:id', classController.getClassById);
  * GET /classes/at-time/{time}
  * @openapi
  * /classes/at-time/{time}:
- *   gett:
+ *   get:
  *     tags:
  *        - Class
  *     summary: Get classes at a specific time

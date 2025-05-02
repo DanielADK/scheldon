@@ -81,6 +81,27 @@ const router = new Router();
  *             $ref: '#/components/schemas/Room'
  *         meta:
  *           $ref: '#/components/schemas/PaginationMeta'
+ */
+
+/**
+ * @openapi
+ * /rooms:
+ *   get:
+ *     tags:
+ *        - Room
+ *     description: Get all rooms
+ *     responses:
+ *       200:
+ *         description: Returns all rooms
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PaginatedRoomsResponse'
+ */
+router.get('/rooms', roomController.getAllRooms);
+
+/**
+ * @openapi
  * /rooms:
  *   post:
  *     tags:
@@ -102,30 +123,13 @@ router.post('/rooms', roomController.createRoom);
 
 /**
  * @openapi
- * /rooms:
- *   get:
- *     tags:
- *        - Room
- *     description: Get all rooms
- *     responses:
- *       200:
- *         description: Returns all rooms
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/PaginatedRoomsResponse'
- */
-router.get('/rooms', roomController.getAllRooms);
-
-/**
- * @openapi
  * /rooms/{id}:
  *   get:
  *     tags:
  *        - Room
  *     summary: Get a room by ID
  *     parameters:
- *         in: path
+ *       - in: path
  *         name: id
  *         required: true
  *         schema:
